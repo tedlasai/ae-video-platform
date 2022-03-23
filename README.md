@@ -7,7 +7,9 @@ The exposure stack data is used as an example to run this data-browsing GUI.
 To avoid latency in opening and reading images every time we use the data slider, the images are pre-processed and stored in a four-dimensional tensor where the first dimension is the image index and the rest are the typical image three channels.
 
 ### Four-dimensional tensor data:
-* [Scene 1-12x90 images](https://drive.google.com/file/d/1EndfDPVuNnxLzZ7_2Sx2Dfx6njRJOdYS/view?usp=sharing) (processed to an sRGB, encoded with a lossless 8-bit depth, and downscaled with a 0.12 ratio).
+* [Scene 1 (12x90 images)](https://drive.google.com/file/d/1EndfDPVuNnxLzZ7_2Sx2Dfx6njRJOdYS/view?usp=sharing)
+	* This data is processed to an sRGB, encoded with a lossless 8-bit depth, and downscaled with a 0.12 ratio.
+	* Download the data and place it inside the same directory of the GUI codes.
 
 ## Code
 ### Prerequisites

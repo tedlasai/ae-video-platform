@@ -66,9 +66,9 @@ def updateSlider(event):
 ################################################################################Main()
 widgetFont, widgetFontSize= 'Arial', 14
 
-scene = ['Scene1','Scene2'] # update sceneList in tk.OptionMenu when add a new scene
-frame_num = [90,65]
-stack_size = [12,47]
+scene = ['Scene1','Scene2', 'Scene3']
+frame_num = [90,65, 15]
+stack_size = [12,47, 28]
 
 scene_index=0
 
@@ -136,7 +136,8 @@ defScene = tk.StringVar(root)
 defScene.set(scene[scene_index]) # default value
 selSceneLabel=tk.Label(root, text='Select Scene:', font=(widgetFont, widgetFontSize))
 selSceneLabel.grid(row=0, column=2, sticky=tk.W)
-sceneList = tk.OptionMenu(root, defScene, scene[0],scene[1])
+
+sceneList = tk.OptionMenu(root, defScene, *scene)
 sceneList.config(font=(widgetFont, widgetFontSize-2), width=15, anchor=tk.W)
 sceneList.grid(row=1, column=2, sticky=tk.NE)
 

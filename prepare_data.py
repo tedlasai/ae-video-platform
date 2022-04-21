@@ -2,9 +2,9 @@ import numpy as np
 import os
 import cv2
 
-read_path='D:/DCIM/100EOS5D/'
+read_path='C:/Users/tedlasai/OneDrive - York University/School/York/Lab/ExposureData/latest/'
 dir_count=0
-
+scene_num='3'
 downscale_ratio=0.12
 
 list_of_images=[]
@@ -21,5 +21,5 @@ for image_name in images:
     list_of_images.append(temp_image_resized)
     list_of_img_mean.append(np.mean(temp_image_resized))
 
-np.save('Scene2_imgs_'+str(downscale_ratio),np.asarray(list_of_images))
-np.save('Scene2_img_mean_'+str(downscale_ratio),np.asarray(list_of_img_mean))
+np.save('Scene'+scene_num+'_imgs_'+str(downscale_ratio),np.asarray(list_of_images))
+np.save('Scene'+scene_num+'_img_mean_'+str(downscale_ratio),np.asarray(list_of_img_mean))

@@ -1,10 +1,76 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 import numpy as np
+import cv2
 from copy import deepcopy
 import matplotlib.pyplot as plt
 import matplotlib as mp
 mp.rcParams.update({'axes.titlesize': 14, 'font.size': 11, 'font.family': 'arial'})
+
+def HdrMean():
+    global horSlider, photo, imagePrevlabel, img_all, scene_index
+    temp_img_ind=int(horSlider.get()*stack_size[scene_index])
+    temp_stack=deepcopy(img_all[temp_img_ind:temp_img_ind+stack_size[scene_index]])
+
+    temp_img=(np.mean(temp_stack, axis=0)).astype(np.uint8)
+    cv2.putText(temp_img, 'HDR-Mean', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+    
+    tempImg = Image.fromarray(temp_img)
+    photo = ImageTk.PhotoImage(tempImg)
+    imagePrevlabel.configure(image=photo)
+    
+def HdrMedian():
+    global horSlider, photo, imagePrevlabel, img_all, scene_index
+    temp_img_ind=int(horSlider.get()*stack_size[scene_index])
+    temp_stack=deepcopy(img_all[temp_img_ind:temp_img_ind+stack_size[scene_index]])
+    
+    temp_img=(np.median(temp_stack, axis=0)).astype(np.uint8)
+    cv2.putText(temp_img, 'HDR-Median', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+    
+    tempImg = Image.fromarray(temp_img)
+    photo = ImageTk.PhotoImage(tempImg)
+    imagePrevlabel.configure(image=photo)
+    
+def HdrMertens():
+    global horSlider, photo, imagePrevlabel, img_all, scene_index
+    temp_img_ind=int(horSlider.get()*stack_size[scene_index])
+    temp_stack=deepcopy(img_all[temp_img_ind:temp_img_ind+stack_size[scene_index]])
+    
+    # Exposure fusion using Mertens
+    merge_mertens = cv2.createMergeMertens()
+    res_mertens = merge_mertens.process(temp_stack)
+    # Convert datatype to 8-bit and save
+    res_mertens_8bit = np.clip(res_mertens*255, 0, 255).astype('uint8')
+    cv2.putText(res_mertens_8bit, 'HDR-Mertens', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+    
+    tempImg = Image.fromarray(res_mertens_8bit)
+    photo = ImageTk.PhotoImage(tempImg)
+    imagePrevlabel.configure(image=photo)
+    
+def HdrAbdullah():
+    global horSlider, photo, imagePrevlabel, img_all, scene_index
+    temp_img_ind=int(horSlider.get()*stack_size[scene_index])
+    temp_stack=deepcopy(img_all[temp_img_ind:temp_img_ind+stack_size[scene_index]])
+    
+    print(temp_img_ind,temp_img_ind+stack_size[scene_index])
+    
+    temp_stack_clip_weights=np.where(temp_stack[:,:,:,1] < 10, 0.1, 1)
+    mean_2=np.average(temp_stack[:,:,:,1], axis=0, weights=temp_stack_clip_weights)
+    stack_distance=abs(temp_stack[:,:,:,1]-mean_2)
+    stack_distance_arrs=np.argsort(stack_distance, axis=0)
+    stack_distance_min=(np.mean(stack_distance_arrs[0:7], axis=0)).astype(np.uint8)
+    stack_distance_min_med = cv2.medianBlur(stack_distance_min,91)
+    stack_distance_min_med = cv2.medianBlur(stack_distance_min_med,151)
+    stack_distance_min_med = cv2.medianBlur(stack_distance_min_med,191)
+    mean_min_dis_med=(np.zeros((temp_stack.shape[1],temp_stack.shape[2],temp_stack.shape[3]))).astype(np.uint8)
+    for i in range (mean_min_dis_med.shape[0]):
+        for j in range (mean_min_dis_med.shape[1]):
+            mean_min_dis_med[i,j,:]=temp_stack[stack_distance_min_med[i,j],i,j,:]
+    cv2.putText(mean_min_dis_med, 'HDR-Abdullah', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+    
+    tempImg = Image.fromarray(mean_min_dis_med)
+    photo = ImageTk.PhotoImage(tempImg)
+    imagePrevlabel.configure(image=photo)
 
 def setValues():
     global scene, scene_index, defScene, img, img_all, img_mean_list, downscale_ratio, bit_depth
@@ -64,7 +130,7 @@ def updateSlider(event):
     updatePlot()
 
 ################################################################################Main()
-widgetFont, widgetFontSize= 'Arial', 14
+widgetFont, widgetFontSize= 'Arial', 12
 
 scene = ['Scene1','Scene2', 'Scene3']
 frame_num = [90,65, 15]
@@ -84,7 +150,7 @@ heightToScale = int(float(imgSize[0])*float(widPercent))
 img_all = np.load(scene[scene_index]+'_imgs_'+str(downscale_ratio)+'.npy')
 img_mean_list=np.load(scene[scene_index]+'_img_mean_'+str(downscale_ratio)+'.npy')/(2**bit_depth-1)
 
-tempImg, img = deepcopy(img_all[0]), deepcopy(img_all[0])
+img = deepcopy(img_all[0])
 #################################
 
 #Tkinter Window
@@ -92,8 +158,7 @@ root=tk.Tk()
 root.geometry('1900x1000+5+5'), root.title('Data Browser'), root.iconbitmap('AF_Icon.ico')
 
 #Image Convas
-tempImg = Image.fromarray(tempImg)
-photo = ImageTk.PhotoImage(tempImg)
+photo = ImageTk.PhotoImage(Image.fromarray(img))
 imagePrevlabel=tk.Label(root, image=photo)
 imagePrevlabel.grid(row=1, column=1, rowspan=30, sticky=tk.NW)
 
@@ -136,17 +201,33 @@ defScene = tk.StringVar(root)
 defScene.set(scene[scene_index]) # default value
 selSceneLabel=tk.Label(root, text='Select Scene:', font=(widgetFont, widgetFontSize))
 selSceneLabel.grid(row=0, column=2, sticky=tk.W)
-
 sceneList = tk.OptionMenu(root, defScene, *scene)
 sceneList.config(font=(widgetFont, widgetFontSize-2), width=15, anchor=tk.W)
 sceneList.grid(row=1, column=2, sticky=tk.NE)
 
+#HDR Button - Mean
+HdrMeanButton=tk.Button(root, text='HDR-Mean', fg='#ffffff', bg='#999999', activebackground='#454545', relief=tk.RAISED, width=16, font=(widgetFont, widgetFontSize), command=HdrMean)
+HdrMeanButton.grid(row=26, column=2, sticky=tk.E)
+
+#HDR Button - Median
+HdrMedianButton=tk.Button(root, text='HDR-Median', fg='#ffffff', bg='#999999', activebackground='#454545', relief=tk.RAISED, width=16, font=(widgetFont, widgetFontSize), command=HdrMedian)
+HdrMedianButton.grid(row=27, column=2, sticky=tk.E)
+
+#HDR Button - Mertens
+HdrMertensButton=tk.Button(root, text='HDR-Mertens', fg='#ffffff', bg='#999999', activebackground='#454545', relief=tk.RAISED, width=16, font=(widgetFont, widgetFontSize), command=HdrMertens)
+HdrMertensButton.grid(row=28, column=2, sticky=tk.E)
+
+#HDR Button - Abdullah
+HdrAbdullahButton=tk.Button(root, text='HDR-Abdullah', fg='#ffffff', bg='#999999', activebackground='#454545', relief=tk.RAISED, width=16, font=(widgetFont, widgetFontSize), command=HdrAbdullah)
+HdrAbdullahButton.grid(row=29, column=2, sticky=tk.E)
+
+
 #Run Button
-RunButton=tk.Button(root, text='Run', fg='#ffffff', bg='#999999', activebackground='#454545', relief=tk.RAISED, width=18, font=(widgetFont, widgetFontSize), command=setValues)
-RunButton.grid(row=29, column=2, sticky=tk.E)
+RunButton=tk.Button(root, text='Run', fg='#ffffff', bg='#999999', activebackground='#454545', relief=tk.RAISED, width=16, font=(widgetFont, widgetFontSize), command=setValues)
+RunButton.grid(row=30, column=2, sticky=tk.E)
 
 #Reset Button
-RunButton=tk.Button(root, text='Reset', fg='#ffffff', bg='#999999', activebackground='#454545', relief=tk.RAISED, width=18, font=(widgetFont, widgetFontSize), command=resetValues)
-RunButton.grid(row=31, column=2, sticky=tk.E)
+RestButton=tk.Button(root, text='Reset', fg='#ffffff', bg='#999999', activebackground='#454545', relief=tk.RAISED, width=16, font=(widgetFont, widgetFontSize), command=resetValues)
+RestButton.grid(row=31, column=2, sticky=tk.E)
 
 root.mainloop()

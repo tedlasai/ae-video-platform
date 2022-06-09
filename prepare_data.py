@@ -3,14 +3,19 @@ import os
 import cv2
 
 read_path='C:/Users/tedlasai/OneDrive - York University/School/York/Lab/ExposureData/latest/'
+
+read_path = 'F:/DCIM/102EOS5D'
+
+# read_path = 'J:/Extra/Scene103'
+
 dir_count=0
-scene_num='3'
+scene_num='17'
 downscale_ratio=0.12
 
 list_of_images=[]
 list_of_img_mean=[]
 
-images = [read_path + '/'+ f for f in os.listdir(read_path + '/') if f.endswith(('.jpg','.JPG', '.jpeg','.JPEG', '.png', '.PNG'))]
+images = [read_path + "/"+ f for f in os.listdir(read_path + '/') if f.endswith(('.jpg','.JPG', '.jpeg','.JPEG', '.png', '.PNG'))]
 images.sort()
 count=0
 for image_name in images:

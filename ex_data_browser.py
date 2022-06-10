@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mp
 
 mp.rcParams.update({'axes.titlesize': 14, 'font.size': 11, 'font.family': 'arial'})
-
+print("HELLo SAI")
 def HdrMean():
     global horSlider, photo, imagePrevlabel, img_all, scene_index
     temp_img_ind=int(horSlider.get()*stack_size[scene_index])

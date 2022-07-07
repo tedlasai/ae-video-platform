@@ -4,13 +4,13 @@ import cv2
 
 read_path='C:/Users/tedlasai/OneDrive - York University/School/York/Lab/ExposureData/latest/'
 
-read_path = 'F:/DCIM/102EOS5D'
+read_path = 'I:/Final/Scene7_LeftMotor_BrightMirror'
 
 # read_path = 'J:/Extra/Scene103'
 
 dir_count=0
-scene_num='17'
-downscale_ratio=0.12
+scene_num='7'
+downscale_ratio= 0.12 #0.12
 
 list_of_images=[]
 list_of_img_mean=[]

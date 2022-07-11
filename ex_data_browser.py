@@ -24,13 +24,15 @@ class Browser:
         self.widgetFontSize = 12
         self.scene = ['Scene101', 'Scene102', 'Scene103', 'Scene1', 'Scene2', 'Scene3', 'Scene4', 'Scene5', 'Scene6',
                       'Scene7', 'Scene8', 'Scene9', 'Scene10', 'Scene11', 'Scene12', 'Scene13', 'Scene14', 'Scene15', 'Scene16', 'Scene17', 'Scene18']
-        self.frame_num = [80, 65, 15, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]  # number of frames per position
-        self.stack_size = [15, 47, 28, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15]  # number of shutter options per position
+        self.frame_num = [90, 65, 15, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]  # number of frames per position
+        self.stack_size = [12, 47, 28, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15]  # number of shutter options per position
 
         self.scene_index = 0
         self.mertensVideo = []
         self.bit_depth = 8
         self.downscale_ratio = 0.12
+        self.check = True
+        self.temp_img_ind = 0
 
         self.imgSize = [int(4480 * self.downscale_ratio), int(6720 * self.downscale_ratio)]
         self.widthToScale = self.imgSize[1]
@@ -44,6 +46,7 @@ class Browser:
         self.useMertens = False
         self.play = True
         self.video_speed = 50
+        self.regular_video_fps = 30
 
         # Image Convas
         self.photo = ImageTk.PhotoImage(Image.fromarray(self.img))
@@ -62,10 +65,13 @@ class Browser:
         self.hdr_pause_button()
         self.hdr_reset_button()
         self.scene_select()
-        self.text_box()
+        self.playback_text_box()
+        self.video_fps()
         self.horizontal_slider()
         self.vertical_slider()
         self.image_mean_plot()
+        self.regular_video_button()
+        self.high_res_checkbox()
 
     def hdr_mean_button(self):
         # HDR Button - Mean
@@ -110,6 +116,13 @@ class Browser:
                                relief=tk.RAISED, width=16, font=(self.widgetFont, self.widgetFontSize), command=self.resetValues)
         self.RestButton.grid(row=35, column=2, sticky=tk.E)
 
+    def regular_video_button(self):
+
+        self.VideoButton = tk.Button(root, text='Video', fg='#ffffff', bg='#999999', activebackground='#454545',
+                                relief=tk.RAISED,
+                                width=16, font=(self.widgetFont, self.widgetFontSize), command=self.regular_video)
+        self.VideoButton.grid(row=37, column=2, sticky=tk.E)
+
     def scene_select(self):
         # Select Scene List
         self.defScene = tk.StringVar(root)
@@ -120,13 +133,30 @@ class Browser:
         self.sceneList.config(font=(self.widgetFont, self.widgetFontSize - 2), width=15, anchor=tk.W)
         self.sceneList.grid(row=1, column=2, sticky=tk.NE)
 
-    def text_box(self):
+    def playback_text_box(self):
         # TextBox
         self.video_speed = tk.StringVar()
         # video_speed = 1
-        tk.Label(root, text="Playback Speed (FPS)").grid(row=34, column=1)
+        tk.Label(root, text="Browser Playback Speed (FPS)").grid(row=34, column=1)
         self.e1 = tk.Entry(root, textvariable=self.video_speed)
         self.e1.grid(row=35, column=1)
+
+    def video_fps(self):
+        # TextBox
+        self.save_video_fps = tk.StringVar()
+        # video_speed = 1
+        tk.Label(root, text="Video FPS").grid(row=36, column=1)
+        self.e1 = tk.Entry(root, textvariable=self.save_video_fps)
+        self.e1.grid(row=37, column=1)
+
+    def high_res_checkbox(self):
+
+        self.c1 = tk.Checkbutton(root, text='High Resolution', onvalue=1, offvalue=0, command= self.switch_res)
+        self.c1.grid(row = 33, column = 1)
+
+    def switch_res(self):
+
+        pass
 
     def horizontal_slider(self):
         # Horizantal Slider
@@ -137,12 +167,53 @@ class Browser:
 
     def vertical_slider(self):
         # Vertical Slider
+
+        self.SCALE_LABELS = {
+            0: '15"',
+            1: '8"',
+            2: '6"',
+            3: '4"',
+            4: '2"',
+            5: '1"',
+            6: '0"5',
+            7: '1/4',
+            8: '1/8',
+            9: '1/15',
+            10: '1/30',
+            11: '1/60',
+            12: '1/125',
+            13: '1/250',
+            14: '1/500'
+        }
+
+
         self.verSliderLabel = tk.Label(root, text='Exposure Time', font=(self.widgetFont, self.widgetFontSize))
         self.verSliderLabel.grid(row=0, column=0)
+
         self.verSlider = tk.Scale(root, activebackground='black', cursor='sb_v_double_arrow', from_=0,
                              to=self.stack_size[self.scene_index] - 1, font=(self.widgetFont, self.widgetFontSize), length=self.heightToScale,
                              command=self.updateSlider)
+
+        self.verSlider = tk.Scale(root, activebackground='black', cursor='sb_v_double_arrow', from_=min(self.SCALE_LABELS), to=max(self.SCALE_LABELS), font=(self.widgetFont, self.widgetFontSize),
+                                  length=self.heightToScale,
+                                  command= self.scale_labels)
+
+        print(self.verSlider.configure().keys())
+
         self.verSlider.grid(row=1, column=0, rowspan=30)
+
+    def scale_labels(self, value):
+
+        # self.verSlider.config(label=self.SCALE_LABELS[int(value)])
+        tk.Label(root, text=self.SCALE_LABELS[int(value)], font=("Times New Roman", 15)).grid(row=31, column=0, )
+
+        # self.verSlider.place(x=50, y=300, anchor="center")
+
+        self.updateSlider(value)
+
+
+        # scale = tk.Scale(root, from_=min(SCALE_LABELS), to=max(SCALE_LABELS),
+        #                  orient=tk.HORIZONTAL, showvalue=False, command=scale_labels)
 
     def image_mean_plot(self):
 
@@ -226,14 +297,14 @@ class Browser:
             size = (width, height)
             self.mertens_pic.append(img)
 
-        fps = 30
+        self.check_fps()
 
-        vid_name = self.scene[self.scene_index] + "_0.12_" + "Mertens" + ".avi"
+        vid_name = self.scene[self.scene_index] + "_0.12_" + "Mertens" + "_FPS_" + str(self.regular_video_fps) + ".avi"
         folderStore = os.path.join(os.path.dirname(__file__), 'HDR_Mertens_Video')
         os.makedirs(folderStore, exist_ok=True)
         save_vid = folderStore + '\\' + vid_name
 
-        video = cv2.VideoWriter(save_vid, cv2.VideoWriter_fourcc('M', 'J', "P", 'G'), float(fps),
+        video = cv2.VideoWriter(save_vid, cv2.VideoWriter_fourcc('M', 'J', "P", 'G'), self.regular_video_fps,
                                 (806, 538))  # fourcc,
 
 
@@ -248,15 +319,13 @@ class Browser:
 
             # tempImg.save(save_image)
             video.write(cv2.cvtColor(self.mertensVideo[i], cv2.COLOR_RGB2BGR))
+            print(type(self.mertensVideo[i]))
 
         video.release()
 
         print("mertens finished")
 
-
-        # tempImg = Image.fromarray(res_mertens_8bit)
-        # photo = ImageTk.PhotoImage(tempImg)
-        # imagePrevlabel.configure(image=photo)
+        self.mertensVideo = []
 
     def HdrAbdullah(self):
 
@@ -283,15 +352,87 @@ class Browser:
         self.photo = ImageTk.PhotoImage(tempImg)
         self.imagePrevlabel.configure(image=self.photo)
 
+    def regular_video(self):
+
+        reg_vid = []
+        reg_vid_plot = []
+        for i in range(100):
+            self.temp_img_ind = int(i) * self.stack_size[self.scene_index] + int(self.verSlider.get())
+
+            self.check = False
+            self.updatePlot()
+            reg_vid_plot.append(self.tempImg_2)
+
+            img = deepcopy(self.img_all[self.temp_img_ind])
+            reg_vid.append(img)
+
+
+        list = ['15', '8', '6', '4', '2', '1', '05', '1-4', '1-8', '1-15', '1-30', '1-60', '1-125', '1-250', '1-500']
+
+        m1 = Image.fromarray(reg_vid[0])
+        m2 = reg_vid_plot[0]
+        sv = self.get_concat_h_blank(m1, m2)
+
+        self.check_fps()
+
+        fold_name = self.scene[self.scene_index] + "_" + list[int(self.verSlider.get())] + "_FPS_" + str(self.regular_video_fps)
+        folderStore = os.path.join(os.path.dirname(__file__), 'Regular_Videos')
+        connected_image = folderStore + '\\' + fold_name + ".avi"
+
+        # capture the image and save it on the save path
+        os.makedirs(folderStore, exist_ok=True)
+
+
+        print(self.regular_video_fps)
+        video = cv2.VideoWriter(connected_image, cv2.VideoWriter_fourcc('M', 'J', "P", 'G'), self.regular_video_fps,
+                                (sv.width, sv.height))
+
+        for i in range(len(reg_vid)):
+            tempImg = Image.fromarray(reg_vid[i])
+
+            temp_img_plot = reg_vid_plot[i]
+
+            connected_image = folderStore + '\\' + fold_name + ".avi"
+
+            # print(i)
+
+            array = np.array(self.get_concat_h_blank(tempImg, temp_img_plot))
+            video.write(cv2.cvtColor(array, cv2.COLOR_RGB2BGR))
+
+        video.release()
+
+        reg_vid = []
+
+        save_image = folderStore + '\\' + fold_name + "_" + str(i) + "*.jpeg"
+
+    def get_concat_h_blank(self, im1, im2, color=(0, 0, 0)):
+        dst = Image.new('RGB', (im1.width + im2.width, max(im1.height, im2.height)), color)
+        dst.paste(im1, (0, 0))
+        dst.paste(im2, (im1.width, 0))
+        return dst
+
+    def check_fps(self):
+
+        print("text is ", self.save_video_fps.get())
+
+        if self.validate_video_speed(self.save_video_fps.get()) is True:
+
+            try:
+                self.regular_video_fps = int(self.save_video_fps.get())
+                # print(set_speed)
+            except ValueError:
+                self.regular_video_fps = 30  # set as default speed
+
     def pauseRun(self):
 
         self.play = False
 
-    def setValues(self, test):
+    def setValues(self, dummy):
 
         self.play = True
         self.playVideo()
         # time.sleep(1)
+        # print(scene_name)
 
         if self.scene[self.scene_index] != self.defScene.get():
             self.img_all = np.load(self.defScene.get() + '_imgs_' + str(self.downscale_ratio) + '.npy')
@@ -348,17 +489,22 @@ class Browser:
 
     def updatePlot(self):
         # global verSlider, horSlider, photo, photo_2, stack_size, img_all, img, img_mean_list, scene_index, fig
-        temp_img_ind = int(self.horSlider.get()) * self.stack_size[self.scene_index] + int(self.verSlider.get())
 
+        if self.check == True:
+            self.temp_img_ind = int(self.horSlider.get()) * self.stack_size[self.scene_index] + int(self.verSlider.get())
+        else:
+            pass
+
+        self.check == True
         # Image mean plot
         plt.close(self.fig)
         self.fig.clear()
         self.fig = plt.figure(figsize=(4, 4))  # 4.6, 3.6
-        plt.plot(np.arange(self.stack_size[self.scene_index]), self.img_mean_list[(temp_img_ind // self.stack_size[self.scene_index]) * self.stack_size[self.scene_index]:(temp_img_ind //self.stack_size[self.scene_index]) *self.stack_size[self.scene_index] + self.stack_size[self.scene_index]],color='green', linewidth=2)
-        plt.plot(int(self.verSlider.get()), self.img_mean_list[temp_img_ind], color='red', marker='o', markersize=12)
-        plt.text(int(self.verSlider.get()), self.img_mean_list[temp_img_ind],
-                 '(' + str(int(self.verSlider.get())) + ', ' + str("%.2f" % self.img_mean_list[temp_img_ind]) + ')', color='red',
-                 fontsize=13, position=(self.verSlider.get() - 0.2, self.img_mean_list[temp_img_ind] + 0.04))
+        plt.plot(np.arange(self.stack_size[self.scene_index]), self.img_mean_list[(self.temp_img_ind // self.stack_size[self.scene_index]) * self.stack_size[self.scene_index]:(self.temp_img_ind //self.stack_size[self.scene_index]) *self.stack_size[self.scene_index] + self.stack_size[self.scene_index]],color='green', linewidth=2)
+        plt.plot(int(self.verSlider.get()), self.img_mean_list[self.temp_img_ind], color='red', marker='o', markersize=12)
+        plt.text(int(self.verSlider.get()), self.img_mean_list[self.temp_img_ind],
+                 '(' + str(int(self.verSlider.get())) + ', ' + str("%.2f" % self.img_mean_list[self.temp_img_ind]) + ')', color='red',
+                 fontsize=13, position=(self.verSlider.get() - 0.2, self.img_mean_list[self.temp_img_ind] + 0.04))
         plt.title('Exposure stack mean')
         plt.xlabel('Image index')
         plt.ylabel('Mean value')

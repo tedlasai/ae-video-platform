@@ -22,7 +22,7 @@ class Browser:
         # myB.pack()
         self.widgetFont = 'Arial'
         self.widgetFontSize = 12
-        self.scene = ['Scene101', 'Scene102', 'Scene103', 'Scene1', 'Scene2', 'Scene3', 'Scene4', 'Scene5', 'Scene6',
+        self.scene = ['Scene104', 'Scene102', 'Scene103', 'Scene1', 'Scene2', 'Scene3', 'Scene4', 'Scene5', 'Scene6',
                       'Scene7', 'Scene8', 'Scene9', 'Scene10', 'Scene11', 'Scene12', 'Scene13', 'Scene14', 'Scene15', 'Scene16', 'Scene17', 'Scene18']
         self.frame_num = [90, 65, 15, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]  # number of frames per position
         self.stack_size = [12, 47, 28, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15]  # number of shutter options per position
@@ -279,10 +279,11 @@ class Browser:
             # Exposure fusion using Mertens
             merge_mertens = cv2.createMergeMertens()
             res_mertens = merge_mertens.process(temp_stack)
-
+            print(type(res_mertens))
 
             # print(type(res_mertens))
             # Convert datatype to 8-bit and save
+
             res_mertens_8bit = np.clip(res_mertens * 255, 0, 255).astype('uint8')
             cv2.putText(res_mertens_8bit, 'HDR-Mertens', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
 
@@ -427,7 +428,7 @@ class Browser:
 
         self.play = False
 
-    def setValues(self, dummy):
+    def setValues(self, dummy=False):
 
         self.play = True
         self.playVideo()
@@ -515,8 +516,8 @@ class Browser:
             plt.xticks(np.arange(0, self.stack_size[self.scene_index], 2))
         else:
             plt.xticks(np.arange(0, self.stack_size[self.scene_index], 3))
-        plt.ylim(-0.02, 0.85)
-        plt.yticks(np.arange(0, 0.85, 0.1))
+        plt.ylim(-0.02, 1.1)
+        plt.yticks(np.arange(0, 1.1, 0.1))
         self.fig.canvas.draw()
 
         self.tempImg_2 = Image.frombytes('RGB', self.fig.canvas.get_width_height(), self.fig.canvas.tostring_rgb())

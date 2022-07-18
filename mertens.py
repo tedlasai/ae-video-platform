@@ -10,11 +10,26 @@ import glob
 import platform
 
 Image.MAX_IMAGE_PIXELS = None
-path = "J:\Final\Scene17_Globe"
+path = "J:\Final\Scene9_WindowDiffuse"
 
 joinPathChar = "/"
 if(platform.system() == "Windows"):
     joinPathChar = "\\"
+
+folder = "J:\Final"
+
+
+my_fold = os.listdir(folder)
+filtered_path = []
+
+for i in my_fold:
+    if "Scene" in i:
+
+        loc = "J:\Final" + "\\" + i
+        filtered_path.append(loc)
+
+print(filtered_path)
+
 
 os.chdir(path)
 my_files1 = glob.glob('*.JPG')
@@ -22,7 +37,7 @@ my_files1 = glob.glob('*.JPG')
 
 mertens_ar = []
 
-for i in range(1):
+for i in range(100):
 
 
     print("i is ", i)
@@ -59,7 +74,7 @@ print(len(mertens_ar))
 
 img = Image.fromarray(mertens_ar[0])
 
-video = cv2.VideoWriter("C:\\Users\\tedlasai\\PycharmProjects\\4d-data-browser\\high_mertens.avi", cv2.VideoWriter_fourcc('M', 'J', "P", 'G'), 1,
+video = cv2.VideoWriter("C:\\Users\\tedlasai\\PycharmProjects\\4d-data-browser\\HDR_Mertens_Video\\Scene9_1.0_Mertens_FPS_10.avi", cv2.VideoWriter_fourcc('M', 'J', "P", 'G'), 10,
                                 (img.width, img.height))
 
 for i in range(len(mertens_ar)):
@@ -69,5 +84,5 @@ for i in range(len(mertens_ar)):
 
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
     video.write(img)
-    cv2.imwrite("C:\\Users\\tedlasai\\PycharmProjects\\4d-data-browser\\HDR_Mertens_Video\\try.jpeg", img)
+    # cv2.imwrite("C:\\Users\\tedlasai\\PycharmProjects\\4d-data-browser\\HDR_Mertens_Video\\try.jpeg", img)
     #img.save("C:\\Users\\tedlasai\\PycharmProjects\\4d-data-browser\\HDR_Mertens_Video\\try.jpeg")

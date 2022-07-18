@@ -27,6 +27,13 @@ class Browser:
         self.frame_num = [90, 65, 15, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]  # number of frames per position
         self.stack_size = [12, 47, 28, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15]  # number of shutter options per position
 
+        self.scene = ['Scene11', 'Scene12', 'Scene13', 'Scene14', 'Scene15',
+                      'Scene16', 'Scene17', 'Scene18']
+        self.frame_num = [100, 100, 100, 100, 100, 100,
+                          100, 100]  # number of frames per position
+        self.stack_size = [15, 15, 15, 15, 15, 15, 15,
+                           15]  # number of shutter options per position
+
         self.scene_index = 0
         self.mertensVideo = []
         self.bit_depth = 8
@@ -41,6 +48,7 @@ class Browser:
 
         self.img_all = np.load(self.scene[self.scene_index] + '_imgs_' + str(self.downscale_ratio) + '.npy')
         self.img_mean_list = np.load(self.scene[self.scene_index] + '_img_mean_' + str(self.downscale_ratio) + '.npy') / (2**self.bit_depth - 1)
+        self.img_mertens = np.load(self.scene[self.scene_index] + '_mertens_imgs_' + str(self.downscale_ratio) + '.npy')
 
         self.img = deepcopy(self.img_all[0])
         self.useMertens = False
@@ -72,6 +80,7 @@ class Browser:
         self.image_mean_plot()
         self.regular_video_button()
         self.high_res_checkbox()
+        self.mertens_checkbox()
 
     def hdr_mean_button(self):
         # HDR Button - Mean
@@ -154,8 +163,22 @@ class Browser:
         self.c1 = tk.Checkbutton(root, text='High Resolution', onvalue=1, offvalue=0, command= self.switch_res)
         self.c1.grid(row = 33, column = 1)
 
+    def mertens_checkbox(self):
+
+        self.mertens_check = tk.IntVar()
+        self.c1 = tk.Checkbutton(root, text=' Mertens Export', variable= self.mertens_check, offvalue= 0, onvalue= 1, command= self.switch_res)
+        self.c1.grid(row = 32, column = 1)
+        # self.c1.select()
+        # self.c1.select()
+
+        # self.mertens_check = mertens_check
+
+        # print(self.mertens_check.get())
+
     def switch_res(self):
 
+        print(self.mertens_check.get())
+        # return True
         pass
 
     def horizontal_slider(self):
@@ -190,9 +213,9 @@ class Browser:
         self.verSliderLabel = tk.Label(root, text='Exposure Time', font=(self.widgetFont, self.widgetFontSize))
         self.verSliderLabel.grid(row=0, column=0)
 
-        self.verSlider = tk.Scale(root, activebackground='black', cursor='sb_v_double_arrow', from_=0,
-                             to=self.stack_size[self.scene_index] - 1, font=(self.widgetFont, self.widgetFontSize), length=self.heightToScale,
-                             command=self.updateSlider)
+        # self.verSlider = tk.Scale(root, activebackground='black', cursor='sb_v_double_arrow', from_=0,
+        #                      to=self.stack_size[self.scene_index] - 1, font=(self.widgetFont, self.widgetFontSize), length=self.heightToScale,
+        #                      command=self.updateSlider)
 
         self.verSlider = tk.Scale(root, activebackground='black', cursor='sb_v_double_arrow', from_=min(self.SCALE_LABELS), to=max(self.SCALE_LABELS), font=(self.widgetFont, self.widgetFontSize),
                                   length=self.heightToScale,
@@ -208,7 +231,7 @@ class Browser:
         tk.Label(root, text=self.SCALE_LABELS[int(value)], font=("Times New Roman", 15)).grid(row=31, column=0, )
 
         # self.verSlider.place(x=50, y=300, anchor="center")
-
+        self.useMertens = False
         self.updateSlider(value)
 
 
@@ -269,64 +292,67 @@ class Browser:
 
     def HdrMertens(self):
 
+        self.mertensVideo = []
         self.useMertens = True
         self.mertens_pic = []
 
-        for i in range(self.frame_num[self.scene_index]):
-            temp_img_ind = int(i * self.stack_size[self.scene_index])
-            temp_stack = deepcopy(self.img_all[temp_img_ind:temp_img_ind + self.stack_size[self.scene_index]])
+        self.updateSlider(0)
 
-            # Exposure fusion using Mertens
-            merge_mertens = cv2.createMergeMertens()
-            res_mertens = merge_mertens.process(temp_stack)
-            print(type(res_mertens))
-
-            # print(type(res_mertens))
-            # Convert datatype to 8-bit and save
-
-            res_mertens_8bit = np.clip(res_mertens * 255, 0, 255).astype('uint8')
-            cv2.putText(res_mertens_8bit, 'HDR-Mertens', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-
-            img = Image.fromarray(res_mertens_8bit)
-            # im.save("your_file_" + str(i) + ".jpeg")
-
-            # print(type(res_mertens_8bit))
-
-            print(i)
-            self.mertensVideo.append(res_mertens_8bit)
-            height, width, layers = 600, 800, 3 #img.shape
-            size = (width, height)
-            self.mertens_pic.append(img)
-
-        self.check_fps()
-
-        vid_name = self.scene[self.scene_index] + "_0.12_" + "Mertens" + "_FPS_" + str(self.regular_video_fps) + ".avi"
-        folderStore = os.path.join(os.path.dirname(__file__), 'HDR_Mertens_Video')
-        os.makedirs(folderStore, exist_ok=True)
-        save_vid = folderStore + '\\' + vid_name
-
-        video = cv2.VideoWriter(save_vid, cv2.VideoWriter_fourcc('M', 'J', "P", 'G'), self.regular_video_fps,
-                                (806, 538))  # fourcc,
-
-
-        print(folderStore)
-        # capture the image and save it on the save path
+        # for i in range(self.frame_num[self.scene_index]):
+        #     temp_img_ind = int(i * self.stack_size[self.scene_index])
+        #     temp_stack = deepcopy(self.img_all[temp_img_ind:temp_img_ind + self.stack_size[self.scene_index]])
+        #
+        #     # Exposure fusion using Mertens
+        #     merge_mertens = cv2.createMergeMertens()
+        #     res_mertens = merge_mertens.process(temp_stack)
+        #     print(type(res_mertens))
+        #
+        #     # print(type(res_mertens))
+        #     # Convert datatype to 8-bit and save
+        #
+        #     res_mertens_8bit = np.clip(res_mertens * 255, 0, 255).astype('uint8')
+        #     cv2.putText(res_mertens_8bit, 'HDR-Mertens', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+        #
+        #     img = Image.fromarray(res_mertens_8bit)
+        #     # im.save("your_file_" + str(i) + ".jpeg")
+        #
+        #     # print(type(res_mertens_8bit))
+        #
+        #     print(i)
+        #     self.mertensVideo.append(res_mertens_8bit)
+        #     height, width, layers = 600, 800, 3 #img.shape
+        #     size = (width, height)
+        #     self.mertens_pic.append(img)
+        #
+        # self.check_fps()
+        #
+        # vid_name = self.scene[self.scene_index] + "_0.12_" + "Mertens" + "_FPS_" + str(self.regular_video_fps) + ".avi"
+        # folderStore = os.path.join(os.path.dirname(__file__), 'HDR_Mertens_Video')
         # os.makedirs(folderStore, exist_ok=True)
+        # save_vid = folderStore + '\\' + vid_name
+        #
+        # video = cv2.VideoWriter(save_vid, cv2.VideoWriter_fourcc('M', 'J', "P", 'G'), self.regular_video_fps,
+        #                         (806, 538))  # fourcc,
+        #
+        #
+        # print(folderStore)
+        # # capture the image and save it on the save path
+        # # os.makedirs(folderStore, exist_ok=True)
+        #
+        # for i in range(len(self.mertensVideo)):
+        #     # tempImg = Image.fromarray(self.mertensVideo[i])
+        #     # print(type(mertensVideo[i]))
+        #     # save_image = folderStore + '\\' + fold_name + "_" + str(i) + ".jpeg"
+        #
+        #     # tempImg.save(save_image)
+        #     video.write(cv2.cvtColor(self.mertensVideo[i], cv2.COLOR_RGB2BGR))
+        #     print(type(self.mertensVideo[i]))
+        #
+        # video.release()
+        #
+        # print("mertens finished")
 
-        for i in range(len(self.mertensVideo)):
-            # tempImg = Image.fromarray(self.mertensVideo[i])
-            # print(type(mertensVideo[i]))
-            # save_image = folderStore + '\\' + fold_name + "_" + str(i) + ".jpeg"
 
-            # tempImg.save(save_image)
-            video.write(cv2.cvtColor(self.mertensVideo[i], cv2.COLOR_RGB2BGR))
-            print(type(self.mertensVideo[i]))
-
-        video.release()
-
-        print("mertens finished")
-
-        self.mertensVideo = []
 
     def HdrAbdullah(self):
 
@@ -439,6 +465,8 @@ class Browser:
             self.img_all = np.load(self.defScene.get() + '_imgs_' + str(self.downscale_ratio) + '.npy')
             self.img_mean_list = np.load(self.defScene.get() + '_img_mean_' + str(self.downscale_ratio) + '.npy') / (2 ** self.bit_depth - 1)
             self.scene_index = self.scene.index(self.defScene.get())
+            self.img_mertens = np.load(self.scene[self.scene_index] + '_mertens_imgs_' + str(self.downscale_ratio) + '.npy')
+
             self.resetValues()
 
     def playVideo(self):
@@ -458,6 +486,7 @@ class Browser:
         if (self.horSlider.get() < (self.frame_num[self.scene_index] - 1) and self.play):
             self.horSlider.set(self.horSlider.get() + 1)
             # print("HELLO", horSlider.get())
+
             root.after(set_speed, self.playVideo)
 
         if (self.play is False):
@@ -530,7 +559,8 @@ class Browser:
         temp_img_ind = int(self.horSlider.get()) * self.stack_size[self.scene_index] + int(self.verSlider.get())
 
         if self.useMertens:
-            img = self.mertensVideo[self.horSlider.get()]
+            # img = self.mertensVideo[self.horSlider.get()]
+            img = self.img_mertens[self.horSlider.get()]
         else:
             img = deepcopy(self.img_all[temp_img_ind])
 

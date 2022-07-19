@@ -18,7 +18,7 @@ if(platform.system() == "Windows"):
 
 folder = "J:\Final"
 
-downscale_ratio=0.12
+
 my_fold = os.listdir(folder)
 filtered_path = []
 
@@ -29,7 +29,6 @@ for i in my_fold:
         filtered_path.append(loc)
 
 print(filtered_path)
-count = 0
 
 for loc_path in range(1, len(filtered_path)):
 
@@ -38,9 +37,6 @@ for loc_path in range(1, len(filtered_path)):
     my_files1 = glob.glob('*.JPG')
 
     mertens_ar = []
-    img_ar = []
-
-    print("mertens length 1 is ", len(mertens_ar))
 
     for i in range(100):
 
@@ -54,11 +50,9 @@ for loc_path in range(1, len(filtered_path)):
 
             print("j is ", j)
             check = os.path.abspath(my_files1[temp_img_ind+j])
-            print(check, "i is ", i, "j is ", j, filtered_path[loc_path])
             im = cv2.imread(check)
-            im2 = cv2.resize(im, None, fx=downscale_ratio, fy=downscale_ratio)[:, :, ::-1]
-            # im = cv2.cvtColor(im, cv2.COLOR_RGB2BGR)
-            img_ar.append(im2)
+            im = cv2.cvtColor(im, cv2.COLOR_RGB2BGR)
+            img_ar.append(im)
 
         temp_stack = deepcopy(img_ar[0:15])
 
@@ -76,26 +70,21 @@ for loc_path in range(1, len(filtered_path)):
         mertens_ar.append(res_mertens_8bit)
 
 
-    print("mertens length 2 is ", len(mertens_ar))
+    print(len(mertens_ar))
 
-    np.save('C:\\Users\\tedlasai\\PycharmProjects\\4d-data-browser\\' + (filtered_path[loc_path].split("_")[0]).split("\\")[2] + '_mertens_imgs_' + str(downscale_ratio), np.asarray(mertens_ar))
+    img = Image.fromarray(mertens_ar[0])
 
-    mertens_ar = []
-    # np.save('Scene' + scene_num + '_img_mean_' + str(downscale_ratio), np.asarray(list_of_img_mean))
+    upload_location = "C:\\Users\\tedlasai\\PycharmProjects\\4d-data-browser\\HDR_Mertens_Video\\" + (filtered_path[loc_path].split("_")[0]).split("\\")[2] + "_1.0_Mertens_FPS_10.avi"
 
-    # img = Image.fromarray(mertens_ar[0])
-    #
-    # upload_location = "C:\\Users\\tedlasai\\PycharmProjects\\4d-data-browser\\HDR_Mertens_Video\\" + (filtered_path[loc_path].split("_")[0]).split("\\")[2] + "_1.0_Mertens_FPS_10.avi"
-    #
-    # video = cv2.VideoWriter(upload_location, cv2.VideoWriter_fourcc('M', 'J', "P", 'G'), 10,
-    #                                 (img.width, img.height))
-    #
-    # for i in range(len(mertens_ar)):
-    #
-    #     img = mertens_ar[i]
-    #     print("video product ", i)
-    #
-    #     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-    #     video.write(img)
-    #     # cv2.imwrite("C:\\Users\\tedlasai\\PycharmProjects\\4d-data-browser\\HDR_Mertens_Video\\try.jpeg", img)
-    #     #img.save("C:\\Users\\tedlasai\\PycharmProjects\\4d-data-browser\\HDR_Mertens_Video\\try.jpeg")
+    video = cv2.VideoWriter(upload_location, cv2.VideoWriter_fourcc('M', 'J', "P", 'G'), 10,
+                                    (img.width, img.height))
+
+    for i in range(len(mertens_ar)):
+
+        img = mertens_ar[i]
+        print("video product ", i)
+
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+        video.write(img)
+        # cv2.imwrite("C:\\Users\\tedlasai\\PycharmProjects\\4d-data-browser\\HDR_Mertens_Video\\try.jpeg", img)
+        #img.save("C:\\Users\\tedlasai\\PycharmProjects\\4d-data-browser\\HDR_Mertens_Video\\try.jpeg")

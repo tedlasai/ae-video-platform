@@ -22,7 +22,7 @@ class Browser:
         # myB.pack()
         self.widgetFont = 'Arial'
         self.widgetFontSize = 12
-        self.scene = ['Scene104', 'Scene102', 'Scene103', 'Scene1', 'Scene2', 'Scene3', 'Scene4', 'Scene5', 'Scene6',
+        self.scene = ['Scene101', 'Scene102', 'Scene103', 'Scene1', 'Scene2', 'Scene3', 'Scene4', 'Scene5', 'Scene6',
                       'Scene7', 'Scene8', 'Scene9', 'Scene10', 'Scene11', 'Scene12', 'Scene13', 'Scene14', 'Scene15', 'Scene16', 'Scene17', 'Scene18']
         self.frame_num = [90, 65, 15, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]  # number of frames per position
         self.stack_size = [12, 47, 28, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15]  # number of shutter options per position
@@ -55,6 +55,8 @@ class Browser:
         self.play = True
         self.video_speed = 50
         self.regular_video_fps = 30
+
+        self.video_high_res_check = 0
 
         # Image Convas
         self.photo = ImageTk.PhotoImage(Image.fromarray(self.img))
@@ -165,21 +167,15 @@ class Browser:
 
     def mertens_checkbox(self):
 
-        self.mertens_check = tk.IntVar()
-        self.c1 = tk.Checkbutton(root, text=' Mertens Export', variable= self.mertens_check, offvalue= 0, onvalue= 1, command= self.switch_res)
+        self.mertens_high_res_check = tk.IntVar()
+        self.c1 = tk.Checkbutton(root, text=' Mertens Export', variable= self.mertens_high_res_check, offvalue= 0, onvalue= 1, command= self.switch_mertens_res)
         self.c1.grid(row = 32, column = 1)
-        # self.c1.select()
-        # self.c1.select()
 
-        # self.mertens_check = mertens_check
+    def switch_mertens_res(self):
 
-        # print(self.mertens_check.get())
+        self.video_high_res_check = self.mertens_high_res_check.get()
+        print(self.video_high_res_check)
 
-    def switch_res(self):
-
-        print(self.mertens_check.get())
-        # return True
-        pass
 
     def horizontal_slider(self):
         # Horizantal Slider

@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 import matplotlib as mp
 import os
 import glob
+import regular
+import mertens
 
 mp.rcParams.update({'axes.titlesize': 14, 'font.size': 11, 'font.family': 'arial'})
 
@@ -27,11 +29,12 @@ class Browser:
         self.frame_num = [90, 65, 15, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]  # number of frames per position
         self.stack_size = [12, 47, 28, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15]  # number of shutter options per position
 
-        self.scene = ['Scene11', 'Scene12', 'Scene13', 'Scene14', 'Scene15',
+        self.scene = ['Scene1', 'Scene2', 'Scene3', 'Scene4', 'Scene5', 'Scene6',
+                      'Scene7', 'Scene8', 'Scene9', 'Scene10', 'Scene11', 'Scene12', 'Scene13', 'Scene14', 'Scene15',
                       'Scene16', 'Scene17', 'Scene18']
-        self.frame_num = [100, 100, 100, 100, 100, 100,
+        self.frame_num = [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,
                           100, 100]  # number of frames per position
-        self.stack_size = [15, 15, 15, 15, 15, 15, 15,
+        self.stack_size = [15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
                            15]  # number of shutter options per position
 
         self.scene_index = 0
@@ -56,7 +59,8 @@ class Browser:
         self.video_speed = 50
         self.regular_video_fps = 30
 
-        self.video_high_res_check = 0
+        self.res_check = 0
+        self.hdr_mode_check = 0
 
         # Image Convas
         self.photo = ImageTk.PhotoImage(Image.fromarray(self.img))
@@ -162,20 +166,25 @@ class Browser:
 
     def high_res_checkbox(self):
 
-        self.c1 = tk.Checkbutton(root, text='High Resolution', onvalue=1, offvalue=0, command= self.switch_res)
+        self.high_res_check = tk.IntVar()
+        self.c1 = tk.Checkbutton(root, text='High Resolution', variable = self.high_res_check, offvalue=0, onvalue=1, command= self.switch_res)
         self.c1.grid(row = 33, column = 1)
+
+    def switch_res(self):
+
+        self.res_check = self.high_res_check.get()
+        print("self.res_check is ", self.res_check)
 
     def mertens_checkbox(self):
 
-        self.mertens_high_res_check = tk.IntVar()
-        self.c1 = tk.Checkbutton(root, text=' Mertens Export', variable= self.mertens_high_res_check, offvalue= 0, onvalue= 1, command= self.switch_mertens_res)
+        self.mertens_check = tk.IntVar()
+        self.c1 = tk.Checkbutton(root, text=' Mertens Export', variable= self.mertens_check, offvalue= 0, onvalue= 1, command= self.switch_mertens)
         self.c1.grid(row = 32, column = 1)
 
-    def switch_mertens_res(self):
+    def switch_mertens(self):
 
-        self.video_high_res_check = self.mertens_high_res_check.get()
-        print(self.video_high_res_check)
-
+        self.hdr_mode_check = self.mertens_check.get()
+        print("self.hdr_mode_check is ", self.hdr_mode_check)
 
     def horizontal_slider(self):
         # Horizantal Slider
@@ -294,60 +303,6 @@ class Browser:
 
         self.updateSlider(0)
 
-        # for i in range(self.frame_num[self.scene_index]):
-        #     temp_img_ind = int(i * self.stack_size[self.scene_index])
-        #     temp_stack = deepcopy(self.img_all[temp_img_ind:temp_img_ind + self.stack_size[self.scene_index]])
-        #
-        #     # Exposure fusion using Mertens
-        #     merge_mertens = cv2.createMergeMertens()
-        #     res_mertens = merge_mertens.process(temp_stack)
-        #     print(type(res_mertens))
-        #
-        #     # print(type(res_mertens))
-        #     # Convert datatype to 8-bit and save
-        #
-        #     res_mertens_8bit = np.clip(res_mertens * 255, 0, 255).astype('uint8')
-        #     cv2.putText(res_mertens_8bit, 'HDR-Mertens', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-        #
-        #     img = Image.fromarray(res_mertens_8bit)
-        #     # im.save("your_file_" + str(i) + ".jpeg")
-        #
-        #     # print(type(res_mertens_8bit))
-        #
-        #     print(i)
-        #     self.mertensVideo.append(res_mertens_8bit)
-        #     height, width, layers = 600, 800, 3 #img.shape
-        #     size = (width, height)
-        #     self.mertens_pic.append(img)
-        #
-        # self.check_fps()
-        #
-        # vid_name = self.scene[self.scene_index] + "_0.12_" + "Mertens" + "_FPS_" + str(self.regular_video_fps) + ".avi"
-        # folderStore = os.path.join(os.path.dirname(__file__), 'HDR_Mertens_Video')
-        # os.makedirs(folderStore, exist_ok=True)
-        # save_vid = folderStore + '\\' + vid_name
-        #
-        # video = cv2.VideoWriter(save_vid, cv2.VideoWriter_fourcc('M', 'J', "P", 'G'), self.regular_video_fps,
-        #                         (806, 538))  # fourcc,
-        #
-        #
-        # print(folderStore)
-        # # capture the image and save it on the save path
-        # # os.makedirs(folderStore, exist_ok=True)
-        #
-        # for i in range(len(self.mertensVideo)):
-        #     # tempImg = Image.fromarray(self.mertensVideo[i])
-        #     # print(type(mertensVideo[i]))
-        #     # save_image = folderStore + '\\' + fold_name + "_" + str(i) + ".jpeg"
-        #
-        #     # tempImg.save(save_image)
-        #     video.write(cv2.cvtColor(self.mertensVideo[i], cv2.COLOR_RGB2BGR))
-        #     print(type(self.mertensVideo[i]))
-        #
-        # video.release()
-        #
-        # print("mertens finished")
-
 
 
     def HdrAbdullah(self):
@@ -379,54 +334,124 @@ class Browser:
 
         reg_vid = []
         reg_vid_plot = []
-        for i in range(100):
-            self.temp_img_ind = int(i) * self.stack_size[self.scene_index] + int(self.verSlider.get())
-
-            self.check = False
-            self.updatePlot()
-            reg_vid_plot.append(self.tempImg_2)
-
-            img = deepcopy(self.img_all[self.temp_img_ind])
-            reg_vid.append(img)
-
-
         list = ['15', '8', '6', '4', '2', '1', '05', '1-4', '1-8', '1-15', '1-30', '1-60', '1-125', '1-250', '1-500']
 
-        m1 = Image.fromarray(reg_vid[0])
-        m2 = reg_vid_plot[0]
-        sv = self.get_concat_h_blank(m1, m2)
+        self.mertensVideo = []
+        self.useMertens = True
+        self.mertens_pic = []
 
-        self.check_fps()
+        # print("here")
+        # print(self.res_check, self.hdr_mode_check)
 
-        fold_name = self.scene[self.scene_index] + "_" + list[int(self.verSlider.get())] + "_FPS_" + str(self.regular_video_fps)
-        folderStore = os.path.join(os.path.dirname(__file__), 'Regular_Videos')
-        connected_image = folderStore + '\\' + fold_name + ".avi"
+        if self.res_check == 0 and self.hdr_mode_check == 0:
 
-        # capture the image and save it on the save path
-        os.makedirs(folderStore, exist_ok=True)
+            for i in range(100):
 
+                self.temp_img_ind = int(i) * self.stack_size[self.scene_index] + int(self.verSlider.get())
+                self.check = False
+                self.updatePlot()
+                reg_vid_plot.append(self.tempImg_2)
 
-        print(self.regular_video_fps)
-        video = cv2.VideoWriter(connected_image, cv2.VideoWriter_fourcc('M', 'J', "P", 'G'), self.regular_video_fps,
-                                (sv.width, sv.height))
+                img = deepcopy(self.img_all[self.temp_img_ind])
+                reg_vid.append(img)
 
-        for i in range(len(reg_vid)):
-            tempImg = Image.fromarray(reg_vid[i])
+            m1 = Image.fromarray(reg_vid[0])
+            m2 = reg_vid_plot[0]
+            sv = self.get_concat_h_blank(m1, m2)
 
-            temp_img_plot = reg_vid_plot[i]
+            self.check_fps()
 
+            fold_name = self.scene[self.scene_index] + "_" + list[int(self.verSlider.get())] + "_FPS_" + str(self.regular_video_fps)
+            folderStore = os.path.join(os.path.dirname(__file__), 'Regular_Videos')
             connected_image = folderStore + '\\' + fold_name + ".avi"
 
-            # print(i)
+            # capture the image and save it on the save path
+            os.makedirs(folderStore, exist_ok=True)
 
-            array = np.array(self.get_concat_h_blank(tempImg, temp_img_plot))
-            video.write(cv2.cvtColor(array, cv2.COLOR_RGB2BGR))
 
-        video.release()
+            print(self.regular_video_fps)
+            video = cv2.VideoWriter(connected_image, cv2.VideoWriter_fourcc('M', 'J', "P", 'G'), self.regular_video_fps,
+                                    (sv.width, sv.height))
 
-        reg_vid = []
+            for i in range(len(reg_vid)):
 
-        save_image = folderStore + '\\' + fold_name + "_" + str(i) + "*.jpeg"
+                tempImg = Image.fromarray(reg_vid[i])
+                temp_img_plot = reg_vid_plot[i]
+                connected_image = folderStore + '\\' + fold_name + ".avi"
+                # print(i)
+                array = np.array(self.get_concat_h_blank(tempImg, temp_img_plot))
+                video.write(cv2.cvtColor(array, cv2.COLOR_RGB2BGR))
+
+            video.release()
+
+        elif self.res_check == 0 and self.hdr_mode_check == 1:
+
+            # for i in range(self.frame_num[self.scene_index]):
+            #     temp_img_ind = int(i * self.stack_size[self.scene_index])
+            #     temp_stack = deepcopy(self.img_all[temp_img_ind:temp_img_ind + self.stack_size[self.scene_index]])
+            #
+            #     # Exposure fusion using Mertens
+            #     merge_mertens = cv2.createMergeMertens()
+            #     res_mertens = merge_mertens.process(temp_stack)
+            #     print(type(res_mertens))
+            #
+            #     # print(type(res_mertens))
+            #     # Convert datatype to 8-bit and save
+            #
+            #     res_mertens_8bit = np.clip(res_mertens * 255, 0, 255).astype('uint8')
+            #     cv2.putText(res_mertens_8bit, 'HDR-Mertens', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            #
+            #     img = Image.fromarray(res_mertens_8bit)
+            #     # im.save("your_file_" + str(i) + ".jpeg")
+            #
+            #     # print(type(res_mertens_8bit))
+            #
+            #     print(i)
+            #     self.mertensVideo.append(res_mertens_8bit)
+            #     height, width, layers = 600, 800, 3 #img.shape
+            #     size = (width, height)
+            #     self.mertens_pic.append(img)
+
+            self.check_fps()
+
+            vid_name = self.scene[self.scene_index] + "_0.12_" + "Mertens" + "_FPS_" + str(self.regular_video_fps) + ".avi"
+            folderStore = os.path.join(os.path.dirname(__file__), 'HDR_Mertens_Video')
+            os.makedirs(folderStore, exist_ok=True)
+            save_vid = folderStore + '\\' + vid_name
+
+            video = cv2.VideoWriter(save_vid, cv2.VideoWriter_fourcc('M', 'J', "P", 'G'), self.regular_video_fps,
+                                    (806, 538))  # fourcc,
+
+
+            print(folderStore)
+            # capture the image and save it on the save path
+            # os.makedirs(folderStore, exist_ok=True)
+
+            for i in range(len(self.img_mertens)):
+                # tempImg = Image.fromarray(self.mertensVideo[i])
+                # print(type(mertensVideo[i]))
+                # save_image = folderStore + '\\' + fold_name + "_" + str(i) + ".jpeg"
+
+                # tempImg.save(save_image)
+                video.write(cv2.cvtColor(self.img_mertens[i], cv2.COLOR_RGB2BGR))
+                print(type(self.img_mertens[i]))
+
+            video.release()
+
+        elif self.res_check == 1 and self.hdr_mode_check == 0:
+
+            self.check_fps()
+
+            regular.main(self.scene[self.scene_index], self.regular_video_fps, self.verSlider.get(), list)
+
+        elif self.res_check == 1 and self.hdr_mode_check == 1:
+
+            self.check_fps()
+
+            mertens.main(self.scene[self.scene_index], self.regular_video_fps)
+
+
+
 
     def get_concat_h_blank(self, im1, im2, color=(0, 0, 0)):
         dst = Image.new('RGB', (im1.width + im2.width, max(im1.height, im2.height)), color)
@@ -444,7 +469,7 @@ class Browser:
                 self.regular_video_fps = int(self.save_video_fps.get())
                 # print(set_speed)
             except ValueError:
-                self.regular_video_fps = 30  # set as default speed
+                self.regular_video_fps = 10  # set as default speed
 
     def pauseRun(self):
 

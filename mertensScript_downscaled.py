@@ -28,10 +28,11 @@ for i in my_fold:
         loc = "J:\Final" + "\\" + i
         filtered_path.append(loc)
 
-print(filtered_path)
+for i in range(len(filtered_path)):
+    print(i, filtered_path[i])
 count = 0
 
-for loc_path in range(1, len(filtered_path)):
+for loc_path in range(1): #, len(filtered_path)
 
     print(filtered_path[loc_path])
     os.chdir(filtered_path[loc_path])

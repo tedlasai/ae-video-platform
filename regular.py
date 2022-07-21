@@ -55,7 +55,7 @@ def main(scene, fps, exposure, exp_list):
 
     img = Image.fromarray(img_ar[0])
 
-    vid_name = "C:\\Users\\tedlasai\\PycharmProjects\\4d-data-browser\\Regular_Videos\\" + str(scene) + "_1.0_Ex_" + exp_list[exposure] + "_FPS_" + str(fps) + ".avi"
+    vid_name = os.path.join(os.path.dirname(__file__), 'Regular_Videos') + "\\" + str(scene) + "_1.0_Ex_" + exp_list[exposure] + "_FPS_" + str(fps) + ".avi"
 
     video = cv2.VideoWriter(vid_name, cv2.VideoWriter_fourcc('M', 'J', "P", 'G'), fps, (img.width, img.height))
 

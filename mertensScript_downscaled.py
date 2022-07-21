@@ -18,7 +18,7 @@ if(platform.system() == "Windows"):
 
 folder = "J:\Final"
 
-downscale_ratio=0.12
+downscale_ratio= 1.00
 my_fold = os.listdir(folder)
 filtered_path = []
 
@@ -32,7 +32,7 @@ for i in range(len(filtered_path)):
     print(i, filtered_path[i])
 count = 0
 
-for loc_path in range(1): #, len(filtered_path)
+for loc_path in range(len(filtered_path)): #, len(filtered_path)
 
     print(filtered_path[loc_path])
     os.chdir(filtered_path[loc_path])
@@ -79,7 +79,7 @@ for loc_path in range(1): #, len(filtered_path)
 
     print("mertens length 2 is ", len(mertens_ar))
 
-    np.save('C:\\Users\\tedlasai\\PycharmProjects\\4d-data-browser\\' + (filtered_path[loc_path].split("_")[0]).split("\\")[2] + '_mertens_imgs_' + str(downscale_ratio), np.asarray(mertens_ar))
+    np.save(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + "\\" + (filtered_path[loc_path].split("_")[0]).split("\\")[2] + '_mertens_imgs_' + str(downscale_ratio), np.asarray(mertens_ar))
 
     mertens_ar = []
     # np.save('Scene' + scene_num + '_img_mean_' + str(downscale_ratio), np.asarray(list_of_img_mean))

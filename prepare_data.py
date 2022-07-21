@@ -14,6 +14,7 @@ downscale_ratio=0.12
 
 list_of_images=[]
 list_of_img_mean=[]
+list_of_img_mertens = []
 
 images = [read_path + "/"+ f for f in os.listdir(read_path + '/') if f.endswith(('.jpg','.JPG', '.jpeg','.JPEG', '.png', '.PNG'))]
 images.sort()

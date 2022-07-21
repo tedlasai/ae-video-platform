@@ -49,15 +49,15 @@ class Browser:
         self.widPercent = (self.widthToScale / float(self.imgSize[1]))
         self.heightToScale = int(float(self.imgSize[0]) * float(self.widPercent))
 
-        self.img_all = np.load(self.scene[self.scene_index] + '_imgs_' + str(self.downscale_ratio) + '.npy')
-        self.img_mean_list = np.load(self.scene[self.scene_index] + '_img_mean_' + str(self.downscale_ratio) + '.npy') / (2**self.bit_depth - 1)
-        self.img_mertens = np.load(self.scene[self.scene_index] + '_mertens_imgs_' + str(self.downscale_ratio) + '.npy')
+        self.img_all = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + "\\" + self.scene[self.scene_index] + '_imgs_' + str(self.downscale_ratio) + '.npy')
+        self.img_mean_list = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + "\\" + self.scene[self.scene_index] + '_img_mean_' + str(self.downscale_ratio) + '.npy') / (2**self.bit_depth - 1)
+        self.img_mertens = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + "\\" + self.scene[self.scene_index] + '_mertens_imgs_' + str(self.downscale_ratio) + '.npy')
 
         self.img = deepcopy(self.img_all[0])
         self.useMertens = False
         self.play = True
         self.video_speed = 50
-        self.regular_video_fps = 30
+        self.video_fps = 30
 
         self.res_check = 0
         self.hdr_mode_check = 0
@@ -80,7 +80,7 @@ class Browser:
         self.hdr_reset_button()
         self.scene_select()
         self.playback_text_box()
-        self.video_fps()
+        self.video_fps_text()
         self.horizontal_slider()
         self.vertical_slider()
         self.image_mean_plot()
@@ -135,7 +135,7 @@ class Browser:
 
         self.VideoButton = tk.Button(root, text='Video', fg='#ffffff', bg='#999999', activebackground='#454545',
                                 relief=tk.RAISED,
-                                width=16, font=(self.widgetFont, self.widgetFontSize), command=self.regular_video)
+                                width=16, font=(self.widgetFont, self.widgetFontSize), command=self.export_video)
         self.VideoButton.grid(row=37, column=2, sticky=tk.E)
 
     def scene_select(self):
@@ -152,11 +152,11 @@ class Browser:
         # TextBox
         self.video_speed = tk.StringVar()
         # video_speed = 1
-        tk.Label(root, text="Browser Playback Speed (FPS)").grid(row=34, column=1)
+        tk.Label(root, text="Browser Playback Speed (ms delay)").grid(row=34, column=1)
         self.e1 = tk.Entry(root, textvariable=self.video_speed)
         self.e1.grid(row=35, column=1)
 
-    def video_fps(self):
+    def video_fps_text(self):
         # TextBox
         self.save_video_fps = tk.StringVar()
         # video_speed = 1
@@ -303,8 +303,6 @@ class Browser:
 
         self.updateSlider(0)
 
-
-
     def HdrAbdullah(self):
 
         temp_img_ind = int(self.horSlider.get() * self.stack_size[self.scene_index])
@@ -330,14 +328,14 @@ class Browser:
         self.photo = ImageTk.PhotoImage(tempImg)
         self.imagePrevlabel.configure(image=self.photo)
 
-    def regular_video(self):
+    def export_video(self):
 
         reg_vid = []
         reg_vid_plot = []
         list = ['15', '8', '6', '4', '2', '1', '05', '1-4', '1-8', '1-15', '1-30', '1-60', '1-125', '1-250', '1-500']
 
         self.mertensVideo = []
-        self.useMertens = True
+        # self.useMertens = True
         self.mertens_pic = []
 
         # print("here")
@@ -361,7 +359,7 @@ class Browser:
 
             self.check_fps()
 
-            fold_name = self.scene[self.scene_index] + "_" + list[int(self.verSlider.get())] + "_FPS_" + str(self.regular_video_fps)
+            fold_name = self.scene[self.scene_index] + "_0.12_Ex_" + list[int(self.verSlider.get())] + "_FPS_" + str(self.video_fps)
             folderStore = os.path.join(os.path.dirname(__file__), 'Regular_Videos')
             connected_image = folderStore + '\\' + fold_name + ".avi"
 
@@ -369,8 +367,8 @@ class Browser:
             os.makedirs(folderStore, exist_ok=True)
 
 
-            print(self.regular_video_fps)
-            video = cv2.VideoWriter(connected_image, cv2.VideoWriter_fourcc('M', 'J', "P", 'G'), self.regular_video_fps,
+            print(self.video_fps)
+            video = cv2.VideoWriter(connected_image, cv2.VideoWriter_fourcc('M', 'J', "P", 'G'), self.video_fps,
                                     (sv.width, sv.height))
 
             for i in range(len(reg_vid)):
@@ -414,12 +412,12 @@ class Browser:
 
             self.check_fps()
 
-            vid_name = self.scene[self.scene_index] + "_0.12_" + "Mertens" + "_FPS_" + str(self.regular_video_fps) + ".avi"
+            vid_name = self.scene[self.scene_index] + "_0.12_" + "Mertens" + "_FPS_" + str(self.video_fps) + ".avi"
             folderStore = os.path.join(os.path.dirname(__file__), 'HDR_Mertens_Video')
             os.makedirs(folderStore, exist_ok=True)
             save_vid = folderStore + '\\' + vid_name
 
-            video = cv2.VideoWriter(save_vid, cv2.VideoWriter_fourcc('M', 'J', "P", 'G'), self.regular_video_fps,
+            video = cv2.VideoWriter(save_vid, cv2.VideoWriter_fourcc('M', 'J', "P", 'G'), self.video_fps,
                                     (806, 538))  # fourcc,
 
 
@@ -442,16 +440,13 @@ class Browser:
 
             self.check_fps()
 
-            regular.main(self.scene[self.scene_index], self.regular_video_fps, self.verSlider.get(), list)
+            regular.main(self.scene[self.scene_index], self.video_fps, self.verSlider.get(), list)
 
         elif self.res_check == 1 and self.hdr_mode_check == 1:
 
             self.check_fps()
 
-            mertens.main(self.scene[self.scene_index], self.regular_video_fps)
-
-
-
+            mertens.main(self.scene[self.scene_index], self.video_fps)
 
     def get_concat_h_blank(self, im1, im2, color=(0, 0, 0)):
         dst = Image.new('RGB', (im1.width + im2.width, max(im1.height, im2.height)), color)
@@ -466,10 +461,10 @@ class Browser:
         if self.validate_video_speed(self.save_video_fps.get()) is True:
 
             try:
-                self.regular_video_fps = int(self.save_video_fps.get())
+                self.video_fps = int(self.save_video_fps.get())
                 # print(set_speed)
             except ValueError:
-                self.regular_video_fps = 10  # set as default speed
+                self.video_fps = 10  # set as default speed
 
     def pauseRun(self):
 
@@ -483,6 +478,7 @@ class Browser:
         # print(scene_name)
 
         if self.scene[self.scene_index] != self.defScene.get():
+            os.chdir("C:\\Users\\tedlasai\\PycharmProjects\\4d-data-browser")
             self.img_all = np.load(self.defScene.get() + '_imgs_' + str(self.downscale_ratio) + '.npy')
             self.img_mean_list = np.load(self.defScene.get() + '_img_mean_' + str(self.downscale_ratio) + '.npy') / (2 ** self.bit_depth - 1)
             self.scene_index = self.scene.index(self.defScene.get())

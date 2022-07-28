@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mp
 import os
 import glob
+import platform
 import regular
 import mertens
 
@@ -20,10 +21,12 @@ class Browser:
 
     def __init__(self, root):
         super().__init__()
-        # myB = Frame(master)
-        # myB.pack()
+
+        self.folders = "I:\Final"     #link to directory containing all the dataset image folders
+
         self.widgetFont = 'Arial'
         self.widgetFontSize = 12
+
         self.scene = ['Scene101', 'Scene102', 'Scene103', 'Scene1', 'Scene2', 'Scene3', 'Scene4', 'Scene5', 'Scene6',
                       'Scene7', 'Scene8', 'Scene9', 'Scene10', 'Scene11', 'Scene12', 'Scene13', 'Scene14', 'Scene15', 'Scene16', 'Scene17', 'Scene18']
         self.frame_num = [90, 65, 15, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]  # number of frames per position
@@ -31,11 +34,11 @@ class Browser:
 
         self.scene = ['Scene1', 'Scene2', 'Scene3', 'Scene4', 'Scene5', 'Scene6',
                       'Scene7', 'Scene8', 'Scene9', 'Scene10', 'Scene11', 'Scene12', 'Scene13', 'Scene14', 'Scene15',
-                      'Scene16', 'Scene17', 'Scene18']
+                      'Scene16', 'Scene17', 'Scene18', 'Scene19', 'Scene20']
         self.frame_num = [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,
-                          100, 100]  # number of frames per position
+                          100, 100, 100, 100]  # number of frames per position
         self.stack_size = [15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-                           15]  # number of shutter options per position
+                           15, 15, 15]  # number of shutter options per position
 
         self.scene_index = 0
         self.mertensVideo = []
@@ -44,14 +47,18 @@ class Browser:
         self.check = True
         self.temp_img_ind = 0
 
+        self.joinPathChar = "/"
+        if (platform.system() == "Windows"):
+            self.joinPathChar = "\\"
+
         self.imgSize = [int(4480 * self.downscale_ratio), int(6720 * self.downscale_ratio)]
         self.widthToScale = self.imgSize[1]
         self.widPercent = (self.widthToScale / float(self.imgSize[1]))
         self.heightToScale = int(float(self.imgSize[0]) * float(self.widPercent))
 
-        self.img_all = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + "\\" + self.scene[self.scene_index] + '_imgs_' + str(self.downscale_ratio) + '.npy')
-        self.img_mean_list = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + "\\" + self.scene[self.scene_index] + '_img_mean_' + str(self.downscale_ratio) + '.npy') / (2**self.bit_depth - 1)
-        self.img_mertens = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + "\\" + self.scene[self.scene_index] + '_mertens_imgs_' + str(self.downscale_ratio) + '.npy')
+        self.img_all = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + self.joinPathChar + self.scene[self.scene_index] + '_imgs_' + str(self.downscale_ratio) + '.npy')
+        self.img_mean_list = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + self.joinPathChar + self.scene[self.scene_index] + '_img_mean_' + str(self.downscale_ratio) + '.npy') / (2**self.bit_depth - 1)
+        self.img_mertens = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + self.joinPathChar + self.scene[self.scene_index] + '_mertens_imgs_' + str(self.downscale_ratio) + '.npy')
 
         self.img = deepcopy(self.img_all[0])
         self.useMertens = False
@@ -335,11 +342,8 @@ class Browser:
         list = ['15', '8', '6', '4', '2', '1', '05', '1-4', '1-8', '1-15', '1-30', '1-60', '1-125', '1-250', '1-500']
 
         self.mertensVideo = []
-        # self.useMertens = True
         self.mertens_pic = []
 
-        # print("here")
-        # print(self.res_check, self.hdr_mode_check)
 
         if self.res_check == 0 and self.hdr_mode_check == 0:
 
@@ -361,7 +365,8 @@ class Browser:
 
             fold_name = self.scene[self.scene_index] + "_0.12_Ex_" + list[int(self.verSlider.get())] + "_FPS_" + str(self.video_fps)
             folderStore = os.path.join(os.path.dirname(__file__), 'Regular_Videos')
-            connected_image = folderStore + '\\' + fold_name + ".avi"
+            os.makedirs(folderStore, exist_ok=True)
+            connected_image = folderStore + self.joinPathChar + fold_name + ".avi"
 
             # capture the image and save it on the save path
             os.makedirs(folderStore, exist_ok=True)
@@ -375,8 +380,7 @@ class Browser:
 
                 tempImg = Image.fromarray(reg_vid[i])
                 temp_img_plot = reg_vid_plot[i]
-                connected_image = folderStore + '\\' + fold_name + ".avi"
-                # print(i)
+
                 array = np.array(self.get_concat_h_blank(tempImg, temp_img_plot))
                 video.write(cv2.cvtColor(array, cv2.COLOR_RGB2BGR))
 
@@ -384,53 +388,20 @@ class Browser:
 
         elif self.res_check == 0 and self.hdr_mode_check == 1:
 
-            # for i in range(self.frame_num[self.scene_index]):
-            #     temp_img_ind = int(i * self.stack_size[self.scene_index])
-            #     temp_stack = deepcopy(self.img_all[temp_img_ind:temp_img_ind + self.stack_size[self.scene_index]])
-            #
-            #     # Exposure fusion using Mertens
-            #     merge_mertens = cv2.createMergeMertens()
-            #     res_mertens = merge_mertens.process(temp_stack)
-            #     print(type(res_mertens))
-            #
-            #     # print(type(res_mertens))
-            #     # Convert datatype to 8-bit and save
-            #
-            #     res_mertens_8bit = np.clip(res_mertens * 255, 0, 255).astype('uint8')
-            #     cv2.putText(res_mertens_8bit, 'HDR-Mertens', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-            #
-            #     img = Image.fromarray(res_mertens_8bit)
-            #     # im.save("your_file_" + str(i) + ".jpeg")
-            #
-            #     # print(type(res_mertens_8bit))
-            #
-            #     print(i)
-            #     self.mertensVideo.append(res_mertens_8bit)
-            #     height, width, layers = 600, 800, 3 #img.shape
-            #     size = (width, height)
-            #     self.mertens_pic.append(img)
-
             self.check_fps()
 
             vid_name = self.scene[self.scene_index] + "_0.12_" + "Mertens" + "_FPS_" + str(self.video_fps) + ".avi"
             folderStore = os.path.join(os.path.dirname(__file__), 'HDR_Mertens_Video')
             os.makedirs(folderStore, exist_ok=True)
-            save_vid = folderStore + '\\' + vid_name
+            save_vid = folderStore + self.joinPathChar + vid_name
 
             video = cv2.VideoWriter(save_vid, cv2.VideoWriter_fourcc('M', 'J', "P", 'G'), self.video_fps,
                                     (806, 538))  # fourcc,
 
-
             print(folderStore)
-            # capture the image and save it on the save path
-            # os.makedirs(folderStore, exist_ok=True)
 
             for i in range(len(self.img_mertens)):
-                # tempImg = Image.fromarray(self.mertensVideo[i])
-                # print(type(mertensVideo[i]))
-                # save_image = folderStore + '\\' + fold_name + "_" + str(i) + ".jpeg"
 
-                # tempImg.save(save_image)
                 video.write(cv2.cvtColor(self.img_mertens[i], cv2.COLOR_RGB2BGR))
                 print(type(self.img_mertens[i]))
 
@@ -440,13 +411,13 @@ class Browser:
 
             self.check_fps()
 
-            regular.main(self.scene[self.scene_index], self.video_fps, self.verSlider.get(), list)
+            regular.main(self.scene[self.scene_index], self.video_fps, self.verSlider.get(), list, self.folders)
 
         elif self.res_check == 1 and self.hdr_mode_check == 1:
 
             self.check_fps()
 
-            mertens.main(self.scene[self.scene_index], self.video_fps)
+            mertens.main(self.scene[self.scene_index], self.video_fps, self.folders)
 
     def get_concat_h_blank(self, im1, im2, color=(0, 0, 0)):
         dst = Image.new('RGB', (im1.width + im2.width, max(im1.height, im2.height)), color)
@@ -478,11 +449,11 @@ class Browser:
         # print(scene_name)
 
         if self.scene[self.scene_index] != self.defScene.get():
-            os.chdir("C:\\Users\\tedlasai\\PycharmProjects\\4d-data-browser")
-            self.img_all = np.load(self.defScene.get() + '_imgs_' + str(self.downscale_ratio) + '.npy')
-            self.img_mean_list = np.load(self.defScene.get() + '_img_mean_' + str(self.downscale_ratio) + '.npy') / (2 ** self.bit_depth - 1)
+
+            self.img_all = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + self.joinPathChar + self.defScene.get() + '_imgs_' + str(self.downscale_ratio) + '.npy')
+            self.img_mean_list = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + self.joinPathChar + self.defScene.get() + '_img_mean_' + str(self.downscale_ratio) + '.npy') / (2 ** self.bit_depth - 1)
             self.scene_index = self.scene.index(self.defScene.get())
-            self.img_mertens = np.load(self.scene[self.scene_index] + '_mertens_imgs_' + str(self.downscale_ratio) + '.npy')
+            self.img_mertens = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + self.joinPathChar + self.scene[self.scene_index] + '_mertens_imgs_' + str(self.downscale_ratio) + '.npy')
 
             self.resetValues()
 
@@ -503,6 +474,7 @@ class Browser:
         if (self.horSlider.get() < (self.frame_num[self.scene_index] - 1) and self.play):
             self.horSlider.set(self.horSlider.get() + 1)
             # print("HELLO", horSlider.get())
+            print("SET SPEED", set_speed)
 
             root.after(set_speed, self.playVideo)
 

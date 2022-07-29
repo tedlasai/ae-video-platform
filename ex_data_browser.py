@@ -494,7 +494,7 @@ class Browser:
     def resetValues(self):
         # global verSlider, horSlider, photo, img, scene_index, play, useMertens
 
-        self.useMertens = False
+        # self.useMertens = False
         # print("Reset")
         self.play = False
         # verSlider.config(to=stack_size[scene_index]-1)

@@ -26,10 +26,8 @@ def main(scene, fps, exposure, exp_list, folder):
 
             loc = folder + joinPathChar + i
             filtered_path.append(loc)
-            if (platform.system() == "Windows"):
-                scene_name.append((loc.split("_")[0]).split("\\")[2])
-            else:
-                scene_name.append((loc.split("_")[0]).split("/")[2])
+            scene_name.append((loc.split("_")[0]).split(joinPathChar)[2])
+
 
     index = scene_name.index(scene)
     print(filtered_path[index])

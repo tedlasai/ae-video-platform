@@ -31,7 +31,7 @@ def main():
 
     images = [read_path + "/" + f for f in os.listdir(read_path + '/') if f.endswith(('.jpg','.JPG', '.jpeg','.JPEG', '.png', '.PNG'))]
     images.sort()
-    count=0
+    count= 0
 
     # regular images into npy
 
@@ -50,7 +50,6 @@ def main():
         temp_img_ind = int(i * 15)
 
         for j in range(15):
-            print("j is ", j)
             check = os.path.abspath(images[temp_img_ind + j])
             print(check, "i is ", i, "j is ", j)
             im = cv2.imread(check)

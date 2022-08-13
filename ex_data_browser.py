@@ -83,8 +83,7 @@ class Browser:
         self.canvas = tk.Canvas(root, width=self.photo.width(), height=self.photo.height(),
                            borderwidth=0, highlightthickness=0)
         self.canvas.grid(row=1, column=1, columnspan=2, rowspan=30, padx=0, pady=0, sticky=tk.NW)
-        self.canvas.img = self.photo  # Keep reference in case this code is put into a function.
-        self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
+        self.canvas_img = self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
         self.current_rects = []
 
         self.canvas.bind('<Button-1>', self.canvas_click)
@@ -561,14 +560,6 @@ class Browser:
         self.horSlider.config(to=self.frame_num[self.scene_index] - 1)
         # verSlider.set(0),
         self.horSlider.set(0)
-        tempImg = Image.fromarray(self.img_all[0])
-        photo = ImageTk.PhotoImage(tempImg)
-
-
-        self.canvas.img = photo  # Keep reference in case this code is put into a function.
-        self.canvas.create_image(0, 0, image=photo, anchor=tk.NW)
-
-
 
        # self.imagePrevlabel.configure(image=photo)
         self.updatePlot()
@@ -673,8 +664,10 @@ class Browser:
 
         self.photo = ImageTk.PhotoImage(tempImg)
          #= self.photo  # Keep reference in case this code is put into a function.
-        self.canvas.img = self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
-        self.canvas.tag_lower(self.canvas.img)
+
+        self.canvas.itemconfig(self.canvas_img, image=self.photo)
+
+        self.canvas.tag_lower(self.canvas_img)
 
         # Keep reference in case this code is put into a function.
         self.updatePlot()

@@ -10,6 +10,8 @@ import glob
 import platform
 import regular
 import mertens
+import exposure_class
+from test_pipline import local_interested_grids_generater
 
 mp.rcParams.update({'axes.titlesize': 14, 'font.size': 11, 'font.family': 'arial'})
 
@@ -40,6 +42,9 @@ class Browser:
         self.stack_size = [15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
                            15, 15, 15]  # number of shutter options per position
 
+        self.auto_exposures = ["None", "Global", "Local"]
+        self.current_auto_exposure = "None"
+
         self.scene_index = 0
         self.mertensVideo = []
         self.bit_depth = 8
@@ -56,9 +61,12 @@ class Browser:
         self.widPercent = (self.widthToScale / float(self.imgSize[1]))
         self.heightToScale = int(float(self.imgSize[0]) * float(self.widPercent))
 
+
+
         self.img_all = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + self.joinPathChar + self.scene[self.scene_index] + '_imgs_' + str(self.downscale_ratio) + '.npy')
         self.img_mean_list = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + self.joinPathChar + self.scene[self.scene_index] + '_img_mean_' + str(self.downscale_ratio) + '.npy') / (2**self.bit_depth - 1)
         self.img_mertens = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + self.joinPathChar + self.scene[self.scene_index] + '_mertens_imgs_' + str(self.downscale_ratio) + '.npy')
+
 
         self.img = deepcopy(self.img_all[0])
         self.useMertens = False
@@ -71,8 +79,18 @@ class Browser:
 
         # Image Convas
         self.photo = ImageTk.PhotoImage(Image.fromarray(self.img))
-        self.imagePrevlabel = tk.Label(root, image=self.photo)
-        self.imagePrevlabel.grid(row=1, column=1, rowspan=30, sticky=tk.NW)
+
+        self.canvas = tk.Canvas(root, width=self.photo.width(), height=self.photo.height(),
+                           borderwidth=0, highlightthickness=0)
+        self.canvas.grid(row=1, column=1, columnspan=2, rowspan=30, padx=0, pady=0, sticky=tk.NW)
+        self.canvas.img = self.photo  # Keep reference in case this code is put into a function.
+        self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
+        self.current_rects = []
+
+        self.canvas.bind('<Button-1>', self.canvas_click)
+        #some defaults
+        self.rowGridSelect = 0
+        self.colGridSelect = 0
 
         self.init_functions()
 
@@ -94,6 +112,7 @@ class Browser:
         self.regular_video_button()
         self.high_res_checkbox()
         self.mertens_checkbox()
+        self.auto_exposure_select()
 
     def hdr_mean_button(self):
         # HDR Button - Mean
@@ -154,6 +173,16 @@ class Browser:
         self.sceneList = tk.OptionMenu(root, self.defScene, *self.scene, command=self.setValues)
         self.sceneList.config(font=(self.widgetFont, self.widgetFontSize - 2), width=15, anchor=tk.W)
         self.sceneList.grid(row=1, column=2, sticky=tk.NE)
+
+    def auto_exposure_select(self):
+        # Select Scene List
+        self.defAutoExposure = tk.StringVar(root)
+        self.defAutoExposure.set(self.auto_exposures[0])  # default value
+        self.selAutoExposureLabel = tk.Label(root, text='Select AutoExposure:', font=(self.widgetFont, self.widgetFontSize))
+        self.selAutoExposureLabel.grid(row=0, column=3, sticky=tk.W)
+        self.AutoExposureList = tk.OptionMenu(root, self.defAutoExposure, *self.auto_exposures, command=self.setAutoExposure)
+        self.AutoExposureList.config(font=(self.widgetFont, self.widgetFontSize - 2), width=15, anchor=tk.W)
+        self.AutoExposureList.grid(row=1, column=3, sticky=tk.NE)
 
     def playback_text_box(self):
         # TextBox
@@ -244,11 +273,17 @@ class Browser:
 
         # self.verSlider.place(x=50, y=300, anchor="center")
         self.useMertens = False
-        self.updateSlider(value)
+
+        if(self.current_auto_exposure == "None"):
+            self.updateSlider(value)
+
+
 
 
         # scale = tk.Scale(root, from_=min(SCALE_LABELS), to=max(SCALE_LABELS),
         #                  orient=tk.HORIZONTAL, showvalue=False, command=scale_labels)
+
+
 
     def image_mean_plot(self):
 
@@ -286,9 +321,9 @@ class Browser:
         temp_img = (np.mean(temp_stack, axis=0)).astype(np.uint8)
         cv2.putText(temp_img, 'HDR-Mean', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
 
-        tempImg = Image.fromarray(temp_img)
-        self.photo = ImageTk.PhotoImage(tempImg)
-        self.imagePrevlabel.configure(image=self.photo)
+        #tempImg = Image.fromarray(temp_img)
+        #self.photo = ImageTk.PhotoImage(tempImg)
+        #self.imagePrevlabel.configure(image=self.photo)
 
     def HdrMedian(self):
 
@@ -298,9 +333,11 @@ class Browser:
         temp_img = (np.median(temp_stack, axis=0)).astype(np.uint8)
         cv2.putText(temp_img, 'HDR-Median', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
 
-        tempImg = Image.fromarray(temp_img)
-        self.photo = ImageTk.PhotoImage(tempImg)
-        self.imagePrevlabel.configure(image=self.photo)
+        #tempImg = Image.fromarray(temp_img)
+        #self.photo = ImageTk.PhotoImage(tempImg)
+       # self.imagePrevlabel.configure(image=self.photo)
+
+
 
     def HdrMertens(self):
 
@@ -331,9 +368,9 @@ class Browser:
                 mean_min_dis_med[i, j, :] = temp_stack[stack_distance_min_med[i, j], i, j, :]
         cv2.putText(mean_min_dis_med, 'HDR-Abdullah', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
 
-        tempImg = Image.fromarray(mean_min_dis_med)
-        self.photo = ImageTk.PhotoImage(tempImg)
-        self.imagePrevlabel.configure(image=self.photo)
+        #tempImg = Image.fromarray(mean_min_dis_med)
+        #self.photo = ImageTk.PhotoImage(tempImg)
+        #self.imagePrevlabel.configure(image=self.photo)
 
     def export_video(self):
 
@@ -449,13 +486,35 @@ class Browser:
         # print(scene_name)
 
         if self.scene[self.scene_index] != self.defScene.get():
+            exposures = exposure_class.Exposure('Scene1_raw_imgs.npy', downsample_rate=1 / 60, r_percent=0, g_percent=1,
+                                                x_num_grids=8, y_num_grids=8, low_threshold=0.1, low_rate=0.2,
+                                                high_threshold=0.35, high_rate=0.5)
+            self.eV = exposures.pipeline()
 
             self.img_all = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + self.joinPathChar + self.defScene.get() + '_imgs_' + str(self.downscale_ratio) + '.npy')
             self.img_mean_list = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + self.joinPathChar + self.defScene.get() + '_img_mean_' + str(self.downscale_ratio) + '.npy') / (2 ** self.bit_depth - 1)
             self.scene_index = self.scene.index(self.defScene.get())
             self.img_mertens = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + self.joinPathChar + self.scene[self.scene_index] + '_mertens_imgs_' + str(self.downscale_ratio) + '.npy')
 
+
             self.resetValues()
+
+    def setAutoExposure(self, dummy = False):
+        self.current_auto_exposure = self.defAutoExposure.get()
+
+        if(self.current_auto_exposure == "Global"):
+            exposures = exposure_class.Exposure('Scene1_raw_imgs.npy', downsample_rate=1 / 60, r_percent=0, g_percent=1,
+                                                col_num_grids=8, row_num_grids=8, low_threshold=0.1, low_rate=0.2,
+                                                high_threshold=0.35, high_rate=0.5)
+            self.eV = exposures.pipeline()
+        elif(self.current_auto_exposure == "Local"):
+            list_local = local_interested_grids_generater(8, 8, [[self.rowGridSelect, self.colGridSelect]])
+            exposures = exposure_class.Exposure('Scene1_raw_imgs.npy', downsample_rate=1 / 60, r_percent=0, g_percent=1,
+                                                col_num_grids=8, row_num_grids=8, low_threshold=0.1, low_rate=0.2,
+                                                high_threshold=0.35, high_rate=0.5, local_indices=list_local)
+            self.eV = exposures.pipeline()
+
+        print("CURRENT AUTO EXPOSURE", self.current_auto_exposure)
 
     def playVideo(self):
         # global horSlider, scene, scene_index, defScene, img, img_all, img_mean_list, downscale_ratio, bit_depth, play, video_speed, useMertens
@@ -471,10 +530,11 @@ class Browser:
                 set_speed = 50  # set as default speed
 
         # print('screen index is ', scene_index)
+
+
         if (self.horSlider.get() < (self.frame_num[self.scene_index] - 1) and self.play):
             self.horSlider.set(self.horSlider.get() + 1)
             # print("HELLO", horSlider.get())
-            print("SET SPEED", set_speed)
 
             root.after(set_speed, self.playVideo)
 
@@ -503,7 +563,14 @@ class Browser:
         self.horSlider.set(0)
         tempImg = Image.fromarray(self.img_all[0])
         photo = ImageTk.PhotoImage(tempImg)
-        self.imagePrevlabel.configure(image=photo)
+
+
+        self.canvas.img = photo  # Keep reference in case this code is put into a function.
+        self.canvas.create_image(0, 0, image=photo, anchor=tk.NW)
+
+
+
+       # self.imagePrevlabel.configure(image=photo)
         self.updatePlot()
 
     def updatePlot(self):
@@ -542,10 +609,55 @@ class Browser:
         self.photo_2 = ImageTk.PhotoImage(self.tempImg_2)
         self.imagePrevlabel_2.configure(image=self.photo_2)
 
+    def canvas_click(self, event):
+        col, row = event.x, event.y
+
+
+
+        for rect in self.current_rects:
+            self.canvas.delete(rect)
+
+        if self.current_auto_exposure  == "Local":
+            self.colGridSelect = int(col * 8 / self.photo.width())
+            self.rowGridSelect = int(row * 8 / self.photo.height())
+
+            rectangles = np.array([[self.rowGridSelect, self.colGridSelect]]) #making this array to allow us to be flexible in the future
+            for rect in rectangles:
+                self.current_rects.append(self.draw_rectangle(rect[0], rect[1], "blue"))
+            self.setAutoExposure()
+
+
+
+    def draw_rectangle(self, row, col, color):
+        ww = self.photo.width()
+        hh= self.photo.height()
+        topx = col * (ww // 8)
+        if col == 7:
+            botx = ww - 1
+        else:
+            botx = (col + 1) * (ww // 8)
+
+        topy = row * (hh // 8)
+        if row == 7:
+            boty = hh - 1
+        else:
+            boty = (row + 1) * (hh // 8)
+        print(topx, topy, botx, boty)
+        rect = self.canvas.create_rectangle(topx, topy, botx, boty, dash=(2, 2), fill='', outline=color)
+        return rect
+
+
     def updateSlider(self, scale_value):
+        if(self.current_auto_exposure != "None"):
+            self.verSlider.set(self.eV[self.horSlider.get()])
+            temp_img_ind = int(self.horSlider.get()) * self.stack_size[self.scene_index] + self.eV[self.horSlider.get()]
+        else:
+            temp_img_ind = int(self.horSlider.get()) * self.stack_size[self.scene_index] + int(self.verSlider.get())
+
+        autoExposureMode = True
 
         # global verSlider, horSlider, photo, photo_2, imagePrevlabel, imagePrevlabel_2, img_all, img, img_mean_list, scene_index, fig, useMertens, mertensVideo
-        temp_img_ind = int(self.horSlider.get()) * self.stack_size[self.scene_index] + int(self.verSlider.get())
+        #
 
         if self.useMertens:
             # img = self.mertensVideo[self.horSlider.get()]
@@ -558,10 +670,16 @@ class Browser:
         # self.imagePrevlabel.grid(row=1, column=1, rowspan=30, sticky=tk.NW)
 
         tempImg = Image.fromarray(img)
-        self.photo = ImageTk.PhotoImage(tempImg)
-        self.imagePrevlabel.configure(image=self.photo)
 
+        self.photo = ImageTk.PhotoImage(tempImg)
+         #= self.photo  # Keep reference in case this code is put into a function.
+        self.canvas.img = self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
+        self.canvas.tag_lower(self.canvas.img)
+
+        # Keep reference in case this code is put into a function.
         self.updatePlot()
+
+
 
 b = Browser(root)
 

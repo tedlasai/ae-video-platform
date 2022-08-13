@@ -9,7 +9,7 @@ import os
 import glob
 import platform
 
-Image.MAX_IMAGE_PIXELS = None
+
 path = "J:\Final\Scene9_WindowDiffuse"
 
 joinPathChar = "/"
@@ -18,7 +18,8 @@ if(platform.system() == "Windows"):
 
 folder = "J:\Final"
 
-downscale_ratio= 1.00
+downscale_ratio= 0.12
+scene = "19"
 my_fold = os.listdir(folder)
 filtered_path = []
 
@@ -31,6 +32,8 @@ for i in my_fold:
 for i in range(len(filtered_path)):
     print(i, filtered_path[i])
 count = 0
+
+filtered_path = ["I:\\Final\\Scene19_Blackspace"]
 
 for loc_path in range(len(filtered_path)): #, len(filtered_path)
 
@@ -79,7 +82,7 @@ for loc_path in range(len(filtered_path)): #, len(filtered_path)
 
     print("mertens length 2 is ", len(mertens_ar))
 
-    np.save(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + "\\" + (filtered_path[loc_path].split("_")[0]).split("\\")[2] + '_mertens_imgs_' + str(downscale_ratio), np.asarray(mertens_ar))
+    np.save("C:\\Users\\tedlasai\\PycharmProjects\\4d-data-browser\\Image_Arrays" + "\\" + "Scene" + scene + '_mertens_imgs_' + str(downscale_ratio), np.asarray(mertens_ar))
 
     mertens_ar = []
     # np.save('Scene' + scene_num + '_img_mean_' + str(downscale_ratio), np.asarray(list_of_img_mean))
@@ -100,3 +103,5 @@ for loc_path in range(len(filtered_path)): #, len(filtered_path)
     #     video.write(img)
     #     # cv2.imwrite("C:\\Users\\tedlasai\\PycharmProjects\\4d-data-browser\\HDR_Mertens_Video\\try.jpeg", img)
     #     #img.save("C:\\Users\\tedlasai\\PycharmProjects\\4d-data-browser\\HDR_Mertens_Video\\try.jpeg")
+
+# (filtered_path[loc_path].split("_")[0]).split("\\")[2]

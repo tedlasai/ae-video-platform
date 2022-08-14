@@ -1,7 +1,6 @@
 import math
 import numpy as np
 
-
 class Exposure:
     def __init__(self, input_images, downsample_rate=1 / 121, r_percent=0, g_percent=1, col_num_grids=8, row_num_grids=8,
                  target_intensity=0.18, high_threshold=1, low_threshold=0, high_rate=0.2, low_rate=0.2,

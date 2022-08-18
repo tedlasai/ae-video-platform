@@ -9,7 +9,7 @@ import os
 import glob
 import platform
 import regular
-import mertens
+import high_res_auto_ex_video
 import exposure_class
 from test_pipline import local_interested_grids_generater
 
@@ -24,7 +24,7 @@ class Browser:
     def __init__(self, root):
         super().__init__()
 
-        self.folders = "I:\Final"     #link to directory containing all the dataset image folders
+        self.folders = "D:\Final"     #link to directory containing all the dataset image folders
 
         self.widgetFont = 'Arial'
         self.widgetFontSize = 12
@@ -84,13 +84,14 @@ class Browser:
                            borderwidth=0, highlightthickness=0)
         self.canvas.grid(row=1, column=1, columnspan=2, rowspan=30, padx=0, pady=0, sticky=tk.NW)
         self.canvas_img = self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
-        self.current_rects = []
-
+        self.current_rects = []  # the rectangles drawn in canvas
+        self.rectangles = []  # the coordinates of the rectangles
         self.canvas.bind('<Button-1>', self.canvas_click)
         #some defaults
+        self.col_num_grids = 8
+        self.row_num_grids = 8
         self.rowGridSelect = 0
         self.colGridSelect = 0
-
         self.init_functions()
 
     def init_functions(self):
@@ -111,77 +112,93 @@ class Browser:
         self.regular_video_button()
         self.high_res_checkbox()
         self.mertens_checkbox()
+        self.col_num_grids_text()
+        self.row_num_grids_text()
+        self.clear_interested_areas_button()
+        self.local_consider_outliers_checkbox()
         self.auto_exposure_select()
+
 
     def hdr_mean_button(self):
         # HDR Button - Mean
         self.HdrMeanButton = tk.Button(root, text='HDR-Mean', fg='#ffffff', bg='#999999', activebackground='#454545',
                                   relief=tk.RAISED, width=16, font=(self.widgetFont, self.widgetFontSize), command=self.HdrMean)
-        self.HdrMeanButton.grid(row=29, column=2, sticky=tk.E)  # initial row was 26, +1 increments for all other rows
+        self.HdrMeanButton.grid(row=29, column=3, sticky=tk.E)  # initial row was 26, +1 increments for all other rows
 
     def hdr_median_button(self):
         # HDR Button - Median
         self.HdrMedianButton = tk.Button(root, text='HDR-Median', fg='#ffffff', bg='#999999', activebackground='#454545',
                                     relief=tk.RAISED, width=16, font=(self.widgetFont, self.widgetFontSize), command=self.HdrMedian)
-        self.HdrMedianButton.grid(row=30, column=2, sticky=tk.E)
+        self.HdrMedianButton.grid(row=30, column=3, sticky=tk.E)
 
     def hdr_mertens_button(self):
         # HDR Button - Mertens
         self.HdrMertensButton = tk.Button(root, text='HDR-Mertens', fg='#ffffff', bg='#999999', activebackground='#454545',
                                      relief=tk.RAISED, width=16, font=(self.widgetFont, self.widgetFontSize), command=self.HdrMertens)
-        self.HdrMertensButton.grid(row=31, column=2, sticky=tk.E)
+        self.HdrMertensButton.grid(row=31, column=3, sticky=tk.E)
 
     def hdr_abdullah_button(self):
         # HDR Button - Abdullah
         self.HdrAbdullahButton = tk.Button(root, text='HDR-Abdullah', fg='#ffffff', bg='#999999', activebackground='#454545',
                                       relief=tk.RAISED, width=16, font=(self.widgetFont, self.widgetFontSize),
                                       command=self.HdrAbdullah)
-        self.HdrAbdullahButton.grid(row=32, column=2, sticky=tk.E)
+        self.HdrAbdullahButton.grid(row=32, column=3, sticky=tk.E)
 
     def hdr_run_button(self):
         # Run Button
         self.RunButton = tk.Button(root, text='Run', fg='#ffffff', bg='#999999', activebackground='#454545',
                               relief=tk.RAISED, width=16, font=(self.widgetFont, self.widgetFontSize), command=self.setValues)
-        self.RunButton.grid(row=33, column=2, sticky=tk.E)
+        self.RunButton.grid(row=33, column=3, sticky=tk.E)
 
     def hdr_pause_button(self):
         self.PauseButton = tk.Button(root, text='Pause', fg='#ffffff', bg='#999999', activebackground='#454545',
                                 relief=tk.RAISED,
                                 width=16, font=(self.widgetFont, self.widgetFontSize), command=self.pauseRun)
-        self.PauseButton.grid(row=34, column=2, sticky=tk.E)
+        self.PauseButton.grid(row=34, column=3, sticky=tk.E)
 
     def hdr_reset_button(self):
         # Reset Button
         self.RestButton = tk.Button(root, text='Reset', fg='#ffffff', bg='#999999', activebackground='#454545',
                                relief=tk.RAISED, width=16, font=(self.widgetFont, self.widgetFontSize), command=self.resetValues)
-        self.RestButton.grid(row=35, column=2, sticky=tk.E)
+        self.RestButton.grid(row=35, column=3, sticky=tk.E)
 
     def regular_video_button(self):
 
         self.VideoButton = tk.Button(root, text='Video', fg='#ffffff', bg='#999999', activebackground='#454545',
                                 relief=tk.RAISED,
                                 width=16, font=(self.widgetFont, self.widgetFontSize), command=self.export_video)
-        self.VideoButton.grid(row=37, column=2, sticky=tk.E)
+        self.VideoButton.grid(row=37, column=3, sticky=tk.E)
+
+    def clear_interested_areas_button(self):
+        # clear the rects
+        self.ClearInterestedAreasButton = tk.Button(root, text='Clear_Rectangles', fg='#ffffff', bg='#999999',
+                                               activebackground='#454545',
+                                               relief=tk.RAISED, width=16,
+                                               font=(self.widgetFont, self.widgetFontSize), command=self.clear_rects,
+                                               )
+        self.ClearInterestedAreasButton.grid(row=29, column=4,
+                                        sticky=tk.E)  # initial row was 26, +1 increments for all other rows
+
 
     def scene_select(self):
         # Select Scene List
         self.defScene = tk.StringVar(root)
         self.defScene.set(self.scene[self.scene_index])  # default value
         self.selSceneLabel = tk.Label(root, text='Select Scene:', font=(self.widgetFont, self.widgetFontSize))
-        self.selSceneLabel.grid(row=0, column=2, sticky=tk.W)
+        self.selSceneLabel.grid(row=0, column=3, sticky=tk.W)
         self.sceneList = tk.OptionMenu(root, self.defScene, *self.scene, command=self.setValues)
         self.sceneList.config(font=(self.widgetFont, self.widgetFontSize - 2), width=15, anchor=tk.W)
-        self.sceneList.grid(row=1, column=2, sticky=tk.NE)
+        self.sceneList.grid(row=1, column=3, sticky=tk.NE)
 
     def auto_exposure_select(self):
         # Select Scene List
         self.defAutoExposure = tk.StringVar(root)
         self.defAutoExposure.set(self.auto_exposures[0])  # default value
         self.selAutoExposureLabel = tk.Label(root, text='Select AutoExposure:', font=(self.widgetFont, self.widgetFontSize))
-        self.selAutoExposureLabel.grid(row=0, column=3, sticky=tk.W)
+        self.selAutoExposureLabel.grid(row=0, column=4, sticky=tk.W)
         self.AutoExposureList = tk.OptionMenu(root, self.defAutoExposure, *self.auto_exposures, command=self.setAutoExposure)
         self.AutoExposureList.config(font=(self.widgetFont, self.widgetFontSize - 2), width=15, anchor=tk.W)
-        self.AutoExposureList.grid(row=1, column=3, sticky=tk.NE)
+        self.AutoExposureList.grid(row=1, column=4, sticky=tk.NE)
 
     def playback_text_box(self):
         # TextBox
@@ -198,6 +215,28 @@ class Browser:
         tk.Label(root, text="Video FPS").grid(row=36, column=1)
         self.e1 = tk.Entry(root, textvariable=self.save_video_fps)
         self.e1.grid(row=37, column=1)
+
+    def col_num_grids_text(self):
+        # TextBox
+        self.col_num_grids_ = tk.StringVar()
+        # video_speed = 1
+        tk.Label(root, text=" Number of Grids per Column").grid(row=32, column=2)
+        self.e1 = tk.Entry(root, textvariable=self.col_num_grids_)
+        self.e1.grid(row=33, column=2)
+
+    def row_num_grids_text(self):
+        # TextBox
+        self.row_num_grids_ = tk.StringVar()
+        # video_speed = 1
+        tk.Label(root, text=" Number of Grids per Row").grid(row=34, column=2)
+        self.e1 = tk.Entry(root, textvariable=self.row_num_grids_)
+        self.e1.grid(row=35, column=2)
+
+    def local_consider_outliers_checkbox(self):
+
+        self.local_consider_outliers_check = tk.IntVar()
+        self.c1 = tk.Checkbutton(root, text='Consider outliers at local selection', variable = self.local_consider_outliers_check, offvalue=0, onvalue=1, command= self.switch_res)
+        self.c1.grid(row = 36, column = 2)
 
     def high_res_checkbox(self):
 
@@ -226,7 +265,7 @@ class Browser:
         self.horSlider = tk.Scale(root, activebackground='black', cursor='sb_h_double_arrow', from_=0, to=self.frame_num[0] - 1,
                              label='Frame Number', font=(self.widgetFont, self.widgetFontSize), orient=tk.HORIZONTAL,
                              length=self.widthToScale, command=self.updateSlider)
-        self.horSlider.grid(row=31, column=1, sticky=tk.SW)
+        self.horSlider.grid(row=31, column=1, columnspan=2,  sticky=tk.SW)
 
     def vertical_slider(self):
         # Vertical Slider
@@ -310,7 +349,7 @@ class Browser:
         self.tempImg_2 = Image.frombytes('RGB', self.fig.canvas.get_width_height(), self.fig.canvas.tostring_rgb())
         self.photo_2 = ImageTk.PhotoImage(self.tempImg_2)
         self.imagePrevlabel_2 = tk.Label(root, image=self.photo_2)
-        self.imagePrevlabel_2.grid(row=4, column=2, columnspan=2, rowspan=24, sticky=tk.NE)
+        self.imagePrevlabel_2.grid(row=4, column=3, columnspan=2, rowspan=24, sticky=tk.NE)
 
     def HdrMean(self):
 
@@ -381,7 +420,7 @@ class Browser:
         self.mertens_pic = []
 
 
-        if self.res_check == 0 and self.hdr_mode_check == 0:
+        if self.res_check == 0 and self.current_auto_exposure == "None":
 
             for i in range(100):
 
@@ -422,38 +461,60 @@ class Browser:
 
             video.release()
 
-        elif self.res_check == 0 and self.hdr_mode_check == 1:
+        elif self.res_check == 0 and self.current_auto_exposure == "Global" or self.current_auto_exposure == 'Local':
+            if not len(self.eV) == 100:
+                return
+
+            for i in range(100):
+                self.temp_img_ind = int(i) * self.stack_size[self.scene_index] + self.eV[i]
+                self.check = False
+                self.updatePlot()
+                reg_vid_plot.append(self.tempImg_2)
+
+                img = deepcopy(self.img_all[self.temp_img_ind])
+                reg_vid.append(img)
+
+            m1 = Image.fromarray(reg_vid[0])
+            m2 = reg_vid_plot[0]
+            sv = self.get_concat_h_blank(m1, m2)
 
             self.check_fps()
 
-            vid_name = self.scene[self.scene_index] + "_0.12_" + "Mertens" + "_FPS_" + str(self.video_fps) + ".avi"
-            folderStore = os.path.join(os.path.dirname(__file__), 'HDR_Mertens_Video')
+            fold_name = self.scene[self.scene_index] + "_0.12_Ex_" + self.current_auto_exposure + "_FPS_" + str(
+                self.video_fps)
+            folderStore = os.path.join(os.path.dirname(__file__), 'Regular_Videos')
             os.makedirs(folderStore, exist_ok=True)
-            save_vid = folderStore + self.joinPathChar + vid_name
+            connected_image = folderStore + self.joinPathChar + fold_name + ".avi"
 
-            video = cv2.VideoWriter(save_vid, cv2.VideoWriter_fourcc('M', 'J', "P", 'G'), self.video_fps,
-                                    (806, 538))  # fourcc,
+            # capture the image and save it on the save path
+            os.makedirs(folderStore, exist_ok=True)
 
-            print(folderStore)
+            print(self.eV)
+            video = cv2.VideoWriter(connected_image, cv2.VideoWriter_fourcc('M', 'J', "P", 'G'), self.video_fps,
+                                    (sv.width, sv.height))
 
-            for i in range(len(self.img_mertens)):
+            for i in range(len(reg_vid)):
+                tempImg = Image.fromarray(reg_vid[i])
+                temp_img_plot = reg_vid_plot[i]
 
-                video.write(cv2.cvtColor(self.img_mertens[i], cv2.COLOR_RGB2BGR))
-                print(type(self.img_mertens[i]))
+                array = np.array(self.get_concat_h_blank(tempImg, temp_img_plot))
+                video.write(cv2.cvtColor(array, cv2.COLOR_RGB2BGR))
 
             video.release()
 
-        elif self.res_check == 1 and self.hdr_mode_check == 0:
+            self.check_fps()
+
+        elif self.res_check == 1 and self.current_auto_exposure == "None":
 
             self.check_fps()
 
             regular.main(self.scene[self.scene_index], self.video_fps, self.verSlider.get(), list, self.folders)
 
-        elif self.res_check == 1 and self.hdr_mode_check == 1:
+        elif self.res_check == 1 and self.current_auto_exposure == "Global" or self.current_auto_exposure == 'Local':
 
             self.check_fps()
 
-            mertens.main(self.scene[self.scene_index], self.video_fps, self.folders)
+            high_res_auto_ex_video.main(self.scene[self.scene_index], self.video_fps,self.eV,self.current_auto_exposure, self.folders)
 
     def get_concat_h_blank(self, im1, im2, color=(0, 0, 0)):
         dst = Image.new('RGB', (im1.width + im2.width, max(im1.height, im2.height)), color)
@@ -473,6 +534,41 @@ class Browser:
             except ValueError:
                 self.video_fps = 10  # set as default speed
 
+    def check_num_grids(self):
+        if len(self.rectangles) == 0:
+            self.check_row_num_grids()
+            self.check_col_num_grids()
+        else:
+            print(" Please clear rectangles before changing grid size")
+
+    def check_row_num_grids(self):
+
+        print("row num girds is ", self.row_num_grids_.get())
+
+        if self.validate_num_grids(self.row_num_grids_.get()) is True:
+
+            try:
+                self.row_num_grids = int(self.row_num_grids_.get())
+                # print(set_speed)
+            except ValueError:
+                self.row_num_grids = 8  # set as default speed
+        else:
+            self.row_num_grids = 8
+
+    def check_col_num_grids(self):
+
+        print("col num girds is ", self.col_num_grids_.get())
+
+        if self.validate_num_grids(self.col_num_grids_.get()) is True:
+
+            try:
+                self.col_num_grids = int(self.col_num_grids_.get())
+                # print(set_speed)
+            except ValueError:
+                self.col_num_grids = 8  # set as default speed
+        else:
+            self.col_num_grids = 8
+
     def pauseRun(self):
 
         self.play = False
@@ -483,34 +579,48 @@ class Browser:
         self.playVideo()
         # time.sleep(1)
         # print(scene_name)
-
+        self.check_num_grids()
         if self.scene[self.scene_index] != self.defScene.get():
-            exposures = exposure_class.Exposure('Scene1_raw_imgs.npy', downsample_rate=1 / 60, r_percent=0, g_percent=1,
-                                                x_num_grids=8, y_num_grids=8, low_threshold=0.1, low_rate=0.2,
-                                                high_threshold=0.35, high_rate=0.5)
+            self.clear_rects()
+            self.scene_index = self.scene.index(self.defScene.get())
+            input_ims = 'Image_Arrays_exposure/Scene' + str(self.scene_index + 1) + '_ds_raw_imgs.npy'
+
+            exposures = exposure_class.Exposure(input_ims, downsample_rate=1 / 64, r_percent=0.25, g_percent=0.5,
+                                                col_num_grids=self.col_num_grids, row_num_grids=self.row_num_grids, low_threshold=-0.1, low_rate=0.2,
+                                                high_threshold=1.1, high_rate=0.2)
             self.eV = exposures.pipeline()
 
             self.img_all = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + self.joinPathChar + self.defScene.get() + '_imgs_' + str(self.downscale_ratio) + '.npy')
             self.img_mean_list = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + self.joinPathChar + self.defScene.get() + '_img_mean_' + str(self.downscale_ratio) + '.npy') / (2 ** self.bit_depth - 1)
-            self.scene_index = self.scene.index(self.defScene.get())
+
             self.img_mertens = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + self.joinPathChar + self.scene[self.scene_index] + '_mertens_imgs_' + str(self.downscale_ratio) + '.npy')
 
 
             self.resetValues()
 
-    def setAutoExposure(self, dummy = False):
+    def setAutoExposure(self, dummy=False):
         self.current_auto_exposure = self.defAutoExposure.get()
+        self.scene_index = self.scene.index(self.defScene.get())
+        print(self.scene_index)
+        input_ims = 'Image_Arrays_exposure/Scene' + str(self.scene_index+1) + '_ds_raw_imgs.npy'
+        self.check_num_grids()
 
+        #self.exposureParams = {"downsample_rate":1/64}
         if(self.current_auto_exposure == "Global"):
-            exposures = exposure_class.Exposure('Scene1_raw_imgs.npy', downsample_rate=1 / 60, r_percent=0, g_percent=1,
-                                                col_num_grids=8, row_num_grids=8, low_threshold=0.1, low_rate=0.2,
-                                                high_threshold=0.35, high_rate=0.5)
+            self.clear_rects()
+            exposures = exposure_class.Exposure(input_ims, downsample_rate=self.exposureParams["downsample_rate"], r_percent=0.25, g_percent=0.5,
+                                                col_num_grids=self.col_num_grids, row_num_grids=self.row_num_grids, low_threshold=-0.1, low_rate=0.2,
+                                                high_threshold=1.1, high_rate=0)
+            #exposures = exposure_class.Exposure(params = self.exposureParams)
             self.eV = exposures.pipeline()
         elif(self.current_auto_exposure == "Local"):
-            list_local = local_interested_grids_generater(8, 8, [[self.rowGridSelect, self.colGridSelect]])
-            exposures = exposure_class.Exposure('Scene1_raw_imgs.npy', downsample_rate=1 / 60, r_percent=0, g_percent=1,
-                                                col_num_grids=8, row_num_grids=8, low_threshold=0.1, low_rate=0.2,
-                                                high_threshold=0.35, high_rate=0.5, local_indices=list_local)
+            consider_outliers = bool(self.local_consider_outliers_check.get())
+            print(consider_outliers)
+            list_local = local_interested_grids_generater(self.row_num_grids, self.col_num_grids, self.rectangles)
+            print(self.rectangles)
+            exposures = exposure_class.Exposure(input_ims, downsample_rate=1 / 64, r_percent=0.25, g_percent=0.5,
+                                                col_num_grids=self.col_num_grids, row_num_grids=self.row_num_grids, low_threshold=-0.1, low_rate=0.2,
+                                                high_threshold=1.1, high_rate=0.2, local_indices=list_local,local_with_downsampled_outliers=consider_outliers)
             self.eV = exposures.pipeline()
 
         print("CURRENT AUTO EXPOSURE", self.current_auto_exposure)
@@ -550,9 +660,21 @@ class Browser:
         except ValueError:
             return True
 
+    def validate_num_grids(self, num):
+        try:
+            if int(num) and 1 < int(num) < 31:
+                return True
+            else:
+                print("please enter an integer between 2 and 30")
+                return False
+        except ValueError:
+            print("please enter an integer between 2 and 30")
+            return False
+
     def resetValues(self):
         # global verSlider, horSlider, photo, img, scene_index, play, useMertens
-
+        if self.current_auto_exposure == "Local":
+            self.setAutoExposure()
         # self.useMertens = False
         # print("Reset")
         self.play = False
@@ -600,21 +722,24 @@ class Browser:
         self.photo_2 = ImageTk.PhotoImage(self.tempImg_2)
         self.imagePrevlabel_2.configure(image=self.photo_2)
 
+    def clear_rects(self):
+        self.rectangles = []
+        for rect in self.current_rects:
+            self.canvas.delete(rect)
+        self.current_rects = []
+
     def canvas_click(self, event):
         col, row = event.x, event.y
 
-
-
-        for rect in self.current_rects:
-            self.canvas.delete(rect)
+        #self.clear_rects()
 
         if self.current_auto_exposure  == "Local":
-            self.colGridSelect = int(col * 8 / self.photo.width())
-            self.rowGridSelect = int(row * 8 / self.photo.height())
-
-            rectangles = np.array([[self.rowGridSelect, self.colGridSelect]]) #making this array to allow us to be flexible in the future
-            for rect in rectangles:
-                self.current_rects.append(self.draw_rectangle(rect[0], rect[1], "blue"))
+            self.check_num_grids()
+            self.colGridSelect = int(col * self.col_num_grids / self.photo.width())
+            self.rowGridSelect = int(row * self.row_num_grids / self.photo.height())
+            rect = [self.rowGridSelect, self.colGridSelect]
+            self.rectangles.append(rect) #making this array to allow us to be flexible in the future
+            self.current_rects.append(self.draw_rectangle(rect[0], rect[1], "green"))
             self.setAutoExposure()
 
 
@@ -622,19 +747,19 @@ class Browser:
     def draw_rectangle(self, row, col, color):
         ww = self.photo.width()
         hh= self.photo.height()
-        topx = col * (ww // 8)
-        if col == 7:
+        topx = col * (ww // self.col_num_grids)
+        if col == self.col_num_grids - 1:
             botx = ww - 1
         else:
-            botx = (col + 1) * (ww // 8)
+            botx = (col + 1) * (ww // self.col_num_grids)
 
-        topy = row * (hh // 8)
-        if row == 7:
+        topy = row * (hh // self.row_num_grids)
+        if row == self.row_num_grids - 1:
             boty = hh - 1
         else:
-            boty = (row + 1) * (hh // 8)
-        print(topx, topy, botx, boty)
-        rect = self.canvas.create_rectangle(topx, topy, botx, boty, dash=(2, 2), fill='', outline=color)
+            boty = (row + 1) * (hh // self.row_num_grids)
+        #print(topx, topy, botx, boty)
+        rect = self.canvas.create_rectangle(topx, topy, botx, boty, fill='', outline=color)
         return rect
 
 

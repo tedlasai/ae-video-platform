@@ -1,13 +1,13 @@
 import os
 import numpy as np
 import rawpy as rawpy
-import exifread
+#import exifread
 import time
 
-def getMata_exifread(filePath):
-    f = open(filePath, "rb")
-    exif_0 = exifread.process_file(f)
-    return exif_0['EXIF ExposureTime'], exif_0['EXIF ISOSpeedRatings']
+# def getMata_exifread(filePath):
+#     f = open(filePath, "rb")
+#     exif_0 = exifread.process_file(f)
+#     return exif_0['EXIF ExposureTime'], exif_0['EXIF ISOSpeedRatings']
 
 
 # https://stackoverflow.com/questions/1806278/convert-fraction-to-float
@@ -31,7 +31,11 @@ def fraction_str_to_float(str):
 
 start_time = time.time()
 NUMBER_OF_IMAGES_PER_STACK = 15
-read_path = 'I:/Final/Scene1_Flashing/'
+read_path = 'D:/Final/Scene20_MeteorDebris/'
+scene_num = '20'
+save_loc = os.path.join(os.path.dirname(__file__), 'Image_Arrays_exposure')
+os.makedirs(save_loc, exist_ok=True)
+joinPathChar = "/"
 
 listdir_ = os.listdir(read_path)
 images = [read_path + f for f in listdir_ if f.endswith(('.cr2', '.CR2'))]
@@ -57,7 +61,7 @@ else:
         #scale data between 0-255
         #this is the active area for this sensor and also takes into account the default crop
         raw_bayer = raw_bayer [54:4544-10,148:6868]
-        print(np.right_shift(np.array([16383], 6)))
+        #print(np.right_shift(np.array([16383], 6)))
 
         raw_bayer_downscaled = np.right_shift(raw_bayer, 6)
         raw_bayer_downscaled = raw_bayer_downscaled[::4,::4]
@@ -76,7 +80,7 @@ else:
             # one_stack_isos_temp_list = []
             # one_stack_shutter_speeds_temp_list = []
 
-    np.save('Scene1_raw_imgs',np.asarray(list_of_ims))
+    np.save(save_loc + joinPathChar + 'Scene' + scene_num + '_ds_raw_imgs',np.asarray(list_of_ims))
     # np.save('Scene_img_ex_times',np.asarray(list_of_shutter_speeds))
     # np.save('Scene_img_isos',np.asarray(list_of_isos))
 

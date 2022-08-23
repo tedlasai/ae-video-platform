@@ -185,28 +185,48 @@ class Exposure:
         low_oned_indices = self.fourd_indices_to_oned_indices(low_coord_list)
         return high_oned_indices, low_oned_indices
 
+    # def get_grids_weight_matrix(self, grid_means):
+    #     if len(self.local_indices) != 0:
+    #         oned_indices = self.fourd_indices_to_oned_indices(self.local_indices)
+    #         weights = np.zeros((self.num_frame, self.num_ims_per_frame, self.row_num_grids, self.col_num_grids))
+    #         weights.flat[oned_indices] = 1
+    #         if self.local_with_downsampled_outliers:
+    #             high_oned_indices, low_oned_indices = self.get_lists_of_outlier_one_d_indices(grid_means)
+    #             high_oned_indices = list(filter(lambda x: x in oned_indices, high_oned_indices))
+    #             low_oned_indices = list(filter(lambda x: x in oned_indices, low_oned_indices))
+    #             print("high indices ")
+    #             print(high_oned_indices)
+    #             print("low indices")
+    #             print(low_oned_indices)
+    #         else:
+    #             return weights
+    #
+    #     else:
+    #         weights = np.ones((self.num_frame, self.num_ims_per_frame, self.row_num_grids, self.col_num_grids))
+    #         high_oned_indices, low_oned_indices = self.get_lists_of_outlier_one_d_indices(grid_means)
+    #     weights.flat[high_oned_indices] = self.high_rate
+    #     weights.flat[low_oned_indices] = self.low_rate
+    #     return weights
+
     def get_grids_weight_matrix(self, grid_means):
         if len(self.local_indices) != 0:
             oned_indices = self.fourd_indices_to_oned_indices(self.local_indices)
             weights = np.zeros((self.num_frame, self.num_ims_per_frame, self.row_num_grids, self.col_num_grids))
-            weights.flat[oned_indices] = 1
+            weights.flat[oned_indices] = 1.0
             if self.local_with_downsampled_outliers:
-                high_oned_indices, low_oned_indices = self.get_lists_of_outlier_one_d_indices(grid_means)
-                high_oned_indices = list(filter(lambda x: x in oned_indices, high_oned_indices))
-                low_oned_indices = list(filter(lambda x: x in oned_indices, low_oned_indices))
-                print("high indices ")
-                print(high_oned_indices)
-                print("low indices")
-                print(low_oned_indices)
+                high_indices = np.where(grid_means > self.high_threshold)
+                low_indices = np.where(grid_means < self.low_threshold)
             else:
-                return weights
+                return weights, weights
 
         else:
             weights = np.ones((self.num_frame, self.num_ims_per_frame, self.row_num_grids, self.col_num_grids))
-            high_oned_indices, low_oned_indices = self.get_lists_of_outlier_one_d_indices(grid_means)
-        weights.flat[high_oned_indices] = self.high_rate
-        weights.flat[low_oned_indices] = self.low_rate
-        return weights
+            high_indices = np.where(grid_means > self.high_threshold)
+            low_indices = np.where(grid_means < self.low_threshold)
+        weights_before = np.array(weights)
+        weights[high_indices] *= self.high_rate
+        weights[low_indices] *= self.low_rate
+        return weights, weights_before
 
     # helper function to convert (row_num_grids,col_num_grids) to an one d index
     def twod_indices_to_oned_index(self, twod_ind):
@@ -232,6 +252,32 @@ class Exposure:
                 end = (1 + third_ind_of_grided_ims) * num_of_pixels_per_grid
                 flatten_weighted_ims[i][j][start:end] = flatten_weighted_im_per_grid
         return flatten_weighted_ims
+
+    def get_flatten_weighted_imgs_local_wo_grids(self, ims):
+        flatten_weighted_ims = np.ones((self.num_frame, self.num_ims_per_frame, self.h , self.w)) * (-0.01)
+        for (y_start,x_start,y_end,x_end) in self.local_indices:
+            y_start = int(y_start * self.h)
+            x_start = int(x_start * self.w)
+            y_end = int(y_end * self.h)
+            x_end = int(x_end * self.w)
+            print("&&&&&")
+            print(y_start)
+            print(x_start)
+            print(y_end)
+            print(x_end)
+            print("&&&&&&")
+
+            flatten_weighted_ims[:,:,y_start:y_end+1,x_start:x_end+1] = ims[:,:,y_start:y_end+1,x_start:x_end+1]
+        print(ims.shape)
+        flatten_weighted_ims = flatten_weighted_ims.reshape((self.num_frame, self.num_ims_per_frame, self.h*self.w))
+        flatten_weighted_ims_before_outlier = np.array(flatten_weighted_ims)
+        flatten_weighted_ims[flatten_weighted_ims < self.low_threshold] = -0.01
+        flatten_weighted_ims[flatten_weighted_ims > self.high_threshold] = -0.01
+        print("high rate: "+ str(self.high_threshold))
+        print("low rate: "+str(self.low_threshold))
+        print(flatten_weighted_ims[0][0])
+        print(flatten_weighted_ims_before_outlier[0][0])
+        return flatten_weighted_ims,flatten_weighted_ims_before_outlier
 
     def get_hists(self, flatten_weighted_ims):
         scene_hists_include_drooped_counts = self.hist_laxis(flatten_weighted_ims, self.num_hist_bins + 1, (
@@ -288,9 +334,24 @@ class Exposure:
     def pipeline(self):
         downsampled_ims = self.downsample_blending_rgb_channels()
         grided_ims, grided_means = self.get_grided_ims(downsampled_ims)
-        weights = self.get_grids_weight_matrix(grided_means)
+        weights,weights_before_ds_outlier = self.get_grids_weight_matrix(grided_means)
         flatten_weighted_ims = self.get_flatten_weighted_imgs(weights, grided_ims)
+        flatten_weighted_ims_before_ds_outlier = self.get_flatten_weighted_imgs(weights_before_ds_outlier, grided_ims)
         hists, dropped = self.get_hists(flatten_weighted_ims)
+        hists_before_ds_outlier, dropped_before_ds_outlier = self.get_hists(flatten_weighted_ims_before_ds_outlier)
         weighted_means = self.get_means(dropped, flatten_weighted_ims)
         opti_inds = self.get_optimal_img_index(weighted_means)
-        return opti_inds
+        return opti_inds,weighted_means,hists,hists_before_ds_outlier
+
+    def pipeline_local_without_grids(self):
+        downsampled_ims = self.downsample_blending_rgb_channels()
+        # grided_ims, grided_means = self.get_grided_ims(downsampled_ims)
+        # weights,weights_before_ds_outlier = self.get_grids_weight_matrix(grided_means)
+        flatten_weighted_ims,flatten_weighted_ims_before_outlier = self.get_flatten_weighted_imgs_local_wo_grids(downsampled_ims)
+
+        #flatten_weighted_ims_before_ds_outlier = self.get_flatten_weighted_imgs(weights_before_ds_outlier, grided_ims)
+        hists, dropped = self.get_hists(flatten_weighted_ims)
+        hists_before_ds_outlier, dropped_before_ds_outlier = self.get_hists(flatten_weighted_ims_before_outlier)
+        weighted_means = self.get_means(dropped, flatten_weighted_ims)
+        opti_inds = self.get_optimal_img_index(weighted_means)
+        return opti_inds,weighted_means,hists,flatten_weighted_ims_before_outlier

@@ -42,7 +42,7 @@ class Browser:
         self.stack_size = [15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
                            15, 15, 15]  # number of shutter options per position
 
-        self.auto_exposures = ["None", "Global", "Local"]
+        self.auto_exposures = ["None", "Global", "Local",'Local without grids']
         self.current_auto_exposure = "None"
 
         self.scene_index = 0
@@ -80,18 +80,30 @@ class Browser:
         # Image Convas
         self.photo = ImageTk.PhotoImage(Image.fromarray(self.img))
 
-        self.canvas = tk.Canvas(root, width=self.photo.width(), height=self.photo.height(),
+        self.canvas = tk.Canvas(root, cursor="cross", width=self.photo.width(), height=self.photo.height(),
                            borderwidth=0, highlightthickness=0)
         self.canvas.grid(row=1, column=1, columnspan=2, rowspan=30, padx=0, pady=0, sticky=tk.NW)
         self.canvas_img = self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
         self.current_rects = []  # the rectangles drawn in canvas
         self.rectangles = []  # the coordinates of the rectangles
-        self.canvas.bind('<Button-1>', self.canvas_click)
+        self.current_rects_wo_grids = []
+        self.rects_without_grids = []  # the coordinates of the rectangles @ local without grids
+        #self.canvas.bind('<Button-1>', self.canvas_click)
+        self.canvas.bind('<ButtonPress-1>',self.on_button_press)
+        self.canvas.bind('<B1-Motion>', self.on_move_press)
+        self.canvas.bind('<ButtonRelease-1>', self.on_button_release)
         #some defaults
         self.col_num_grids = 8
         self.row_num_grids = 8
         self.rowGridSelect = 0
         self.colGridSelect = 0
+        self.rect = None
+        self.x = 0
+        self.y = 0
+        self.start_x = None
+        self.start_y = None
+        self.curX = 0
+        self.curY = 0
         self.init_functions()
 
     def init_functions(self):
@@ -219,15 +231,15 @@ class Browser:
     def col_num_grids_text(self):
         # TextBox
         self.col_num_grids_ = tk.StringVar()
-        # video_speed = 1
         tk.Label(root, text=" Number of Grids per Column").grid(row=32, column=2)
+        self.col_num_grids_.set('8')
         self.e1 = tk.Entry(root, textvariable=self.col_num_grids_)
         self.e1.grid(row=33, column=2)
 
     def row_num_grids_text(self):
         # TextBox
         self.row_num_grids_ = tk.StringVar()
-        # video_speed = 1
+        self.row_num_grids_.set('8')
         tk.Label(root, text=" Number of Grids per Row").grid(row=34, column=2)
         self.e1 = tk.Entry(root, textvariable=self.row_num_grids_)
         self.e1.grid(row=35, column=2)
@@ -584,11 +596,12 @@ class Browser:
             self.clear_rects()
             self.scene_index = self.scene.index(self.defScene.get())
             input_ims = 'Image_Arrays_exposure/Scene' + str(self.scene_index + 1) + '_ds_raw_imgs.npy'
+            self.setAutoExposure()
 
-            exposures = exposure_class.Exposure(input_ims, downsample_rate=1 / 64, r_percent=0.25, g_percent=0.5,
-                                                col_num_grids=self.col_num_grids, row_num_grids=self.row_num_grids, low_threshold=-0.1, low_rate=0.2,
-                                                high_threshold=1.1, high_rate=0.2)
-            self.eV = exposures.pipeline()
+            # exposures = exposure_class.Exposure(input_ims, downsample_rate=self.exposureParams["downsample_rate"], r_percent=self.exposureParams['r_percent'], g_percent=self.exposureParams['g_percent'],
+            #                                     col_num_grids=self.exposureParams['col_num_grids'], row_num_grids=self.exposureParams['row_num_grids'], low_threshold=self.exposureParams['low_threshold'], low_rate=self.exposureParams['low_rate'],
+            #                                     high_threshold=self.exposureParams['high_threshold'], high_rate=self.exposureParams['high_rate'])
+            # self.eV,weighted_means,hists,hists_before_ds_outlier = exposures.pipeline()
 
             self.img_all = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + self.joinPathChar + self.defScene.get() + '_imgs_' + str(self.downscale_ratio) + '.npy')
             self.img_mean_list = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + self.joinPathChar + self.defScene.get() + '_img_mean_' + str(self.downscale_ratio) + '.npy') / (2 ** self.bit_depth - 1)
@@ -605,25 +618,54 @@ class Browser:
         input_ims = 'Image_Arrays_exposure/Scene' + str(self.scene_index+1) + '_ds_raw_imgs.npy'
         self.check_num_grids()
 
-        #self.exposureParams = {"downsample_rate":1/64}
+        self.exposureParams = {"downsample_rate":1/64,'r_percent':0.25,'g_percent':0.5,
+                                                'col_num_grids':self.col_num_grids, 'row_num_grids':self.row_num_grids, 'low_threshold':-0.1, 'low_rate':0.2,
+                                                'high_threshold':1.1, 'high_rate':0}
         if(self.current_auto_exposure == "Global"):
             self.clear_rects()
-            exposures = exposure_class.Exposure(input_ims, downsample_rate=self.exposureParams["downsample_rate"], r_percent=0.25, g_percent=0.5,
-                                                col_num_grids=self.col_num_grids, row_num_grids=self.row_num_grids, low_threshold=-0.1, low_rate=0.2,
-                                                high_threshold=1.1, high_rate=0)
+            exposures = exposure_class.Exposure(input_ims, downsample_rate=self.exposureParams["downsample_rate"], r_percent=self.exposureParams['r_percent'], g_percent=self.exposureParams['g_percent'],
+                                                col_num_grids=self.exposureParams['col_num_grids'], row_num_grids=self.exposureParams['row_num_grids'], low_threshold=self.exposureParams['low_threshold'], low_rate=self.exposureParams['low_rate'],
+                                                high_threshold=self.exposureParams['high_threshold'], high_rate=self.exposureParams['high_rate'])
             #exposures = exposure_class.Exposure(params = self.exposureParams)
-            self.eV = exposures.pipeline()
+            self.eV,weighted_means,hists,hists_before_ds_outlier = exposures.pipeline()
         elif(self.current_auto_exposure == "Local"):
+            self.clear_rects_local_wo_grids()
             consider_outliers = bool(self.local_consider_outliers_check.get())
             print(consider_outliers)
             list_local = local_interested_grids_generater(self.row_num_grids, self.col_num_grids, self.rectangles)
             print(self.rectangles)
-            exposures = exposure_class.Exposure(input_ims, downsample_rate=1 / 64, r_percent=0.25, g_percent=0.5,
-                                                col_num_grids=self.col_num_grids, row_num_grids=self.row_num_grids, low_threshold=-0.1, low_rate=0.2,
-                                                high_threshold=1.1, high_rate=0.2, local_indices=list_local,local_with_downsampled_outliers=consider_outliers)
-            self.eV = exposures.pipeline()
+            exposures = exposure_class.Exposure(input_ims, downsample_rate=self.exposureParams["downsample_rate"], r_percent=self.exposureParams['r_percent'], g_percent=self.exposureParams['g_percent'],
+                                                col_num_grids=self.exposureParams['col_num_grids'], row_num_grids=self.exposureParams['row_num_grids'], low_threshold=self.exposureParams['low_threshold'], low_rate=self.exposureParams['low_rate'],
+                                                high_threshold=self.exposureParams['high_threshold'], high_rate=self.exposureParams['high_rate'],local_indices=list_local)
+            self.eV,weighted_means,hists,hists_before_ds_outlier = exposures.pipeline()
+        elif(self.current_auto_exposure == "Local without grids"):
+            self.clear_rects_local()
+            list_local = self.list_local_without_grids()
+            w, h = self.canvas.winfo_width(), self.canvas.winfo_height()
+            print(w)
+            print(h)
+            print("------")
+            print(list_local)
+            exposures = exposure_class.Exposure(input_ims, downsample_rate=self.exposureParams["downsample_rate"],
+                                                r_percent=self.exposureParams['r_percent'],
+                                                g_percent=self.exposureParams['g_percent'],
+                                                col_num_grids=self.exposureParams['col_num_grids'],
+                                                row_num_grids=self.exposureParams['row_num_grids'],
+                                                low_threshold=self.exposureParams['low_threshold'],
+                                                low_rate=self.exposureParams['low_rate'],
+                                                high_threshold=self.exposureParams['high_threshold'],
+                                                high_rate=self.exposureParams['high_rate'], local_indices=list_local)
+            self.eV, weighted_means, hists, hists_before_ds_outlier = exposures.pipeline_local_without_grids()
 
         print("CURRENT AUTO EXPOSURE", self.current_auto_exposure)
+
+    def list_local_without_grids(self):
+        list_ = []
+        w, h = self.canvas.winfo_width(), self.canvas.winfo_height()
+        for (y_start,x_strat,y_end,x_end) in self.rects_without_grids:
+            list_.append([y_start/h,x_strat/w,y_end/h,x_end/w])
+        return list_
+
 
     def playVideo(self):
         # global horSlider, scene, scene_index, defScene, img, img_all, img_mean_list, downscale_ratio, bit_depth, play, video_speed, useMertens
@@ -673,7 +715,7 @@ class Browser:
 
     def resetValues(self):
         # global verSlider, horSlider, photo, img, scene_index, play, useMertens
-        if self.current_auto_exposure == "Local":
+        if self.current_auto_exposure == "Local" or self.current_auto_exposure == "Local without grids":
             self.setAutoExposure()
         # self.useMertens = False
         # print("Reset")
@@ -723,10 +765,28 @@ class Browser:
         self.imagePrevlabel_2.configure(image=self.photo_2)
 
     def clear_rects(self):
+        self.clear_rects_local()
+        self.clear_rects_local_wo_grids()
+
+    def clear_rects_local(self):
         self.rectangles = []
         for rect in self.current_rects:
             self.canvas.delete(rect)
         self.current_rects = []
+
+    def clear_rects_local_wo_grids(self):
+        self.rects_without_grids = []
+        for rect in self.current_rects_wo_grids:
+            self.canvas.delete(rect)
+        self.current_rects_wo_grids = []
+
+
+    def mouse_events(self,event):
+        if self.current_auto_exposure == "Local":
+            self.canvas_click(event)
+        if self.current_auto_exposure == "Local without grids":
+            self.local_wo_grids(event)
+
 
     def canvas_click(self, event):
         col, row = event.x, event.y
@@ -741,8 +801,6 @@ class Browser:
             self.rectangles.append(rect) #making this array to allow us to be flexible in the future
             self.current_rects.append(self.draw_rectangle(rect[0], rect[1], "green"))
             self.setAutoExposure()
-
-
 
     def draw_rectangle(self, row, col, color):
         ww = self.photo.width()
@@ -762,6 +820,57 @@ class Browser:
         rect = self.canvas.create_rectangle(topx, topy, botx, boty, fill='', outline=color)
         return rect
 
+    def local_wo_grids(self,event):
+        self.on_button_press(event)
+        self.on_move_press(event)
+        self.on_button_release(event)
+
+    def on_button_press(self, event):
+        print("herehere")
+        self.start_x = self.canvas.canvasx(event.x)
+        self.start_y = self.canvas.canvasy(event.y)
+        if self.current_auto_exposure == "Local without grids":
+            # save mouse drag start position
+            # create rectangle if not yet exist
+            self.rect = self.canvas.create_rectangle(self.x, self.y, 1, 1, outline='red')
+            self.current_rects_wo_grids.append(self.rect)
+
+    def on_move_press(self, event):
+        if self.current_auto_exposure == "Local without grids":
+            curX = self.canvas.canvasx(event.x)
+            curY = self.canvas.canvasy(event.y)
+
+            w, h = self.canvas.winfo_width(), self.canvas.winfo_height()
+            print('w: '+str(w))
+            print('h: '+str(h))
+            print(event.x)
+            print(event.y)
+
+            # expand rectangle as you drag the mouse
+
+            self.canvas.coords(self.rect, self.start_x, self.start_y, curX, curY)
+            self.curX = curX
+            self.curY = curY
+            print("curx: "+ str(curX))
+            print("cury: "+ str(curY))
+
+    def on_button_release(self, event):
+        print("rect: "+str(self.rect))
+        print("start_x: "+str(self.start_x))
+        print("start_y: "+str(self.start_y))
+        print("cur_x: "+str(self.curX))
+        print("cur_y: "+str(self.curY))
+        if self.current_auto_exposure == "Local without grids":
+            self.rects_without_grids.append([self.start_y, self.start_x, self.curY, self.curX])
+            print(self.rects_without_grids)
+        if self.current_auto_exposure  == "Local":
+            self.check_num_grids()
+            self.colGridSelect = int(self.start_x * self.col_num_grids / self.photo.width())
+            self.rowGridSelect = int(self.start_y * self.row_num_grids / self.photo.height())
+            rect = [self.rowGridSelect, self.colGridSelect]
+            self.rectangles.append(rect) #making this array to allow us to be flexible in the future
+            self.current_rects.append(self.draw_rectangle(rect[0], rect[1], "green"))
+            self.setAutoExposure()
 
     def updateSlider(self, scale_value):
         if(self.current_auto_exposure != "None"):

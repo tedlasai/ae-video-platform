@@ -1,4 +1,6 @@
+import tkinter
 import tkinter as tk
+from RangeSlider.RangeSlider import RangeSliderH
 from PIL import Image, ImageTk
 import numpy as np
 import cv2
@@ -82,7 +84,7 @@ class Browser:
 
         self.canvas = tk.Canvas(root, cursor="cross", width=self.photo.width(), height=self.photo.height(),
                            borderwidth=0, highlightthickness=0)
-        self.canvas.grid(row=1, column=1, columnspan=2, rowspan=30, padx=0, pady=0, sticky=tk.NW)
+        self.canvas.grid(row=1, column=1, columnspan=2, rowspan=27, padx=0, pady=0, sticky=tk.NW)
         self.canvas_img = self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
         self.current_rects = []  # the rectangles drawn in canvas
         self.rectangles = []  # the coordinates of the rectangles
@@ -104,6 +106,7 @@ class Browser:
         self.start_y = None
         self.curX = 0
         self.curY = 0
+        self.num_bins = 100
         self.init_functions()
 
     def init_functions(self):
@@ -121,9 +124,11 @@ class Browser:
         self.horizontal_slider()
         self.vertical_slider()
         self.image_mean_plot()
+        self.hist_plot()
         self.regular_video_button()
         self.high_res_checkbox()
         self.mertens_checkbox()
+        self.outlier_slider()
         self.col_num_grids_text()
         self.row_num_grids_text()
         self.clear_interested_areas_button()
@@ -134,61 +139,92 @@ class Browser:
     def hdr_mean_button(self):
         # HDR Button - Mean
         self.HdrMeanButton = tk.Button(root, text='HDR-Mean', fg='#ffffff', bg='#999999', activebackground='#454545',
-                                  relief=tk.RAISED, width=16, font=(self.widgetFont, self.widgetFontSize), command=self.HdrMean)
-        self.HdrMeanButton.grid(row=29, column=3, sticky=tk.E)  # initial row was 26, +1 increments for all other rows
+                                  relief=tk.RAISED, width=16,padx=10, pady=5, font=(self.widgetFont, self.widgetFontSize), command=self.HdrMean)
+        self.HdrMeanButton.grid(row=1, column=5, sticky=tk.E)  # initial row was 26, +1 increments for all other rows
 
     def hdr_median_button(self):
         # HDR Button - Median
         self.HdrMedianButton = tk.Button(root, text='HDR-Median', fg='#ffffff', bg='#999999', activebackground='#454545',
-                                    relief=tk.RAISED, width=16, font=(self.widgetFont, self.widgetFontSize), command=self.HdrMedian)
-        self.HdrMedianButton.grid(row=30, column=3, sticky=tk.E)
+                                    relief=tk.RAISED, width=16, padx=10, pady=5,font=(self.widgetFont, self.widgetFontSize), command=self.HdrMedian)
+        self.HdrMedianButton.grid(row=2, column=5, sticky=tk.E)
 
     def hdr_mertens_button(self):
         # HDR Button - Mertens
         self.HdrMertensButton = tk.Button(root, text='HDR-Mertens', fg='#ffffff', bg='#999999', activebackground='#454545',
-                                     relief=tk.RAISED, width=16, font=(self.widgetFont, self.widgetFontSize), command=self.HdrMertens)
-        self.HdrMertensButton.grid(row=31, column=3, sticky=tk.E)
+                                     relief=tk.RAISED, width=16,padx=10, pady=5, font=(self.widgetFont, self.widgetFontSize), command=self.HdrMertens)
+        self.HdrMertensButton.grid(row=3, column=5, sticky=tk.E)
 
     def hdr_abdullah_button(self):
         # HDR Button - Abdullah
         self.HdrAbdullahButton = tk.Button(root, text='HDR-Abdullah', fg='#ffffff', bg='#999999', activebackground='#454545',
-                                      relief=tk.RAISED, width=16, font=(self.widgetFont, self.widgetFontSize),
+                                      relief=tk.RAISED, width=16,padx=10, pady=5, font=(self.widgetFont, self.widgetFontSize),
                                       command=self.HdrAbdullah)
-        self.HdrAbdullahButton.grid(row=32, column=3, sticky=tk.E)
+        self.HdrAbdullahButton.grid(row=4, column=5, sticky=tk.E)
 
     def hdr_run_button(self):
         # Run Button
         self.RunButton = tk.Button(root, text='Run', fg='#ffffff', bg='#999999', activebackground='#454545',
-                              relief=tk.RAISED, width=16, font=(self.widgetFont, self.widgetFontSize), command=self.setValues)
-        self.RunButton.grid(row=33, column=3, sticky=tk.E)
+                              relief=tk.RAISED, width=16, padx=10, pady=5,font=(self.widgetFont, self.widgetFontSize), command=self.setValues)
+        self.RunButton.grid(row=5, column=5, sticky=tk.E)
 
     def hdr_pause_button(self):
         self.PauseButton = tk.Button(root, text='Pause', fg='#ffffff', bg='#999999', activebackground='#454545',
-                                relief=tk.RAISED,
+                                relief=tk.RAISED,padx=10, pady=5,
                                 width=16, font=(self.widgetFont, self.widgetFontSize), command=self.pauseRun)
-        self.PauseButton.grid(row=34, column=3, sticky=tk.E)
+        self.PauseButton.grid(row=6, column=5, sticky=tk.E)
 
     def hdr_reset_button(self):
         # Reset Button
         self.RestButton = tk.Button(root, text='Reset', fg='#ffffff', bg='#999999', activebackground='#454545',
-                               relief=tk.RAISED, width=16, font=(self.widgetFont, self.widgetFontSize), command=self.resetValues)
-        self.RestButton.grid(row=35, column=3, sticky=tk.E)
+                               relief=tk.RAISED,padx=10, pady=5, width=16, font=(self.widgetFont, self.widgetFontSize), command=self.resetValues)
+        self.RestButton.grid(row=7, column=5, sticky=tk.E)
 
     def regular_video_button(self):
 
         self.VideoButton = tk.Button(root, text='Video', fg='#ffffff', bg='#999999', activebackground='#454545',
-                                relief=tk.RAISED,
+                                relief=tk.RAISED,padx=10, pady=5,
                                 width=16, font=(self.widgetFont, self.widgetFontSize), command=self.export_video)
-        self.VideoButton.grid(row=37, column=3, sticky=tk.E)
+        self.VideoButton.grid(row=8, column=5, sticky=tk.E)
+
+
+    def outlier_slider(self):
+        self.low_threshold = tk.DoubleVar()
+        self.high_threshold = tkinter.DoubleVar()
+        self.outlierSlider =RangeSliderH(root, [self.low_threshold,self.high_threshold],Width = 400, Height = 65, min_val = 0, max_val = 1, show_value=True,padX=17
+                                         , line_s_color="#7eb1c2",digit_precision='.2f')
+
+        self.outlierSlider.grid(padx = 10, pady = 10, row=28, column=2,columnspan=1, sticky=tk.E)
+        self.show_threshold()
+        self.low_rate_text_box()
+        self.high_rate_text_box()
+
+    def low_rate_text_box(self):
+        self.low_rate = tk.StringVar()
+        self.low_rate.set("0.2")
+        tk.Label(root, text="below low threshold").grid(row=29, column=2)
+        self.e1 = tk.Entry(root, textvariable=self.low_rate)
+        self.e1.grid(row=30, column=2)
+
+    def high_rate_text_box(self):
+        self.high_rate = tk.StringVar()
+        self.high_rate.set("0.2")
+        tk.Label(root, text="above high threshold").grid(row=31, column=2)
+        self.e1 = tk.Entry(root, textvariable=self.high_rate)
+        self.e1.grid(row=32, column=2)
+
+
+    def show_threshold(self):
+        print(self.low_threshold.get())
+        print(self.high_threshold.get())
 
     def clear_interested_areas_button(self):
         # clear the rects
         self.ClearInterestedAreasButton = tk.Button(root, text='Clear_Rectangles', fg='#ffffff', bg='#999999',
                                                activebackground='#454545',
-                                               relief=tk.RAISED, width=16,
+                                               relief=tk.RAISED, width=16,padx=10, pady=5,
                                                font=(self.widgetFont, self.widgetFontSize), command=self.clear_rects,
                                                )
-        self.ClearInterestedAreasButton.grid(row=29, column=4,
+        self.ClearInterestedAreasButton.grid(row=9, column=5,
                                         sticky=tk.E)  # initial row was 26, +1 increments for all other rows
 
 
@@ -216,45 +252,45 @@ class Browser:
         # TextBox
         self.video_speed = tk.StringVar()
         # video_speed = 1
-        tk.Label(root, text="Browser Playback Speed (ms delay)").grid(row=34, column=1)
+        tk.Label(root, text="Browser Playback Speed (ms delay)").grid(row=30, column=1)
         self.e1 = tk.Entry(root, textvariable=self.video_speed)
-        self.e1.grid(row=35, column=1)
+        self.e1.grid(row=31, column=1)
 
     def video_fps_text(self):
         # TextBox
         self.save_video_fps = tk.StringVar()
         # video_speed = 1
-        tk.Label(root, text="Video FPS").grid(row=36, column=1)
+        tk.Label(root, text="Video FPS").grid(row=32, column=1)
         self.e1 = tk.Entry(root, textvariable=self.save_video_fps)
-        self.e1.grid(row=37, column=1)
+        self.e1.grid(row=33, column=1)
 
     def col_num_grids_text(self):
         # TextBox
         self.col_num_grids_ = tk.StringVar()
-        tk.Label(root, text=" Number of Grids per Column").grid(row=32, column=2)
+        tk.Label(root, text=" Number of Grids per Column").grid(row=19, column=5)
         self.col_num_grids_.set('8')
         self.e1 = tk.Entry(root, textvariable=self.col_num_grids_)
-        self.e1.grid(row=33, column=2)
+        self.e1.grid(row=20, column=5)
 
     def row_num_grids_text(self):
         # TextBox
         self.row_num_grids_ = tk.StringVar()
         self.row_num_grids_.set('8')
-        tk.Label(root, text=" Number of Grids per Row").grid(row=34, column=2)
+        tk.Label(root, text=" Number of Grids per Row").grid(row=21, column=5)
         self.e1 = tk.Entry(root, textvariable=self.row_num_grids_)
-        self.e1.grid(row=35, column=2)
+        self.e1.grid(row=22, column=5)
 
     def local_consider_outliers_checkbox(self):
 
         self.local_consider_outliers_check = tk.IntVar()
         self.c1 = tk.Checkbutton(root, text='Consider outliers at local selection', variable = self.local_consider_outliers_check, offvalue=0, onvalue=1, command= self.switch_res)
-        self.c1.grid(row = 36, column = 2)
+        self.c1.grid(row = 23, column = 5)
 
     def high_res_checkbox(self):
 
         self.high_res_check = tk.IntVar()
         self.c1 = tk.Checkbutton(root, text='High Resolution', variable = self.high_res_check, offvalue=0, onvalue=1, command= self.switch_res)
-        self.c1.grid(row = 33, column = 1)
+        self.c1.grid(row = 28, column = 1)
 
     def switch_res(self):
 
@@ -265,7 +301,7 @@ class Browser:
 
         self.mertens_check = tk.IntVar()
         self.c1 = tk.Checkbutton(root, text=' Mertens Export', variable= self.mertens_check, offvalue= 0, onvalue= 1, command= self.switch_mertens)
-        self.c1.grid(row = 32, column = 1)
+        self.c1.grid(row = 29, column = 1)
 
     def switch_mertens(self):
 
@@ -277,7 +313,7 @@ class Browser:
         self.horSlider = tk.Scale(root, activebackground='black', cursor='sb_h_double_arrow', from_=0, to=self.frame_num[0] - 1,
                              label='Frame Number', font=(self.widgetFont, self.widgetFontSize), orient=tk.HORIZONTAL,
                              length=self.widthToScale, command=self.updateSlider)
-        self.horSlider.grid(row=31, column=1, columnspan=2,  sticky=tk.SW)
+        self.horSlider.grid(row=27, column=1, columnspan=2,  sticky=tk.SW)
 
     def vertical_slider(self):
         # Vertical Slider
@@ -314,12 +350,12 @@ class Browser:
 
         print(self.verSlider.configure().keys())
 
-        self.verSlider.grid(row=1, column=0, rowspan=30)
+        self.verSlider.grid(row=1, column=0, rowspan=25)
 
     def scale_labels(self, value):
 
         # self.verSlider.config(label=self.SCALE_LABELS[int(value)])
-        tk.Label(root, text=self.SCALE_LABELS[int(value)], font=("Times New Roman", 15)).grid(row=31, column=0, )
+        tk.Label(root, text=self.SCALE_LABELS[int(value)], font=("Times New Roman", 15)).grid(row=27, column=0, )
 
         # self.verSlider.place(x=50, y=300, anchor="center")
         self.useMertens = False
@@ -337,7 +373,7 @@ class Browser:
 
     def image_mean_plot(self):
 
-        self.fig = plt.figure(figsize=(4, 4))  # 4.6, 3.6
+        self.fig = plt.figure(figsize=(4, 3))  # 4.6, 3.6
         plt.plot(np.arange(self.stack_size[self.scene_index]), self.img_mean_list[0:self.stack_size[self.scene_index]], color='green',
                  linewidth=2)  # ,label='Exposure stack mean')
         plt.plot(0, self.img_mean_list[0], color='red', marker='o', markersize=12)
@@ -361,7 +397,49 @@ class Browser:
         self.tempImg_2 = Image.frombytes('RGB', self.fig.canvas.get_width_height(), self.fig.canvas.tostring_rgb())
         self.photo_2 = ImageTk.PhotoImage(self.tempImg_2)
         self.imagePrevlabel_2 = tk.Label(root, image=self.photo_2)
-        self.imagePrevlabel_2.grid(row=4, column=3, columnspan=2, rowspan=24, sticky=tk.NE)
+        self.imagePrevlabel_2.grid(row=2, column=3, columnspan=2, rowspan=15, sticky=tk.NE)
+
+    def hist_plot(self):
+        font = {'family': 'monospace',
+                'weight': 'bold',
+                'size': 10}
+        bins = np.arange(1,self.num_bins+1)
+        #self.fig = plt.figure(figsize=(4, 4))  # 4.6, 3.6
+        self.fig_2, axes = plt.subplots(2, sharex=True, sharey=True,figsize=(4, 6))
+        # count1 = self.hists[0][0]
+        # count2 = self.hists_before_ds_outlier[0][0]
+        count1 = np.zeros(100)
+        count2 = np.zeros(100)
+        axes[1].bar(bins, count2, align='center')
+        axes[0].bar(bins, count1, align='center')
+        axes[1].set_title('histogram with outlier',**font)
+        axes[0].set_title('histogram without outlier',**font)
+
+        # plt.plot(np.arange(self.stack_size[self.scene_index]), self.img_mean_list[0:self.stack_size[self.scene_index]], color='green',
+        #          linewidth=2)  # ,label='Exposure stack mean')
+        # plt.plot(0, self.img_mean_list[0], color='red', marker='o', markersize=12)
+        # plt.text(0, self.img_mean_list[0], '(' + str(0) + ', ' + str("%.2f" % self.img_mean_list[0]) + ')', color='red',
+        #          fontsize=13, position=(0 - 0.2, self.img_mean_list[0] + 0.04))
+        # plt.title('Exposure stack mean')
+        # plt.xlabel('Image index')
+        # plt.ylabel('Mean value')
+        # plt.xlim(-0.2, self.stack_size[self.scene_index] - 0.8)
+        # if self.stack_size[self.scene_index] < 20:
+        #     plt.xticks(np.arange(0, self.stack_size[self.scene_index], 1))
+        # elif self.stack_size[self.scene_index] >= 15 and self.stack_size[self.scene_index] < 30:
+        #     plt.xticks(np.arange(0, self.stack_size[self.scene_index], 2))
+        # else:
+        #     plt.xticks(np.arange(0, self.stack_size[self.scene_index], 3))
+        #
+        # plt.ylim(-0.02, 0.85)
+        # plt.yticks(np.arange(0, 0.85, 0.1))
+        self.fig_2.canvas.draw()
+
+        self.tempImg_3 = Image.frombytes('RGB', self.fig_2.canvas.get_width_height(), self.fig_2.canvas.tostring_rgb())
+        self.photo_3 = ImageTk.PhotoImage(self.tempImg_3)
+        self.imagePrevlabel_3 = tk.Label(root, image=self.photo_3)
+        self.imagePrevlabel_3.grid(row=17, column=3, columnspan=2, rowspan=20, sticky=tk.NE)
+
 
     def HdrMean(self):
 
@@ -617,8 +695,7 @@ class Browser:
         print(self.scene_index)
         input_ims = 'Image_Arrays_exposure/Scene' + str(self.scene_index+1) + '_ds_raw_imgs.npy'
         self.check_num_grids()
-
-        self.exposureParams = {"downsample_rate":1/64,'r_percent':0.25,'g_percent':0.5,
+        self.exposureParams = {"downsample_rate":1/25,'r_percent':0,'g_percent':1,
                                                 'col_num_grids':self.col_num_grids, 'row_num_grids':self.row_num_grids, 'low_threshold':-0.1, 'low_rate':0.2,
                                                 'high_threshold':1.1, 'high_rate':0}
         if(self.current_auto_exposure == "Global"):
@@ -627,7 +704,14 @@ class Browser:
                                                 col_num_grids=self.exposureParams['col_num_grids'], row_num_grids=self.exposureParams['row_num_grids'], low_threshold=self.exposureParams['low_threshold'], low_rate=self.exposureParams['low_rate'],
                                                 high_threshold=self.exposureParams['high_threshold'], high_rate=self.exposureParams['high_rate'])
             #exposures = exposure_class.Exposure(params = self.exposureParams)
-            self.eV,weighted_means,hists,hists_before_ds_outlier = exposures.pipeline()
+            self.eV,self.weighted_means,self.hists,self.hists_before_ds_outlier = exposures.pipeline()
+            print("#####")
+            print(self.eV.shape)
+            print(self.weighted_means.shape)
+            print(self.hists.shape)
+            print(self.hists_before_ds_outlier.shape)
+            print("#####")
+
         elif(self.current_auto_exposure == "Local"):
             self.clear_rects_local_wo_grids()
             consider_outliers = bool(self.local_consider_outliers_check.get())
@@ -637,14 +721,10 @@ class Browser:
             exposures = exposure_class.Exposure(input_ims, downsample_rate=self.exposureParams["downsample_rate"], r_percent=self.exposureParams['r_percent'], g_percent=self.exposureParams['g_percent'],
                                                 col_num_grids=self.exposureParams['col_num_grids'], row_num_grids=self.exposureParams['row_num_grids'], low_threshold=self.exposureParams['low_threshold'], low_rate=self.exposureParams['low_rate'],
                                                 high_threshold=self.exposureParams['high_threshold'], high_rate=self.exposureParams['high_rate'],local_indices=list_local)
-            self.eV,weighted_means,hists,hists_before_ds_outlier = exposures.pipeline()
+            self.eV,self.weighted_means,self.hists,self.hists_before_ds_outlier = exposures.pipeline()
         elif(self.current_auto_exposure == "Local without grids"):
             self.clear_rects_local()
             list_local = self.list_local_without_grids()
-            w, h = self.canvas.winfo_width(), self.canvas.winfo_height()
-            print(w)
-            print(h)
-            print("------")
             print(list_local)
             exposures = exposure_class.Exposure(input_ims, downsample_rate=self.exposureParams["downsample_rate"],
                                                 r_percent=self.exposureParams['r_percent'],
@@ -655,7 +735,7 @@ class Browser:
                                                 low_rate=self.exposureParams['low_rate'],
                                                 high_threshold=self.exposureParams['high_threshold'],
                                                 high_rate=self.exposureParams['high_rate'], local_indices=list_local)
-            self.eV, weighted_means, hists, hists_before_ds_outlier = exposures.pipeline_local_without_grids()
+            self.eV,self.weighted_means,self.hists,self.hists_before_ds_outlier = exposures.pipeline_local_without_grids()
 
         print("CURRENT AUTO EXPOSURE", self.current_auto_exposure)
 
@@ -715,8 +795,8 @@ class Browser:
 
     def resetValues(self):
         # global verSlider, horSlider, photo, img, scene_index, play, useMertens
-        if self.current_auto_exposure == "Local" or self.current_auto_exposure == "Local without grids":
-            self.setAutoExposure()
+        #if self.current_auto_exposure == "Local" or self.current_auto_exposure == "Local without grids":
+        self.setAutoExposure()
         # self.useMertens = False
         # print("Reset")
         self.play = False
@@ -738,9 +818,10 @@ class Browser:
 
         self.check == True
         # Image mean plot
+
         plt.close(self.fig)
         self.fig.clear()
-        self.fig = plt.figure(figsize=(4, 4))  # 4.6, 3.6
+        self.fig = plt.figure(figsize=(4, 3))  # 4.6, 3.6
         plt.plot(np.arange(self.stack_size[self.scene_index]), self.img_mean_list[(self.temp_img_ind // self.stack_size[self.scene_index]) * self.stack_size[self.scene_index]:(self.temp_img_ind //self.stack_size[self.scene_index]) *self.stack_size[self.scene_index] + self.stack_size[self.scene_index]],color='green', linewidth=2)
         plt.plot(int(self.verSlider.get()), self.img_mean_list[self.temp_img_ind], color='red', marker='o', markersize=12)
         plt.text(int(self.verSlider.get()), self.img_mean_list[self.temp_img_ind],

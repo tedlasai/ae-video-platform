@@ -3,7 +3,7 @@ import numpy as np
 
 class Exposure:
     def __init__(self, input_images, downsample_rate=1 / 64, r_percent=0, g_percent=1, col_num_grids=8, row_num_grids=8,
-                 target_intensity=0.18, high_threshold=1, low_threshold=0, high_rate=0.2, low_rate=0.2,
+                 target_intensity=0.19, high_threshold=1, low_threshold=0, high_rate=0.2, low_rate=0.2,
                  local_indices=[], num_hist_bins=100, local_with_downsampled_outliers=False):
         self.absolute_bit = 2**8  # max bit number of the raw image
         self.input_images = input_images
@@ -80,6 +80,8 @@ class Exposure:
             row_skip_step = math.floor(sqrt_rate) * 2
 
         raw_bayer = np.load(self.input_images)
+        print("input shape")
+        print(raw_bayer.shape)
         self.num_frame, self.num_ims_per_frame, orig_h, orig_w = raw_bayer.shape
         self.set_absolute_bit(raw_bayer)
         # when cfa is rggb

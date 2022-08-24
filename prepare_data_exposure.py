@@ -31,8 +31,8 @@ def fraction_str_to_float(str):
 
 start_time = time.time()
 NUMBER_OF_IMAGES_PER_STACK = 15
-read_path = 'D:/Final/Scene20_MeteorDebris/'
-scene_num = '20'
+read_path = 'D:/Final/Scene11_MovingHeadBacklight/'
+scene_num = '11'
 save_loc = os.path.join(os.path.dirname(__file__), 'Image_Arrays_exposure')
 os.makedirs(save_loc, exist_ok=True)
 joinPathChar = "/"
@@ -63,8 +63,16 @@ else:
         raw_bayer = raw_bayer [54:4544-10,148:6868]
         #print(np.right_shift(np.array([16383], 6)))
 
-        raw_bayer_downscaled = np.right_shift(raw_bayer, 6)
-        raw_bayer_downscaled = raw_bayer_downscaled[::4,::4]
+        raw_bayer_ = np.right_shift(raw_bayer, 6)
+        c1 = raw_bayer_[::8, ::8]
+        c2 = raw_bayer_[1::8, ::8]
+        c3 = raw_bayer_[::8, 1::8]
+        c4 = raw_bayer_[1::8, 1::8]
+        raw_bayer_downscaled = np.empty((int(raw_bayer.shape[0] * 0.25), int(raw_bayer.shape[1] * 0.25)))
+        raw_bayer_downscaled[::2, ::2] = c1
+        raw_bayer_downscaled[1::2, ::2] = c2
+        raw_bayer_downscaled[::2, 1::2] = c3
+        raw_bayer_downscaled[1::2, 1::2] = c4
 
         raw_bayer_downscaled = raw_bayer_downscaled.astype(np.uint8)
         one_stack_ims_temp_list.append(raw_bayer_downscaled)

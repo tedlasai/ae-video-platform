@@ -107,6 +107,10 @@ class Browser:
         self.curX = 0
         self.curY = 0
         self.num_bins = 100
+        self.hists = []
+        self.hists_before_ds_outlier = []
+        self.fig_2 = None
+        self.fig = None
         self.init_functions()
 
     def init_functions(self):
@@ -189,7 +193,7 @@ class Browser:
 
     def outlier_slider(self):
         self.low_threshold = tk.DoubleVar()
-        self.high_threshold = tkinter.DoubleVar()
+        self.high_threshold = tk.DoubleVar()
         self.outlierSlider =RangeSliderH(root, [self.low_threshold,self.high_threshold],Width = 400, Height = 65, min_val = 0, max_val = 1, show_value=True,padX=17
                                          , line_s_color="#7eb1c2",digit_precision='.2f')
 
@@ -371,24 +375,32 @@ class Browser:
 
 
 
-    def image_mean_plot(self):
-
+    def image_mean_plot(self,stack_size=15,curr_frame_mean_list=np.zeros(15),ind=0,val=0):
+        print(val)
+        if self.fig:
+            plt.close(self.fig)
+            self.fig.clear()
         self.fig = plt.figure(figsize=(4, 3))  # 4.6, 3.6
-        plt.plot(np.arange(self.stack_size[self.scene_index]), self.img_mean_list[0:self.stack_size[self.scene_index]], color='green',
+        # plt.plot(np.arange(self.stack_size[self.scene_index]), self.img_mean_list[0:self.stack_size[self.scene_index]], color='green',
+        #          linewidth=2)  # ,label='Exposure stack mean')
+        # plt.plot(0, self.img_mean_list[0], color='red', marker='o', markersize=12)
+        # plt.text(0, self.img_mean_list[0], '(' + str(0) + ', ' + str("%.2f" % self.img_mean_list[0]) + ')', color='red',
+        #          fontsize=13, position=(0 - 0.2, self.img_mean_list[0] + 0.04))
+        plt.plot(np.arange(stack_size), curr_frame_mean_list, color='green',
                  linewidth=2)  # ,label='Exposure stack mean')
-        plt.plot(0, self.img_mean_list[0], color='red', marker='o', markersize=12)
-        plt.text(0, self.img_mean_list[0], '(' + str(0) + ', ' + str("%.2f" % self.img_mean_list[0]) + ')', color='red',
-                 fontsize=13, position=(0 - 0.2, self.img_mean_list[0] + 0.04))
+        plt.plot(ind, val, color='red', marker='o', markersize=12)
+        plt.text(ind, val,'(' + str(ind) + ', ' + str("%.2f" % val) + ')', color='red',
+                 fontsize=13, position=(0 - 0.2, val + 0.04))
         plt.title('Exposure stack mean')
         plt.xlabel('Image index')
         plt.ylabel('Mean value')
-        plt.xlim(-0.2, self.stack_size[self.scene_index] - 0.8)
-        if self.stack_size[self.scene_index] < 20:
-            plt.xticks(np.arange(0, self.stack_size[self.scene_index], 1))
-        elif self.stack_size[self.scene_index] >= 15 and self.stack_size[self.scene_index] < 30:
-            plt.xticks(np.arange(0, self.stack_size[self.scene_index], 2))
+        plt.xlim(-0.2, stack_size - 0.8)
+        if stack_size < 20:
+            plt.xticks(np.arange(0, stack_size, 1))
+        elif stack_size >= 15 and stack_size < 30:
+            plt.xticks(np.arange(0, stack_size, 2))
         else:
-            plt.xticks(np.arange(0, self.stack_size[self.scene_index], 3))
+            plt.xticks(np.arange(0, stack_size, 3))
 
         plt.ylim(-0.02, 0.85)
         plt.yticks(np.arange(0, 0.85, 0.1))
@@ -399,17 +411,21 @@ class Browser:
         self.imagePrevlabel_2 = tk.Label(root, image=self.photo_2)
         self.imagePrevlabel_2.grid(row=2, column=3, columnspan=2, rowspan=15, sticky=tk.NE)
 
-    def hist_plot(self):
+    def hist_plot(self,count1=np.zeros(100),count2=np.zeros(100)):
         font = {'family': 'monospace',
                 'weight': 'bold',
                 'size': 10}
         bins = np.arange(1,self.num_bins+1)
         #self.fig = plt.figure(figsize=(4, 4))  # 4.6, 3.6
+        if self.fig_2:
+            plt.close(self.fig_2)
+            self.fig_2.clear()
         self.fig_2, axes = plt.subplots(2, sharex=True, sharey=True,figsize=(4, 6))
         # count1 = self.hists[0][0]
         # count2 = self.hists_before_ds_outlier[0][0]
-        count1 = np.zeros(100)
-        count2 = np.zeros(100)
+        # count1 = np.zeros(100)
+        # count2 = np.zeros(100)
+        print(count2)
         axes[1].bar(bins, count2, align='center')
         axes[0].bar(bins, count1, align='center')
         axes[1].set_title('histogram with outlier',**font)
@@ -696,8 +712,8 @@ class Browser:
         input_ims = 'Image_Arrays_exposure/Scene' + str(self.scene_index+1) + '_ds_raw_imgs.npy'
         self.check_num_grids()
         self.exposureParams = {"downsample_rate":1/25,'r_percent':0,'g_percent':1,
-                                                'col_num_grids':self.col_num_grids, 'row_num_grids':self.row_num_grids, 'low_threshold':-0.1, 'low_rate':0.2,
-                                                'high_threshold':1.1, 'high_rate':0}
+                                                'col_num_grids':self.col_num_grids, 'row_num_grids':self.row_num_grids, 'low_threshold':self.low_threshold.get(), 'low_rate':float(self.low_rate.get()),
+                                                'high_threshold':self.high_threshold.get(), 'high_rate':float(self.high_rate.get())}
         if(self.current_auto_exposure == "Global"):
             self.clear_rects()
             exposures = exposure_class.Exposure(input_ims, downsample_rate=self.exposureParams["downsample_rate"], r_percent=self.exposureParams['r_percent'], g_percent=self.exposureParams['g_percent'],
@@ -818,32 +834,52 @@ class Browser:
 
         self.check == True
         # Image mean plot
-
-        plt.close(self.fig)
-        self.fig.clear()
-        self.fig = plt.figure(figsize=(4, 3))  # 4.6, 3.6
-        plt.plot(np.arange(self.stack_size[self.scene_index]), self.img_mean_list[(self.temp_img_ind // self.stack_size[self.scene_index]) * self.stack_size[self.scene_index]:(self.temp_img_ind //self.stack_size[self.scene_index]) *self.stack_size[self.scene_index] + self.stack_size[self.scene_index]],color='green', linewidth=2)
-        plt.plot(int(self.verSlider.get()), self.img_mean_list[self.temp_img_ind], color='red', marker='o', markersize=12)
-        plt.text(int(self.verSlider.get()), self.img_mean_list[self.temp_img_ind],
-                 '(' + str(int(self.verSlider.get())) + ', ' + str("%.2f" % self.img_mean_list[self.temp_img_ind]) + ')', color='red',
-                 fontsize=13, position=(self.verSlider.get() - 0.2, self.img_mean_list[self.temp_img_ind] + 0.04))
-        plt.title('Exposure stack mean')
-        plt.xlabel('Image index')
-        plt.ylabel('Mean value')
-        plt.xlim(-0.2, self.stack_size[self.scene_index] - 0.8)
-        if self.stack_size[self.scene_index] < 20:
-            plt.xticks(np.arange(0, self.stack_size[self.scene_index], 1))
-        elif self.stack_size[self.scene_index] >= 15 and self.stack_size[self.scene_index] < 30:
-            plt.xticks(np.arange(0, self.stack_size[self.scene_index], 2))
+        if len(self.hists) != 0:
+            first_ind = self.temp_img_ind // self.stack_size[self.scene_index]
+            send_ind = self.temp_img_ind % self.stack_size[self.scene_index]
+            count1 = self.hists[first_ind][send_ind]
+            count2 = self.hists_before_ds_outlier[first_ind][send_ind]
+            stack_size = self.stack_size[self.scene_index]
+            curr_frame_mean_list = self.weighted_means[first_ind]
+            ind = send_ind
+            val = curr_frame_mean_list[send_ind]
         else:
-            plt.xticks(np.arange(0, self.stack_size[self.scene_index], 3))
-        plt.ylim(-0.02, 1.1)
-        plt.yticks(np.arange(0, 1.1, 0.1))
-        self.fig.canvas.draw()
+            count1 = np.zeros(self.num_bins)
+            count2 = np.zeros(self.num_bins)
+            stack_size = 15
+            curr_frame_mean_list = np.zeros(15)
+            ind = 0
+            val = 0
 
-        self.tempImg_2 = Image.frombytes('RGB', self.fig.canvas.get_width_height(), self.fig.canvas.tostring_rgb())
-        self.photo_2 = ImageTk.PhotoImage(self.tempImg_2)
-        self.imagePrevlabel_2.configure(image=self.photo_2)
+        #print("count1")
+        #print(count1)
+        self.image_mean_plot(stack_size=stack_size,curr_frame_mean_list=curr_frame_mean_list,ind=ind,val=val)
+        self.hist_plot(count1=count1,count2=count2)
+        # plt.close(self.fig)
+        # self.fig.clear()
+        # self.fig = plt.figure(figsize=(4, 3))  # 4.6, 3.6
+        # plt.plot(np.arange(self.stack_size[self.scene_index]), self.img_mean_list[(self.temp_img_ind // self.stack_size[self.scene_index]) * self.stack_size[self.scene_index]:(self.temp_img_ind //self.stack_size[self.scene_index]) *self.stack_size[self.scene_index] + self.stack_size[self.scene_index]],color='green', linewidth=2)
+        # plt.plot(int(self.verSlider.get()), self.img_mean_list[self.temp_img_ind], color='red', marker='o', markersize=12)
+        # plt.text(int(self.verSlider.get()), self.img_mean_list[self.temp_img_ind],
+        #          '(' + str(int(self.verSlider.get())) + ', ' + str("%.2f" % self.img_mean_list[self.temp_img_ind]) + ')', color='red',
+        #          fontsize=13, position=(self.verSlider.get() - 0.2, self.img_mean_list[self.temp_img_ind] + 0.04))
+        # plt.title('Exposure stack mean')
+        # plt.xlabel('Image index')
+        # plt.ylabel('Mean value')
+        # plt.xlim(-0.2, self.stack_size[self.scene_index] - 0.8)
+        # if self.stack_size[self.scene_index] < 20:
+        #     plt.xticks(np.arange(0, self.stack_size[self.scene_index], 1))
+        # elif self.stack_size[self.scene_index] >= 15 and self.stack_size[self.scene_index] < 30:
+        #     plt.xticks(np.arange(0, self.stack_size[self.scene_index], 2))
+        # else:
+        #     plt.xticks(np.arange(0, self.stack_size[self.scene_index], 3))
+        # plt.ylim(-0.02, 1.1)
+        # plt.yticks(np.arange(0, 1.1, 0.1))
+        # self.fig.canvas.draw()
+        #
+        # self.tempImg_2 = Image.frombytes('RGB', self.fig.canvas.get_width_height(), self.fig.canvas.tostring_rgb())
+        # self.photo_2 = ImageTk.PhotoImage(self.tempImg_2)
+        # self.imagePrevlabel_2.configure(image=self.photo_2)
 
     def clear_rects(self):
         self.clear_rects_local()

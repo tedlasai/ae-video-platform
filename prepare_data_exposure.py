@@ -11,28 +11,28 @@ import time
 
 
 # https://stackoverflow.com/questions/1806278/convert-fraction-to-float
-def fraction_str_to_float(str):
-    try:
-        return float(str)
-    except ValueError:
-        try:
-            num, denom = str.split('/')
-        except ValueError:
-            return None
-        try:
-            leading, num = num.split(' ')
-        except ValueError:
-            return float(num) / float(denom)
-        if float(leading) < 0:
-            sign_mult = -1
-        else:
-            sign_mult = 1
-        return float(leading) + sign_mult * (float(num) / float(denom))
+# def fraction_str_to_float(str):
+#     try:
+#         return float(str)
+#     except ValueError:
+#         try:
+#             num, denom = str.split('/')
+#         except ValueError:
+#             return None
+#         try:
+#             leading, num = num.split(' ')
+#         except ValueError:
+#             return float(num) / float(denom)
+#         if float(leading) < 0:
+#             sign_mult = -1
+#         else:
+#             sign_mult = 1
+#         return float(leading) + sign_mult * (float(num) / float(denom))
 
 start_time = time.time()
 NUMBER_OF_IMAGES_PER_STACK = 15
-read_path = 'D:/Final/Scene11_MovingHeadBacklight/'
-scene_num = '11'
+read_path = 'D:/Final/Scene12_InitSuddenChangeReflect/'
+scene_num = '12'
 save_loc = os.path.join(os.path.dirname(__file__), 'Image_Arrays_exposure')
 os.makedirs(save_loc, exist_ok=True)
 joinPathChar = "/"

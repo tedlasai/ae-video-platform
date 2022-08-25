@@ -317,8 +317,8 @@ class Exposure:
     def correct_one_mean(self, input_):
         mean, num_drooped_pixels_per_im = input_
         img_size = self.h * self.w
-        if img_size == num_drooped_pixels_per_im:  # if all the pixels are drooped, return a large number i.e 100
-            return 100
+        if img_size == num_drooped_pixels_per_im:  # if all the pixels are drooped, return -1
+            return -1
         return (mean * img_size - (-0.01) * num_drooped_pixels_per_im) / (img_size - num_drooped_pixels_per_im)
 
     def get_means(self, num_dropped_pixels, flatten_weighted_ims):
@@ -356,4 +356,4 @@ class Exposure:
         hists_before_ds_outlier, dropped_before_ds_outlier = self.get_hists(flatten_weighted_ims_before_outlier)
         weighted_means = self.get_means(dropped, flatten_weighted_ims)
         opti_inds = self.get_optimal_img_index(weighted_means)
-        return opti_inds,weighted_means,hists,flatten_weighted_ims_before_outlier
+        return opti_inds,weighted_means,hists,hists_before_ds_outlier

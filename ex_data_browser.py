@@ -68,10 +68,11 @@ class Browser:
         self.img_all = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + self.joinPathChar + self.scene[self.scene_index] + '_imgs_' + str(self.downscale_ratio) + '.npy')
         self.img_mean_list = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + self.joinPathChar + self.scene[self.scene_index] + '_img_mean_' + str(self.downscale_ratio) + '.npy') / (2**self.bit_depth - 1)
         self.img_mertens = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + self.joinPathChar + self.scene[self.scene_index] + '_mertens_imgs_' + str(self.downscale_ratio) + '.npy')
-
+        self.img_raw = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays_from_dng') + self.joinPathChar + self.scene[self.scene_index] + '_show_dng_imgs' + '.npy')
 
         self.img = deepcopy(self.img_all[0])
         self.useMertens = False
+        self.useRawIms = 0
         self.play = True
         self.video_speed = 50
         self.video_fps = 30
@@ -135,6 +136,7 @@ class Browser:
         self.outlier_slider()
         self.col_num_grids_text()
         self.row_num_grids_text()
+        self.show_Raw_Ims_check_box()
         self.clear_interested_areas_button()
         self.local_consider_outliers_checkbox()
         self.auto_exposure_select()
@@ -157,6 +159,11 @@ class Browser:
         self.HdrMertensButton = tk.Button(root, text='HDR-Mertens', fg='#ffffff', bg='#999999', activebackground='#454545',
                                      relief=tk.RAISED, width=16,padx=10, pady=5, font=(self.widgetFont, self.widgetFontSize), command=self.HdrMertens)
         self.HdrMertensButton.grid(row=3, column=5, sticky=tk.E)
+
+    def show_Raw_Ims_check_box(self):
+        self.useRawIms_ = tk.IntVar()
+        self.c1 = tk.Checkbutton(root, text='Show Raw Image', variable=self.useRawIms_, offvalue=0, onvalue=1,command=self.switch_raw)
+        self.c1.grid(row=24, column=5)
 
     def hdr_abdullah_button(self):
         # HDR Button - Abdullah
@@ -286,8 +293,8 @@ class Browser:
 
     def local_consider_outliers_checkbox(self):
 
-        self.local_consider_outliers_check = tk.IntVar()
-        self.c1 = tk.Checkbutton(root, text='Consider outliers at local selection', variable = self.local_consider_outliers_check, offvalue=0, onvalue=1, command= self.switch_res)
+        self.local_consider_outliers_check_ = tk.IntVar()
+        self.c1 = tk.Checkbutton(root, text='Consider outliers at local selection', variable = self.local_consider_outliers_check_, offvalue=0, onvalue=1, command= self.switch_outlier)
         self.c1.grid(row = 23, column = 5)
 
     def high_res_checkbox(self):
@@ -296,10 +303,19 @@ class Browser:
         self.c1 = tk.Checkbutton(root, text='High Resolution', variable = self.high_res_check, offvalue=0, onvalue=1, command= self.switch_res)
         self.c1.grid(row = 28, column = 1)
 
+    def switch_outlier(self):
+        self.local_consider_outliers_check = self.local_consider_outliers_check_.get()
+        print("local_consider_outliers_check is ", self.local_consider_outliers_check)
+
     def switch_res(self):
 
         self.res_check = self.high_res_check.get()
         print("self.res_check is ", self.res_check)
+
+    def switch_raw(self):
+
+        self.useRawIms = self.useRawIms_.get()
+        print("self.useRawIms is ", self.useRawIms)
 
     def mertens_checkbox(self):
 
@@ -363,6 +379,7 @@ class Browser:
 
         # self.verSlider.place(x=50, y=300, anchor="center")
         self.useMertens = False
+
 
         if(self.current_auto_exposure == "None"):
             self.updateSlider(value)
@@ -689,7 +706,7 @@ class Browser:
         if self.scene[self.scene_index] != self.defScene.get():
             self.clear_rects()
             self.scene_index = self.scene.index(self.defScene.get())
-            input_ims = 'Image_Arrays_exposure/Scene' + str(self.scene_index + 1) + '_ds_raw_imgs.npy'
+            #input_ims = 'Image_Arrays_exposure/Scene' + str(self.scene_index + 1) + '_ds_raw_imgs.npy'
             self.setAutoExposure()
 
             # exposures = exposure_class.Exposure(input_ims, downsample_rate=self.exposureParams["downsample_rate"], r_percent=self.exposureParams['r_percent'], g_percent=self.exposureParams['g_percent'],
@@ -702,6 +719,9 @@ class Browser:
 
             self.img_mertens = np.load(os.path.join(os.path.dirname(__file__), 'Image_Arrays') + self.joinPathChar + self.scene[self.scene_index] + '_mertens_imgs_' + str(self.downscale_ratio) + '.npy')
 
+            self.img_raw = np.load(
+                os.path.join(os.path.dirname(__file__), 'Image_Arrays_from_dng') + self.joinPathChar + self.scene[
+                    self.scene_index] + '_show_dng_imgs' + '.npy')
 
             self.resetValues()
 
@@ -1000,10 +1020,15 @@ class Browser:
 
         # global verSlider, horSlider, photo, photo_2, imagePrevlabel, imagePrevlabel_2, img_all, img, img_mean_list, scene_index, fig, useMertens, mertensVideo
         #
-
+        print(self.useRawIms)
         if self.useMertens:
             # img = self.mertensVideo[self.horSlider.get()]
             img = self.img_mertens[self.horSlider.get()]
+        elif self.useRawIms:
+            print(self.verSlider.get())
+            img = self.img_raw[self.horSlider.get()][self.verSlider.get()]
+            print(self.img_raw.shape)
+            print(img.shape)
         else:
             img = deepcopy(self.img_all[temp_img_ind])
 

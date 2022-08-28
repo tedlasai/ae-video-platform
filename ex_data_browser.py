@@ -130,8 +130,9 @@ class Browser:
         self.video_fps_text()
         self.horizontal_slider()
         self.vertical_slider()
-        self.image_mean_plot()
-        self.hist_plot()
+        # self.image_mean_plot()
+        # self.hist_plot()
+        self.hist_plot_three()
         self.regular_video_button()
         self.high_res_checkbox()
         self.mertens_checkbox()
@@ -207,7 +208,7 @@ class Browser:
                                          , line_s_color="#7eb1c2",digit_precision='.2f')
 
         self.outlierSlider.grid(padx = 10, pady = 10, row=28, column=2,columnspan=1, sticky=tk.E)
-        self.show_threshold()
+        #self.show_threshold()
         self.low_rate_text_box()
         self.high_rate_text_box()
 
@@ -226,9 +227,9 @@ class Browser:
         self.e1.grid(row=32, column=2)
 
 
-    def show_threshold(self):
-        print(self.low_threshold.get())
-        print(self.high_threshold.get())
+    # def show_threshold(self):
+    #     print(self.low_threshold.get())
+    #     print(self.high_threshold.get())
 
     def clear_interested_areas_button(self):
         # clear the rects
@@ -395,7 +396,6 @@ class Browser:
 
 
     def image_mean_plot(self,stack_size=15,curr_frame_mean_list=np.zeros(15),ind=0,val=0):
-        print(val)
         if self.fig:
             plt.close(self.fig)
             self.fig.clear()
@@ -440,40 +440,64 @@ class Browser:
             plt.close(self.fig_2)
             self.fig_2.clear()
         self.fig_2, axes = plt.subplots(2, sharex=True, sharey=True,figsize=(4, 6))
-        # count1 = self.hists[0][0]
-        # count2 = self.hists_before_ds_outlier[0][0]
-        # count1 = np.zeros(100)
-        # count2 = np.zeros(100)
-        print(count2)
+
+
         axes[1].bar(bins, count2, align='center')
         axes[0].bar(bins, count1, align='center')
         axes[1].set_title('histogram with outlier',**font)
         axes[0].set_title('histogram without outlier',**font)
 
-        # plt.plot(np.arange(self.stack_size[self.scene_index]), self.img_mean_list[0:self.stack_size[self.scene_index]], color='green',
-        #          linewidth=2)  # ,label='Exposure stack mean')
-        # plt.plot(0, self.img_mean_list[0], color='red', marker='o', markersize=12)
-        # plt.text(0, self.img_mean_list[0], '(' + str(0) + ', ' + str("%.2f" % self.img_mean_list[0]) + ')', color='red',
-        #          fontsize=13, position=(0 - 0.2, self.img_mean_list[0] + 0.04))
-        # plt.title('Exposure stack mean')
-        # plt.xlabel('Image index')
-        # plt.ylabel('Mean value')
-        # plt.xlim(-0.2, self.stack_size[self.scene_index] - 0.8)
-        # if self.stack_size[self.scene_index] < 20:
-        #     plt.xticks(np.arange(0, self.stack_size[self.scene_index], 1))
-        # elif self.stack_size[self.scene_index] >= 15 and self.stack_size[self.scene_index] < 30:
-        #     plt.xticks(np.arange(0, self.stack_size[self.scene_index], 2))
-        # else:
-        #     plt.xticks(np.arange(0, self.stack_size[self.scene_index], 3))
-        #
-        # plt.ylim(-0.02, 0.85)
-        # plt.yticks(np.arange(0, 0.85, 0.1))
         self.fig_2.canvas.draw()
 
         self.tempImg_3 = Image.frombytes('RGB', self.fig_2.canvas.get_width_height(), self.fig_2.canvas.tostring_rgb())
         self.photo_3 = ImageTk.PhotoImage(self.tempImg_3)
         self.imagePrevlabel_3 = tk.Label(root, image=self.photo_3)
         self.imagePrevlabel_3.grid(row=17, column=3, columnspan=2, rowspan=20, sticky=tk.NE)
+
+    def hist_plot_three(self, count1=np.zeros(100), count2=np.zeros(100),stack_size=15,curr_frame_mean_list=np.zeros(15),ind=0,val=0):
+        font = {'family': 'monospace',
+                'weight': 'bold',
+                'size': 10}
+        bins = np.arange(1, self.num_bins + 1)
+        # self.fig = plt.figure(figsize=(4, 4))  # 4.6, 3.6
+        if self.fig_2:
+            plt.close(self.fig_2)
+            self.fig_2.clear()
+        self.fig_2, axes = plt.subplots(3, figsize=(4, 9))
+        self.fig_2.tight_layout()
+
+        axes[1].bar(bins, count2, align='center')
+        axes[0].bar(bins, count1, align='center')
+        axes[1].set_title('histogram with outlier', **font)
+        axes[0].set_title('histogram without outlier', **font)
+
+        axes[2].plot(np.arange(stack_size), curr_frame_mean_list, color='green',
+                     linewidth=2)  # ,label='Exposure stack mean')
+        axes[2].plot(ind, val, color='red', marker='o', markersize=12)
+        axes[2].text(ind, val, '(' + str(ind) + ', ' + str("%.2f" % val) + ')', color='red',
+                 fontsize=13, position=(0 - 0.2, val + 0.01))
+        axes[2].set_title('Exposure stack mean', **font)
+        axes[2].set_ylim([0.0, 0.8])
+        # axes[2].xlabel('Image index')
+        # axes[2].ylabel('Mean value')
+        # axes[2].xlim(-0.2, stack_size - 0.8)
+        # if stack_size < 20:
+        #     axes[2].xticks(np.arange(0, stack_size, 1))
+        # elif stack_size >= 15 and stack_size < 30:
+        #     axes[2].xticks(np.arange(0, stack_size, 2))
+        # else:
+        #     axes[2].xticks(np.arange(0, stack_size, 3))
+
+
+        self.fig_2.canvas.draw()
+
+        self.tempImg_3 = Image.frombytes('RGB', self.fig_2.canvas.get_width_height(),
+                                         self.fig_2.canvas.tostring_rgb())
+        self.photo_3 = ImageTk.PhotoImage(self.tempImg_3)
+        self.imagePrevlabel_3 = tk.Label(root, image=self.photo_3)
+        self.imagePrevlabel_3.grid(row=2, column=3, columnspan=2, rowspan=45, sticky=tk.NE)
+
+
 
 
     def hist_plot_unvisible(self):
@@ -632,7 +656,7 @@ class Browser:
             # capture the image and save it on the save path
             os.makedirs(folderStore, exist_ok=True)
 
-            print(self.eV)
+            #print(self.eV)
             video = cv2.VideoWriter(connected_image, cv2.VideoWriter_fourcc('M', 'J', "P", 'G'), self.video_fps,
                                     (sv.width, sv.height))
 
@@ -686,7 +710,7 @@ class Browser:
 
     def check_row_num_grids(self):
 
-        print("row num girds is ", self.row_num_grids_.get())
+        #print("row num girds is ", self.row_num_grids_.get())
 
         if self.validate_num_grids(self.row_num_grids_.get()) is True:
 
@@ -700,7 +724,7 @@ class Browser:
 
     def check_col_num_grids(self):
 
-        print("col num girds is ", self.col_num_grids_.get())
+        #print("col num girds is ", self.col_num_grids_.get())
 
         if self.validate_num_grids(self.col_num_grids_.get()) is True:
 
@@ -812,7 +836,7 @@ class Browser:
                 set_speed = int(self.video_speed.get())
                 # print(set_speed)
             except ValueError:
-                set_speed = 50  # set as default speed
+                set_speed = 300  # set as default speed
 
         # print('screen index is ', scene_index)
 
@@ -888,9 +912,10 @@ class Browser:
             curr_frame_mean_list = np.zeros(15)
             ind = 0
             val = 0
-        self.hist_plot_unvisible()
-        self.image_mean_plot(stack_size=stack_size,curr_frame_mean_list=curr_frame_mean_list,ind=ind,val=val)
-        self.hist_plot(count1=count1, count2=count2)
+       # self.hist_plot_unvisible()
+        #self.image_mean_plot(stack_size=stack_size,curr_frame_mean_list=curr_frame_mean_list,ind=ind,val=val)
+        #self.hist_plot(count1=count1, count2=count2)
+        self.hist_plot_three(count1=count1, count2=count2,stack_size=stack_size,curr_frame_mean_list=curr_frame_mean_list,ind=ind,val=val)
 
     def clear_rects(self):
         self.clear_rects_local()

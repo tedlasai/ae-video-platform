@@ -112,6 +112,8 @@ class Browser:
         self.hists_before_ds_outlier = []
         self.fig_2 = None
         self.fig = None
+        self.fig_4 = None
+        self.local_consider_outliers_check = 0
         self.init_functions()
 
     def init_functions(self):
@@ -175,7 +177,7 @@ class Browser:
     def hdr_run_button(self):
         # Run Button
         self.RunButton = tk.Button(root, text='Run', fg='#ffffff', bg='#999999', activebackground='#454545',
-                              relief=tk.RAISED, width=16, padx=10, pady=5,font=(self.widgetFont, self.widgetFontSize), command=self.setValues)
+                              relief=tk.RAISED, width=16, padx=10, pady=5,font=(self.widgetFont, self.widgetFontSize), command=self.runVideo)
         self.RunButton.grid(row=5, column=5, sticky=tk.E)
 
     def hdr_pause_button(self):
@@ -474,6 +476,24 @@ class Browser:
         self.imagePrevlabel_3.grid(row=17, column=3, columnspan=2, rowspan=20, sticky=tk.NE)
 
 
+    def hist_plot_unvisible(self):
+        font = {'family': 'monospace',
+                'weight': 'bold',
+                'size': 10}
+        bins = np.arange(1,3)
+        #self.fig = plt.figure(figsize=(4, 4))  # 4.6, 3.6
+        if self.fig_4:
+            plt.close(self.fig_4)
+            self.fig_4.clear()
+        self.fig_4, axes = plt.subplots(2, sharex=True, sharey=True,figsize=(1, 1))
+        count1=np.zeros(2)
+        axes[0].bar(bins, count1, align='center')
+        self.fig_4.canvas.draw()
+        self.tempImg_4 = Image.frombytes('RGB', self.fig_4.canvas.get_width_height(), self.fig_4.canvas.tostring_rgb())
+        self.photo_4 = ImageTk.PhotoImage(self.tempImg_4)
+        self.imagePrevlabel_4 = tk.Label(root, image=self.photo_4)
+        self.imagePrevlabel_4.grid(row=27, column=3, columnspan=2, rowspan=20, sticky=tk.NE)
+
     def HdrMean(self):
 
         temp_img_ind = int(self.horSlider.get() * self.stack_size[self.scene_index])
@@ -693,13 +713,17 @@ class Browser:
             self.col_num_grids = 8
 
     def pauseRun(self):
-
+        print("in pause")
         self.play = False
+
+    def runVideo(self):
+        self.play = True
+        self.playVideo()
 
     def setValues(self, dummy=False):
 
-        self.play = True
-        self.playVideo()
+        # self.play = True
+        # self.playVideo()
         # time.sleep(1)
         # print(scene_name)
         self.check_num_grids()
@@ -728,7 +752,7 @@ class Browser:
     def setAutoExposure(self, dummy=False):
         self.current_auto_exposure = self.defAutoExposure.get()
         self.scene_index = self.scene.index(self.defScene.get())
-        print(self.scene_index)
+
         input_ims = 'Image_Arrays_exposure/Scene' + str(self.scene_index+1) + '_ds_raw_imgs.npy'
         self.check_num_grids()
         self.exposureParams = {"downsample_rate":1/25,'r_percent':0,'g_percent':1,
@@ -741,19 +765,13 @@ class Browser:
                                                 high_threshold=self.exposureParams['high_threshold'], high_rate=self.exposureParams['high_rate'])
             #exposures = exposure_class.Exposure(params = self.exposureParams)
             self.eV,self.weighted_means,self.hists,self.hists_before_ds_outlier = exposures.pipeline()
-            print("#####")
-            print(self.eV.shape)
-            print(self.weighted_means.shape)
-            print(self.hists.shape)
-            print(self.hists_before_ds_outlier.shape)
-            print("#####")
 
         elif(self.current_auto_exposure == "Local"):
             self.clear_rects_local_wo_grids()
-            consider_outliers = bool(self.local_consider_outliers_check.get())
-            print(consider_outliers)
+            consider_outliers = bool(self.local_consider_outliers_check)
+
             list_local = local_interested_grids_generater(self.row_num_grids, self.col_num_grids, self.rectangles)
-            print(self.rectangles)
+
             exposures = exposure_class.Exposure(input_ims, downsample_rate=self.exposureParams["downsample_rate"], r_percent=self.exposureParams['r_percent'], g_percent=self.exposureParams['g_percent'],
                                                 col_num_grids=self.exposureParams['col_num_grids'], row_num_grids=self.exposureParams['row_num_grids'], low_threshold=self.exposureParams['low_threshold'], low_rate=self.exposureParams['low_rate'],
                                                 high_threshold=self.exposureParams['high_threshold'], high_rate=self.exposureParams['high_rate'],local_indices=list_local)
@@ -761,7 +779,7 @@ class Browser:
         elif(self.current_auto_exposure == "Local without grids"):
             self.clear_rects_local()
             list_local = self.list_local_without_grids()
-            print(list_local)
+
             exposures = exposure_class.Exposure(input_ims, downsample_rate=self.exposureParams["downsample_rate"],
                                                 r_percent=self.exposureParams['r_percent'],
                                                 g_percent=self.exposureParams['g_percent'],
@@ -823,7 +841,7 @@ class Browser:
             if int(num) and 1 < int(num) < 31:
                 return True
             else:
-                print("please enter an integer between 2 and 30")
+                ("please enter an integer between 2 and 30")
                 return False
         except ValueError:
             print("please enter an integer between 2 and 30")
@@ -870,36 +888,9 @@ class Browser:
             curr_frame_mean_list = np.zeros(15)
             ind = 0
             val = 0
-
-        #print("count1")
-        #print(count1)
+        self.hist_plot_unvisible()
         self.image_mean_plot(stack_size=stack_size,curr_frame_mean_list=curr_frame_mean_list,ind=ind,val=val)
-        self.hist_plot(count1=count1,count2=count2)
-        # plt.close(self.fig)
-        # self.fig.clear()
-        # self.fig = plt.figure(figsize=(4, 3))  # 4.6, 3.6
-        # plt.plot(np.arange(self.stack_size[self.scene_index]), self.img_mean_list[(self.temp_img_ind // self.stack_size[self.scene_index]) * self.stack_size[self.scene_index]:(self.temp_img_ind //self.stack_size[self.scene_index]) *self.stack_size[self.scene_index] + self.stack_size[self.scene_index]],color='green', linewidth=2)
-        # plt.plot(int(self.verSlider.get()), self.img_mean_list[self.temp_img_ind], color='red', marker='o', markersize=12)
-        # plt.text(int(self.verSlider.get()), self.img_mean_list[self.temp_img_ind],
-        #          '(' + str(int(self.verSlider.get())) + ', ' + str("%.2f" % self.img_mean_list[self.temp_img_ind]) + ')', color='red',
-        #          fontsize=13, position=(self.verSlider.get() - 0.2, self.img_mean_list[self.temp_img_ind] + 0.04))
-        # plt.title('Exposure stack mean')
-        # plt.xlabel('Image index')
-        # plt.ylabel('Mean value')
-        # plt.xlim(-0.2, self.stack_size[self.scene_index] - 0.8)
-        # if self.stack_size[self.scene_index] < 20:
-        #     plt.xticks(np.arange(0, self.stack_size[self.scene_index], 1))
-        # elif self.stack_size[self.scene_index] >= 15 and self.stack_size[self.scene_index] < 30:
-        #     plt.xticks(np.arange(0, self.stack_size[self.scene_index], 2))
-        # else:
-        #     plt.xticks(np.arange(0, self.stack_size[self.scene_index], 3))
-        # plt.ylim(-0.02, 1.1)
-        # plt.yticks(np.arange(0, 1.1, 0.1))
-        # self.fig.canvas.draw()
-        #
-        # self.tempImg_2 = Image.frombytes('RGB', self.fig.canvas.get_width_height(), self.fig.canvas.tostring_rgb())
-        # self.photo_2 = ImageTk.PhotoImage(self.tempImg_2)
-        # self.imagePrevlabel_2.configure(image=self.photo_2)
+        self.hist_plot(count1=count1, count2=count2)
 
     def clear_rects(self):
         self.clear_rects_local()
@@ -1025,10 +1016,8 @@ class Browser:
             # img = self.mertensVideo[self.horSlider.get()]
             img = self.img_mertens[self.horSlider.get()]
         elif self.useRawIms:
-            print(self.verSlider.get())
+            #print(self.verSlider.get())
             img = self.img_raw[self.horSlider.get()][self.verSlider.get()]
-            print(self.img_raw.shape)
-            print(img.shape)
         else:
             img = deepcopy(self.img_all[temp_img_ind])
 
@@ -1036,9 +1025,11 @@ class Browser:
         # self.imagePrevlabel = tk.Label(root, image=self.photo)
         # self.imagePrevlabel.grid(row=1, column=1, rowspan=30, sticky=tk.NW)
 
-        tempImg = Image.fromarray(img)
+        tempImg = Image.fromarray(img).resize((self.canvas.winfo_width(),self.canvas.winfo_height()))
 
-        self.photo = ImageTk.PhotoImage(tempImg)
+
+
+        self.photo = ImageTk.PhotoImage(tempImg,width=self.canvas.winfo_width(),height=self.canvas.winfo_height())
          #= self.photo  # Keep reference in case this code is put into a function.
 
         self.canvas.itemconfig(self.canvas_img, image=self.photo)

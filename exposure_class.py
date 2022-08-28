@@ -58,12 +58,12 @@ class Exposure:
     # helper function to downsample one channel
     def downsample_one_channel(self, matrix, channel, row_skip_step, col_skip_step):
         if channel == 'g1':
-            return matrix[:, :, ::row_skip_step, 1::col_skip_step] / 2 / self.absolute_bit
+            return matrix[:, :, ::row_skip_step, 1::col_skip_step] / 2 / (self.absolute_bit-1)
         if channel == 'g2':
-            return matrix[:, :, 1::row_skip_step, ::col_skip_step] / 2 / self.absolute_bit
+            return matrix[:, :, 1::row_skip_step, ::col_skip_step] / 2 / (self.absolute_bit-1)
         if channel == 'r':
-            return matrix[:, :, ::row_skip_step, ::col_skip_step] / self.absolute_bit
-        return matrix[:, :, 1::row_skip_step, 1::col_skip_step] / self.absolute_bit
+            return matrix[:, :, ::row_skip_step, ::col_skip_step] / (self.absolute_bit-1)
+        return matrix[:, :, 1::row_skip_step, 1::col_skip_step] / (self.absolute_bit-1)
 
     def downsample_blending_rgb_channels(self):
         if self.downsample_rate >= 0.75:
@@ -80,8 +80,8 @@ class Exposure:
             row_skip_step = math.floor(sqrt_rate) * 2
 
         raw_bayer = np.load(self.input_images)
-        print("input shape")
-        print(raw_bayer.shape)
+        # print("input shape")
+        # print(raw_bayer.shape)
         self.num_frame, self.num_ims_per_frame, orig_h, orig_w = raw_bayer.shape
         self.set_absolute_bit(raw_bayer)
         # when cfa is rggb
@@ -262,23 +262,14 @@ class Exposure:
             x_start = int(x_start * self.w)
             y_end = int(y_end * self.h)
             x_end = int(x_end * self.w)
-            print("&&&&&")
-            print(y_start)
-            print(x_start)
-            print(y_end)
-            print(x_end)
-            print("&&&&&&")
+
 
             flatten_weighted_ims[:,:,y_start:y_end+1,x_start:x_end+1] = ims[:,:,y_start:y_end+1,x_start:x_end+1]
-        print(ims.shape)
         flatten_weighted_ims = flatten_weighted_ims.reshape((self.num_frame, self.num_ims_per_frame, self.h*self.w))
         flatten_weighted_ims_before_outlier = np.array(flatten_weighted_ims)
         flatten_weighted_ims[flatten_weighted_ims < self.low_threshold] = -0.01
         flatten_weighted_ims[flatten_weighted_ims > self.high_threshold] = -0.01
-        print("high rate: "+ str(self.high_threshold))
-        print("low rate: "+str(self.low_threshold))
-        print(flatten_weighted_ims[0][0])
-        print(flatten_weighted_ims_before_outlier[0][0])
+
         return flatten_weighted_ims,flatten_weighted_ims_before_outlier
 
     def get_hists(self, flatten_weighted_ims):

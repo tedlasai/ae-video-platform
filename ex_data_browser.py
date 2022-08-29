@@ -384,8 +384,11 @@ class Browser:
         self.useMertens = False
 
 
-        if(self.current_auto_exposure == "None"):
-            self.updateSlider(value)
+        # if(self.current_auto_exposure != "None"):
+        #     self.check = True
+        temp_img_ind = int(self.horSlider.get()) * self.stack_size[self.scene_index] + int(self.verSlider.get())
+
+        self.updateHorSlider(value,temp_img_ind)
 
 
 
@@ -454,7 +457,7 @@ class Browser:
         self.imagePrevlabel_3 = tk.Label(root, image=self.photo_3)
         self.imagePrevlabel_3.grid(row=17, column=3, columnspan=2, rowspan=20, sticky=tk.NE)
 
-    def hist_plot_three(self, count1=np.zeros(100), count2=np.zeros(100),stack_size=15,curr_frame_mean_list=np.zeros(15),ind=0,val=0):
+    def hist_plot_three(self, count1=np.zeros(100), count2=np.zeros(100),count3=np.zeros(100),stack_size=15,curr_frame_mean_list=np.zeros(15),ind=0,val=0,ind2=0, val2=0):
         font = {'family': 'monospace',
                 'weight': 'bold',
                 'size': 10}
@@ -466,17 +469,27 @@ class Browser:
         self.fig_2, axes = plt.subplots(3, figsize=(4, 9))
         self.fig_2.tight_layout()
 
-        axes[1].bar(bins, count2, align='center')
-        axes[0].bar(bins, count1, align='center')
-        axes[1].set_title('histogram with outlier', **font)
-        axes[0].set_title('histogram without outlier', **font)
+        if ind == ind2:
+            axes[1].bar(bins, count2, align='center')
+            axes[1].set_title('histogram with outlier', **font)
+            axes[0].set_title('histogram without outlier', **font)
+        else:
+            axes[1].bar(bins, count3, align='center',color='orange')
+            axes[1].set_title('selected image histogram', **font)
+            axes[0].set_title('current image histogram', **font)
+
+        axes[0].bar(bins, count1, align='center',color='violet')
         axes[1].sharex(axes[0])
         axes[1].sharey(axes[0])
         axes[2].plot(np.arange(stack_size), curr_frame_mean_list, color='green',
                      linewidth=2)  # ,label='Exposure stack mean')
-        axes[2].plot(ind, val, color='red', marker='o', markersize=12)
-        axes[2].text(ind, val, '(' + str(ind) + ', ' + str("%.2f" % val) + ')', color='red',
-                 fontsize=13, position=(0 - 0.2, val + 0.01))
+        axes[2].plot(ind, val, color='violet', marker='o', markersize=12)
+        axes[2].text(ind, val, '(' + str(ind) + ', ' + str("%.2f" % val) + ')', color='violet',
+                 fontsize=13, position=(ind - 0.2, val + 0.01))
+        if ind != ind2:
+            axes[2].plot(ind2, val2, color='orange', marker='o', markersize=12)
+            axes[2].text(ind2, val2, '(' + str(ind2) + ', ' + str("%.2f" % val2) + ')', color='orange',
+                     fontsize=13, position=(ind2 - 0.2, val2 + 0.01))
         axes[2].set_title('Exposure stack mean', **font)
         axes[2].set_ylim([-0.1, 1.1])
         axes[2].set_xlim(-1, stack_size)
@@ -718,7 +731,7 @@ class Browser:
         self.playVideo()
 
     def setValues(self, dummy=False):
-
+        self.runVideo()
         # self.play = True
         # self.playVideo()
         # time.sleep(1)
@@ -809,7 +822,7 @@ class Browser:
                 set_speed = int(self.video_speed.get())
                 # print(set_speed)
             except ValueError:
-                set_speed = 300  # set as default speed
+                set_speed = 360  # set as default speed
 
         # print('screen index is ', scene_index)
 
@@ -878,17 +891,24 @@ class Browser:
             curr_frame_mean_list = self.weighted_means[first_ind]
             ind = send_ind
             val = curr_frame_mean_list[send_ind]
+            ind2 = self.eV[self.horSlider.get()]
+            val2 = curr_frame_mean_list[ind2]
+            count3 = self.hists[first_ind][ind2]
+
         else:
             count1 = np.zeros(self.num_bins)
             count2 = np.zeros(self.num_bins)
+            count3 = np.zeros(self.num_bins)
             stack_size = 15
             curr_frame_mean_list = np.zeros(15)
             ind = 0
             val = 0
+            ind2 = 0
+            val2 = 0
        # self.hist_plot_unvisible()
         #self.image_mean_plot(stack_size=stack_size,curr_frame_mean_list=curr_frame_mean_list,ind=ind,val=val)
         #self.hist_plot(count1=count1, count2=count2)
-        self.hist_plot_three(count1=count1, count2=count2,stack_size=stack_size,curr_frame_mean_list=curr_frame_mean_list,ind=ind,val=val)
+        self.hist_plot_three(count1=count1, count2=count2,count3=count3,stack_size=stack_size,curr_frame_mean_list=curr_frame_mean_list,ind=ind,val=val,ind2=ind2,val2=val2)
 
     def clear_rects(self):
         self.clear_rects_local()
@@ -1005,6 +1025,42 @@ class Browser:
         else:
             temp_img_ind = int(self.horSlider.get()) * self.stack_size[self.scene_index] + int(self.verSlider.get())
 
+        self.updateHorSlider(self, scale_value, temp_img_ind)
+        # autoExposureMode = True
+        #
+        # # global verSlider, horSlider, photo, photo_2, imagePrevlabel, imagePrevlabel_2, img_all, img, img_mean_list, scene_index, fig, useMertens, mertensVideo
+        # #
+        # print(self.useRawIms)
+        # if self.useMertens:
+        #     # img = self.mertensVideo[self.horSlider.get()]
+        #     img = self.img_mertens[self.horSlider.get()]
+        # elif self.useRawIms:
+        #     #print(self.verSlider.get())
+        #     img = self.img_raw[self.horSlider.get()][self.verSlider.get()]
+        # else:
+        #     img = deepcopy(self.img_all[temp_img_ind])
+        #
+        # # self.photo = ImageTk.PhotoImage(Image.fromarray(self.img))
+        # # self.imagePrevlabel = tk.Label(root, image=self.photo)
+        # # self.imagePrevlabel.grid(row=1, column=1, rowspan=30, sticky=tk.NW)
+        #
+        # tempImg = Image.fromarray(img).resize((self.canvas.winfo_width(),self.canvas.winfo_height()))
+        #
+        #
+        #
+        # self.photo = ImageTk.PhotoImage(tempImg,width=self.canvas.winfo_width(),height=self.canvas.winfo_height())
+        #  #= self.photo  # Keep reference in case this code is put into a function.
+        #
+        # self.canvas.itemconfig(self.canvas_img, image=self.photo)
+        #
+        # self.canvas.tag_lower(self.canvas_img)
+        #
+        # # Keep reference in case this code is put into a function.
+        # self.updatePlot()
+
+    def updateHorSlider(self, scale_value,temp_img_ind):
+
+
         autoExposureMode = True
 
         # global verSlider, horSlider, photo, photo_2, imagePrevlabel, imagePrevlabel_2, img_all, img, img_mean_list, scene_index, fig, useMertens, mertensVideo
@@ -1036,8 +1092,6 @@ class Browser:
 
         # Keep reference in case this code is put into a function.
         self.updatePlot()
-
-
 
 b = Browser(root)
 

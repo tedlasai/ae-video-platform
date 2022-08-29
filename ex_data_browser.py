@@ -470,24 +470,18 @@ class Browser:
         axes[0].bar(bins, count1, align='center')
         axes[1].set_title('histogram with outlier', **font)
         axes[0].set_title('histogram without outlier', **font)
-
+        axes[1].sharex(axes[0])
+        axes[1].sharey(axes[0])
         axes[2].plot(np.arange(stack_size), curr_frame_mean_list, color='green',
                      linewidth=2)  # ,label='Exposure stack mean')
         axes[2].plot(ind, val, color='red', marker='o', markersize=12)
         axes[2].text(ind, val, '(' + str(ind) + ', ' + str("%.2f" % val) + ')', color='red',
                  fontsize=13, position=(0 - 0.2, val + 0.01))
         axes[2].set_title('Exposure stack mean', **font)
-        axes[2].set_ylim([0.0, 0.8])
-        # axes[2].xlabel('Image index')
-        # axes[2].ylabel('Mean value')
-        # axes[2].xlim(-0.2, stack_size - 0.8)
-        # if stack_size < 20:
-        #     axes[2].xticks(np.arange(0, stack_size, 1))
-        # elif stack_size >= 15 and stack_size < 30:
-        #     axes[2].xticks(np.arange(0, stack_size, 2))
-        # else:
-        #     axes[2].xticks(np.arange(0, stack_size, 3))
+        axes[2].set_ylim([-0.1, 1.1])
+        axes[2].set_xlim(-1, stack_size)
 
+        axes[2].set_xticks(np.arange(0, stack_size, 2))
 
         self.fig_2.canvas.draw()
 
@@ -496,27 +490,6 @@ class Browser:
         self.photo_3 = ImageTk.PhotoImage(self.tempImg_3)
         self.imagePrevlabel_3 = tk.Label(root, image=self.photo_3)
         self.imagePrevlabel_3.grid(row=2, column=3, columnspan=2, rowspan=45, sticky=tk.NE)
-
-
-
-
-    def hist_plot_unvisible(self):
-        font = {'family': 'monospace',
-                'weight': 'bold',
-                'size': 10}
-        bins = np.arange(1,3)
-        #self.fig = plt.figure(figsize=(4, 4))  # 4.6, 3.6
-        if self.fig_4:
-            plt.close(self.fig_4)
-            self.fig_4.clear()
-        self.fig_4, axes = plt.subplots(2, sharex=True, sharey=True,figsize=(1, 1))
-        count1=np.zeros(2)
-        axes[0].bar(bins, count1, align='center')
-        self.fig_4.canvas.draw()
-        self.tempImg_4 = Image.frombytes('RGB', self.fig_4.canvas.get_width_height(), self.fig_4.canvas.tostring_rgb())
-        self.photo_4 = ImageTk.PhotoImage(self.tempImg_4)
-        self.imagePrevlabel_4 = tk.Label(root, image=self.photo_4)
-        self.imagePrevlabel_4.grid(row=27, column=3, columnspan=2, rowspan=20, sticky=tk.NE)
 
     def HdrMean(self):
 

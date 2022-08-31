@@ -1025,7 +1025,7 @@ class Browser:
         else:
             temp_img_ind = int(self.horSlider.get()) * self.stack_size[self.scene_index] + int(self.verSlider.get())
 
-        self.updateHorSlider(self, scale_value, temp_img_ind)
+        self.updateHorSlider(scale_value, temp_img_ind)
         # autoExposureMode = True
         #
         # # global verSlider, horSlider, photo, photo_2, imagePrevlabel, imagePrevlabel_2, img_all, img, img_mean_list, scene_index, fig, useMertens, mertensVideo

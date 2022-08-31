@@ -78,8 +78,8 @@ from simple_camera_pipeline.python.pipeline import run_pipeline_v2,get_metadata
 
 start_time = time.time()
 NUMBER_OF_IMAGES_PER_STACK = 15
-read_path = 'D:/Final_dng/Scene8_Window_dng/'
-scene_num = '8'
+read_path = 'D:/Final_dng/Scene19_Blackspace_dng/'
+scene_num = '19'
 save_loc = os.path.join(os.path.dirname(__file__), 'Image_Arrays_from_dng')
 os.makedirs(save_loc, exist_ok=True)
 joinPathChar = "/"
@@ -101,7 +101,7 @@ else:
 #     # one_stack_shutter_speeds_temp_list = []
     count = 0
     for im_path in images:
-        im_path = 'D:/Final_dng/Scene8_Window_dng/1P0X0005.dng'
+        #im_path = 'D:/Final_dng/Scene8_Window_dng/1P0X0005.dng'
         count += 1
         print(count)
         raw_im = rawpy.imread(im_path)
@@ -114,22 +114,30 @@ else:
         raw_bayer_ = raw_bayer[54:4544-10,148:6868]
 #         #print(np.right_shift(np.array([16383], 6)))
 #
-#         #raw_bayer_ = np.right_shift(raw_bayer, 6)
-        c1 = raw_bayer_[::10, ::10]
-        c2 = raw_bayer_[1::10, ::10]
-        c3 = raw_bayer_[::10, 1::10]
-        c4 = raw_bayer_[1::10, 1::10]
-        raw_bayer_downscaled = np.empty((int(raw_bayer_.shape[0] * (1/5)), int(raw_bayer_.shape[1] * (1/5))))
+        #raw_bayer_ = np.right_shift(raw_bayer, 6)
+        c1 = raw_bayer_[::14, ::14]
+        c2 = raw_bayer_[1::14, ::14]
+        c3 = raw_bayer_[::14, 1::14]
+        c4 = raw_bayer_[1::14, 1::14]
+        raw_bayer_downscaled = np.empty((int(raw_bayer_.shape[0] * (1/7)), int(raw_bayer_.shape[1] * (1/7))))
+
+        # c1 = raw_bayer_[::16, ::16]
+        # c2 = raw_bayer_[1::16, ::16]
+        # c3 = raw_bayer_[::16, 1::16]
+        # c4 = raw_bayer_[1::16, 1::16]
+        # raw_bayer_downscaled = np.empty((int(raw_bayer_.shape[0] * (1/8)), int(raw_bayer_.shape[1] * (1/8))))
         raw_bayer_downscaled[::2, ::2] = c1
         raw_bayer_downscaled[1::2, ::2] = c2
         raw_bayer_downscaled[::2, 1::2] = c3
         raw_bayer_downscaled[1::2, 1::2] = c4
+
+
 #
 #         # raw_bayer_downscaled = raw_bayer
         params = {
             'input_stage': 'raw',
 #             # options: 'raw', 'normal', 'white_balance', 'demosaic', 'xyz', 'srgb', 'gamma', 'tone'
-            'output_stage': 'gamma',
+            'output_stage': 'tone',
 #             # options: 'normal', 'white_balance', 'demosaic', 'xyz', 'srgb', 'gamma', 'tone'
             'demosaic_type': 'menon2007'
         }
@@ -140,10 +148,11 @@ else:
        # output_image = output_image ** (1 / 2.2)
         output_image = output_image * 255
         output_image = output_image.astype(np.uint8)
-        output_image = cv2.cvtColor(output_image, cv2.COLOR_BGR2RGB)
+        #output_image = cv2.cvtColor(output_image, cv2.COLOR_BGR2RGB)
         # output_image = cv2.cvtColor(output_image,cv2.COLOR_BGR2RGB)
-        cv2.imwrite("out.jpg",output_image)
-        break
+        #cv2.imwrite("outgamma04516.jpg",output_image)
+        #break
+
 #
 #         raw_bayer_downscaled = raw_bayer_downscaled.astype(np.uint8)
         one_stack_ims_temp_list.append(output_image)

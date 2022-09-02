@@ -78,8 +78,8 @@ from simple_camera_pipeline.python.pipeline import run_pipeline_v2,get_metadata
 
 start_time = time.time()
 NUMBER_OF_IMAGES_PER_STACK = 15
-read_path = 'D:/Final_dng/Scene19_Blackspace_dng/'
-scene_num = '19'
+read_path = 'D:/Final_dng/Scene20_MeteorDebris_dng/'
+scene_num = '20'
 save_loc = os.path.join(os.path.dirname(__file__), 'Image_Arrays_from_dng')
 os.makedirs(save_loc, exist_ok=True)
 joinPathChar = "/"
@@ -115,43 +115,76 @@ else:
 #         #print(np.right_shift(np.array([16383], 6)))
 #
         #raw_bayer_ = np.right_shift(raw_bayer, 6)
-        c1 = raw_bayer_[::14, ::14]
-        c2 = raw_bayer_[1::14, ::14]
-        c3 = raw_bayer_[::14, 1::14]
-        c4 = raw_bayer_[1::14, 1::14]
-        raw_bayer_downscaled = np.empty((int(raw_bayer_.shape[0] * (1/7)), int(raw_bayer_.shape[1] * (1/7))))
+#         c1 = raw_bayer_[::14, ::14]
+#         c2 = raw_bayer_[1::14, ::14]
+#         c3 = raw_bayer_[::14, 1::14]
+#         c4 = raw_bayer_[1::14, 1::14]
+#         raw_bayer_downscaled = np.empty((int(raw_bayer_.shape[0] * (1/7)), int(raw_bayer_.shape[1] * (1/7))))
+#
+#         # c1 = raw_bayer_[::16, ::16]
+#         # c2 = raw_bayer_[1::16, ::16]
+#         # c3 = raw_bayer_[::16, 1::16]
+#         # c4 = raw_bayer_[1::16, 1::16]
+#         # raw_bayer_downscaled = np.empty((int(raw_bayer_.shape[0] * (1/8)), int(raw_bayer_.shape[1] * (1/8))))
+#         raw_bayer_downscaled[::2, ::2] = c1
+#         raw_bayer_downscaled[1::2, ::2] = c2
+#         raw_bayer_downscaled[::2, 1::2] = c3
+#         raw_bayer_downscaled[1::2, 1::2] = c4
+#
+#
+# #
+# #         # raw_bayer_downscaled = raw_bayer
+#         params = {
+#             'input_stage': 'raw',
+# #             # options: 'raw', 'normal', 'white_balance', 'demosaic', 'xyz', 'srgb', 'gamma', 'tone'
+#             'output_stage': 'tone',
+# #             # options: 'normal', 'white_balance', 'demosaic', 'xyz', 'srgb', 'gamma', 'tone'
+#             'demosaic_type': 'menon2007'
+#         }
+#         metadata = get_metadata(im_path)
+# #
+#         output_image = run_pipeline_v2(raw_bayer_downscaled, params, metadata)
+#         output_image = np.clip(output_image, 0, 1)
+#        # output_image = output_image ** (1 / 2.2)
+#         output_image = output_image * 255
+#         output_image = output_image.astype(np.uint8)
+        #output_image = cv2.cvtColor(output_image, cv2.COLOR_BGR2RGB)
+        # output_image = cv2.cvtColor(output_image,cv2.COLOR_BGR2RGB)
+        #cv2.imwrite("outgamma04516.jpg",output_image)
+        #break
 
-        # c1 = raw_bayer_[::16, ::16]
-        # c2 = raw_bayer_[1::16, ::16]
-        # c3 = raw_bayer_[::16, 1::16]
-        # c4 = raw_bayer_[1::16, 1::16]
-        # raw_bayer_downscaled = np.empty((int(raw_bayer_.shape[0] * (1/8)), int(raw_bayer_.shape[1] * (1/8))))
+        params = {
+            'input_stage': 'raw',
+            #             # options: 'raw', 'normal', 'white_balance', 'demosaic', 'xyz', 'srgb', 'gamma', 'tone'
+            'output_stage': 'tone',
+            #             # options: 'normal', 'white_balance', 'demosaic', 'xyz', 'srgb', 'gamma', 'tone'
+            'demosaic_type': 'EA'
+        }
+
+        # raw_bayer_ = np.right_shift(raw_bayer, 6)
+        c1 = raw_bayer_[::4, ::4]
+        c2 = raw_bayer_[1::4, ::4]
+        c3 = raw_bayer_[::4, 1::4]
+        c4 = raw_bayer_[1::4, 1::4]
+        raw_bayer_downscaled = np.empty((int(raw_bayer_.shape[0] * (1 / 2)), int(raw_bayer_.shape[1] * (1 / 2))))
+
+        raw_bayer_downscaled_shape = (raw_bayer_downscaled.shape[1] // 2, raw_bayer_downscaled.shape[0] // 2)
         raw_bayer_downscaled[::2, ::2] = c1
         raw_bayer_downscaled[1::2, ::2] = c2
         raw_bayer_downscaled[::2, 1::2] = c3
         raw_bayer_downscaled[1::2, 1::2] = c4
 
-
-#
-#         # raw_bayer_downscaled = raw_bayer
-        params = {
-            'input_stage': 'raw',
-#             # options: 'raw', 'normal', 'white_balance', 'demosaic', 'xyz', 'srgb', 'gamma', 'tone'
-            'output_stage': 'tone',
-#             # options: 'normal', 'white_balance', 'demosaic', 'xyz', 'srgb', 'gamma', 'tone'
-            'demosaic_type': 'menon2007'
-        }
         metadata = get_metadata(im_path)
-#
+        #
         output_image = run_pipeline_v2(raw_bayer_downscaled, params, metadata)
         output_image = np.clip(output_image, 0, 1)
-       # output_image = output_image ** (1 / 2.2)
+
+        output_image_shape = (int(raw_bayer_.shape[1] * (1 / 7)), int(raw_bayer_.shape[0] * (1 / 7)))
+        output_image = cv2.resize(output_image, output_image_shape)
+
+        # output_image = output_image ** (1 / 2.2)
         output_image = output_image * 255
         output_image = output_image.astype(np.uint8)
-        #output_image = cv2.cvtColor(output_image, cv2.COLOR_BGR2RGB)
-        # output_image = cv2.cvtColor(output_image,cv2.COLOR_BGR2RGB)
-        #cv2.imwrite("outgamma04516.jpg",output_image)
-        #break
 
 #
 #         raw_bayer_downscaled = raw_bayer_downscaled.astype(np.uint8)

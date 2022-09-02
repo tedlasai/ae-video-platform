@@ -185,6 +185,7 @@ class Exposure:
         low_indices = np.where(grid_means < self.low_threshold)
         low_coord_list = list(zip(low_indices[0], low_indices[1], low_indices[2], low_indices[3]))
         low_oned_indices = self.fourd_indices_to_oned_indices(low_coord_list)
+
         return high_oned_indices, low_oned_indices
 
     # def get_grids_weight_matrix(self, grid_means):
@@ -274,7 +275,7 @@ class Exposure:
 
     def get_hists(self, flatten_weighted_ims):
         scene_hists_include_drooped_counts = self.hist_laxis(flatten_weighted_ims, self.num_hist_bins + 1, (
-        -0.01, 1))  # one extra bin is used to count the number of -0.01
+        -0.01, 1.01))  # one extra bin is used to count the number of -0.01
         num_dropped_pixels = scene_hists_include_drooped_counts[:, :, 0]
         scene_hists = scene_hists_include_drooped_counts[:, :, 1:]
         return scene_hists, num_dropped_pixels

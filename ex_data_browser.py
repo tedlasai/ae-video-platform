@@ -319,6 +319,7 @@ class Browser:
 
         self.useRawIms = self.useRawIms_.get()
         print("self.useRawIms is ", self.useRawIms)
+        self.updateSlider(0)
 
     def mertens_checkbox(self):
 

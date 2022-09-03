@@ -325,7 +325,7 @@ class Browser:
 
         self.mertens_check = tk.IntVar()
         self.c1 = tk.Checkbutton(root, text=' Mertens Export', variable= self.mertens_check, offvalue= 0, onvalue= 1, command= self.switch_mertens)
-        self.c1.grid(row = 29, column = 1)
+        self.c1.grid(row=29, column=1)
 
     def switch_mertens(self):
 
@@ -469,19 +469,40 @@ class Browser:
             self.fig_2.clear()
         self.fig_2, axes = plt.subplots(3, figsize=(4, 9))
         self.fig_2.tight_layout()
-
+        sum_c1 = max(sum(count1),1)
+        sum_c2 = max(sum(count2),1)
+        sum_c3 = max(sum(count3),1)
+        vals1 = count1/sum_c1
+        vals2 = count2 / sum_c2
+        vals3 = count3 / sum_c3
         if ind == ind2:
-            axes[1].bar(bins, count2, align='center')
+            color1 = 'blue'
+            axes[1].bar(bins, vals2, align='center',color=color1)
             axes[1].set_title('histogram with outlier', **font)
             axes[0].set_title('histogram without outlier', **font)
+            for i, x in enumerate(vals2):
+                if x > 0.3:
+                    axes[1].text(i, 0.3, str("%.2f" % x), color=color1,
+                                 fontsize=13, position=(i, 0.31))
         else:
-            axes[1].bar(bins, count3, align='center',color='orange')
+            color1 = 'orange'
+            axes[1].bar(bins, vals3, align='center',color=color1)
             axes[1].set_title('selected image histogram', **font)
             axes[0].set_title('current image histogram', **font)
+            for i, x in enumerate(vals3):
+                if x > 0.3:
+                    axes[1].text(i, 0.3, str("%.2f" % x), color=color1,
+                                 fontsize=13, position=(i, 0.31))
 
-        axes[0].bar(bins, count1, align='center',color='violet')
+        axes[0].bar(bins, vals1, align='center',color='violet')
+        axes[0].set_ylim([0, 0.3])
         axes[1].sharex(axes[0])
         axes[1].sharey(axes[0])
+        for i,x in enumerate(vals1):
+            if x > 0.3:
+                axes[0].text(i,0.3,str("%.2f" % x),color='violet',
+                 fontsize=13, position=(i, 0.31))
+
         axes[2].plot(np.arange(stack_size), curr_frame_mean_list, color='green',
                      linewidth=2)  # ,label='Exposure stack mean')
         axes[2].plot(ind, val, color='violet', marker='o', markersize=12)

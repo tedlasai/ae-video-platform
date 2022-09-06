@@ -481,27 +481,27 @@ class Browser:
             axes[1].set_title('histogram with outlier', **font)
             axes[0].set_title('histogram without outlier', **font)
             for i, x in enumerate(vals2):
-                if x > 0.3:
-                    axes[1].text(i, 0.3, str("%.2f" % x), color=color1,
-                                 fontsize=13, position=(i, 0.31))
+                if x > 0.25:
+                    axes[1].text(i, 0.25, str("%.2f" % x), color=color1,
+                                 fontsize=13, position=(i, 0.251))
         else:
             color1 = 'orange'
             axes[1].bar(bins, vals3, align='center',color=color1)
             axes[1].set_title('selected image histogram', **font)
             axes[0].set_title('current image histogram', **font)
             for i, x in enumerate(vals3):
-                if x > 0.3:
-                    axes[1].text(i, 0.3, str("%.2f" % x), color=color1,
-                                 fontsize=13, position=(i, 0.31))
+                if x > 0.25:
+                    axes[1].text(i, 0.25, str("%.2f" % x), color=color1,
+                                 fontsize=13, position=(i, 0.251))
 
         axes[0].bar(bins, vals1, align='center',color='violet')
-        axes[0].set_ylim([0, 0.3])
+        axes[0].set_ylim([0, 0.25])
         axes[1].sharex(axes[0])
         axes[1].sharey(axes[0])
         for i,x in enumerate(vals1):
-            if x > 0.3:
-                axes[0].text(i,0.3,str("%.2f" % x),color='violet',
-                 fontsize=13, position=(i, 0.31))
+            if x > 0.25:
+                axes[0].text(i,0.25,str("%.2f" % x),color='violet',
+                 fontsize=13, position=(i, 0.251))
 
         axes[2].plot(np.arange(stack_size), curr_frame_mean_list, color='green',
                      linewidth=2)  # ,label='Exposure stack mean')

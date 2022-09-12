@@ -26,15 +26,15 @@ class Browser:
     def __init__(self, root):
         super().__init__()
 
-        self.folders = "D:\Final"     #link to directory containing all the dataset image folders
+        self.folders = "E:\Final"     #link to directory containing all the dataset image folders
 
         self.widgetFont = 'Arial'
         self.widgetFontSize = 12
 
-        self.scene = ['Scene101', 'Scene102', 'Scene103', 'Scene1', 'Scene2', 'Scene3', 'Scene4', 'Scene5', 'Scene6',
-                      'Scene7', 'Scene8', 'Scene9', 'Scene10', 'Scene11', 'Scene12', 'Scene13', 'Scene14', 'Scene15', 'Scene16', 'Scene17', 'Scene18']
+        # self.scene = ['Scene101', 'Scene102', 'Scene103', 'Scene1', 'Scene2', 'Scene3', 'Scene4', 'Scene5', 'Scene6',
+        #               'Scene7', 'Scene8', 'Scene9', 'Scene10', 'Scene11', 'Scene12', 'Scene13', 'Scene14', 'Scene15', 'Scene16', 'Scene17', 'Scene18']
         self.frame_num = [90, 65, 15, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]  # number of frames per position
-        self.stack_size = [12, 47, 28, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15]  # number of shutter options per position
+        #self.stack_size = [12, 47, 28, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15]  # number of shutter options per position
 
         self.scene = ['Scene1', 'Scene2', 'Scene3', 'Scene4', 'Scene5', 'Scene6',
                       'Scene7', 'Scene8', 'Scene9', 'Scene10', 'Scene11', 'Scene12', 'Scene13', 'Scene14', 'Scene15',
@@ -42,7 +42,7 @@ class Browser:
         self.frame_num = [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,
                           100, 100, 100, 100]  # number of frames per position
         self.stack_size = [15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-                           15, 15, 15]  # number of shutter options per position
+                           15, 40, 15]  # number of shutter options per position
 
         self.auto_exposures = ["None", "Global", "Local",'Local without grids']
         self.current_auto_exposure = "None"
@@ -132,7 +132,7 @@ class Browser:
         self.vertical_slider()
         # self.image_mean_plot()
         # self.hist_plot()
-        self.hist_plot_three()
+        self.hist_plot_three(stack_size=15, curr_frame_mean_list=np.zeros(15))
         self.regular_video_button()
         self.high_res_checkbox()
         self.mertens_checkbox()
@@ -359,6 +359,48 @@ class Browser:
             13: '1/250',
             14: '1/500'
         }
+        self.SCALE_LABELS_NEW = {
+            0: '15"',
+            1: '13"',
+            2: '10"',
+            3: '8"',
+            4: '6"',
+            5: '5"',
+            6: '4"',
+            7: '3"2',
+            8: '2"5',
+            9: '2"',
+            10: '1"6',
+            11: '1"3',
+            12: '1"',
+            13: '0"8',
+            14: '0"6',
+            15: '0"5',
+            16: '0"4',
+            17: '0"3',
+            18: '1/4',
+            19: '1/5',
+            20: '1/6',
+            21: '1/8',
+            22: '1/10',
+            23: '1/13',
+            24: '1/15',
+            25: '1/20',
+            26: '1/25',
+            27: '1/30',
+            28: '1/40',
+            29: '1/50',
+            30: '1/60',
+            31: '1/80',
+            32: '1/100',
+            33: '1/125',
+            34: '1/160',
+            35: '1/200',
+            36: '1/250',
+            37: '1/320',
+            38: '1/400',
+            39: '1/500'
+        }
 
 
         self.verSliderLabel = tk.Label(root, text='Exposure Time', font=(self.widgetFont, self.widgetFontSize))
@@ -368,7 +410,18 @@ class Browser:
         #                      to=self.stack_size[self.scene_index] - 1, font=(self.widgetFont, self.widgetFontSize), length=self.heightToScale,
         #                      command=self.updateSlider)
 
-        self.verSlider = tk.Scale(root, activebackground='black', cursor='sb_v_double_arrow', from_=min(self.SCALE_LABELS), to=max(self.SCALE_LABELS), font=(self.widgetFont, self.widgetFontSize),
+
+        if self.stack_size[self.scene_index] == 40:
+            min_ = min(self.SCALE_LABELS_NEW)
+            max_ = max(self.SCALE_LABELS_NEW)
+            min_ = 0
+            max_ = len(self.SCALE_LABELS_NEW)-1
+        else:
+            min_ = min(self.SCALE_LABELS)
+            max_ = max(self.SCALE_LABELS)
+            min_ = 0
+            max_ = len(self.SCALE_LABELS)-1
+        self.verSlider = tk.Scale(root, activebackground='black', cursor='sb_v_double_arrow', from_=min_, to=max_, font=(self.widgetFont, self.widgetFontSize),
                                   length=self.heightToScale,
                                   command= self.scale_labels)
 
@@ -379,7 +432,11 @@ class Browser:
     def scale_labels(self, value):
 
         # self.verSlider.config(label=self.SCALE_LABELS[int(value)])
-        tk.Label(root, text=self.SCALE_LABELS[int(value)], font=("Times New Roman", 15)).grid(row=27, column=0, )
+        if self.stack_size[self.scene_index] == 40:
+            text_ =self.SCALE_LABELS_NEW[int(value)]
+        else:
+            text_ = self.SCALE_LABELS[int(value)]
+        tk.Label(root, text=text_, font=("Times New Roman", 15)).grid(row=27, column=0, )
 
         # self.verSlider.place(x=50, y=300, anchor="center")
         self.useMertens = False
@@ -399,7 +456,9 @@ class Browser:
 
 
 
-    def image_mean_plot(self,stack_size=15,curr_frame_mean_list=np.zeros(15),ind=0,val=0):
+    def image_mean_plot(self,ind=0,val=0):
+        stack_size = self.stack_size[self.scene_index]
+        curr_frame_mean_list = np.zeros(stack_size)
         if self.fig:
             plt.close(self.fig)
             self.fig.clear()
@@ -418,12 +477,13 @@ class Browser:
         plt.xlabel('Image index')
         plt.ylabel('Mean value')
         plt.xlim(-0.2, stack_size - 0.8)
-        if stack_size < 20:
-            plt.xticks(np.arange(0, stack_size, 1))
-        elif stack_size >= 15 and stack_size < 30:
-            plt.xticks(np.arange(0, stack_size, 2))
-        else:
-            plt.xticks(np.arange(0, stack_size, 3))
+        plt.xticks(np.arange(0, stack_size, 1))
+        # if stack_size < 20:
+        #     plt.xticks(np.arange(0, stack_size, 1))
+        # elif stack_size >= 15 and stack_size < 30:
+        #     plt.xticks(np.arange(0, stack_size, 2))
+        # else:
+        #     plt.xticks(np.arange(0, stack_size, 3))
 
         plt.ylim(-0.02, 0.85)
         plt.yticks(np.arange(0, 0.85, 0.1))
@@ -458,7 +518,9 @@ class Browser:
         self.imagePrevlabel_3 = tk.Label(root, image=self.photo_3)
         self.imagePrevlabel_3.grid(row=17, column=3, columnspan=2, rowspan=20, sticky=tk.NE)
 
-    def hist_plot_three(self, count1=np.zeros(100), count2=np.zeros(100),count3=np.zeros(100),stack_size=15,curr_frame_mean_list=np.zeros(15),ind=0,val=0,ind2=0, val2=0):
+    def hist_plot_three(self,stack_size,curr_frame_mean_list,count1=np.zeros(100), count2=np.zeros(100),count3=np.zeros(100),ind=0,val=0,ind2=0, val2=0):
+        # stack_size = self.stack_size[self.scene_index]
+        # curr_frame_mean_list = np.zeros(stack_size)
         font = {'family': 'monospace',
                 'weight': 'bold',
                 'size': 10}
@@ -784,8 +846,10 @@ class Browser:
     def setAutoExposure(self, dummy=False):
         self.current_auto_exposure = self.defAutoExposure.get()
         self.scene_index = self.scene.index(self.defScene.get())
-
-        input_ims = 'Image_Arrays_exposure/Scene' + str(self.scene_index+1) + '_ds_raw_imgs.npy'
+        if self.stack_size[self.scene_index] == 40:
+            input_ims = 'Image_Arrays_exposure_new/Scene' + str(self.scene_index + 1) + '_ds_raw_imgs.npy'
+        else:
+            input_ims = 'Image_Arrays_exposure/Scene' + str(self.scene_index+1) + '_ds_raw_imgs.npy'
         self.check_num_grids()
         self.exposureParams = {"downsample_rate":1/25,'r_percent':0,'g_percent':1,
                                                 'col_num_grids':self.col_num_grids, 'row_num_grids':self.row_num_grids, 'low_threshold':self.low_threshold.get(), 'low_rate':float(self.low_rate.get()),
@@ -896,20 +960,21 @@ class Browser:
 
     def updatePlot(self):
         # global verSlider, horSlider, photo, photo_2, stack_size, img_all, img, img_mean_list, scene_index, fig
-
+        stack_size = self.stack_size[self.scene_index]
         if self.check == True:
-            self.temp_img_ind = int(self.horSlider.get()) * self.stack_size[self.scene_index] + int(self.verSlider.get())
+            self.temp_img_ind = int(self.horSlider.get()) * stack_size + int(self.verSlider.get())
         else:
             pass
 
         self.check == True
         # Image mean plot
         if len(self.hists) != 0:
-            first_ind = self.temp_img_ind // self.stack_size[self.scene_index]
-            send_ind = self.temp_img_ind % self.stack_size[self.scene_index]
+
+            first_ind = self.temp_img_ind // stack_size
+            send_ind = self.temp_img_ind % stack_size
             count1 = self.hists[first_ind][send_ind]
             count2 = self.hists_before_ds_outlier[first_ind][send_ind]
-            stack_size = self.stack_size[self.scene_index]
+
             curr_frame_mean_list = self.weighted_means[first_ind]
             ind = send_ind
             val = curr_frame_mean_list[send_ind]
@@ -921,8 +986,7 @@ class Browser:
             count1 = np.zeros(self.num_bins)
             count2 = np.zeros(self.num_bins)
             count3 = np.zeros(self.num_bins)
-            stack_size = 15
-            curr_frame_mean_list = np.zeros(15)
+            curr_frame_mean_list = np.zeros(stack_size)
             ind = 0
             val = 0
             ind2 = 0

@@ -78,8 +78,8 @@ from simple_camera_pipeline.python.pipeline import run_pipeline_v2,get_metadata
 
 start_time = time.time()
 NUMBER_OF_IMAGES_PER_STACK = 15
-read_path = 'D:/Final_dng/Scene19_Blackspace_dng/'
-scene_num = '19'
+read_path = 'D:/project_data/4d_exposure/Final_dng/Scene4_BackAndRightLight_dng/'
+scene_num = '4'
 save_loc = os.path.join(os.path.dirname(__file__), 'Image_Arrays_from_dng')
 os.makedirs(save_loc, exist_ok=True)
 joinPathChar = "/"

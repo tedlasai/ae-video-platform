@@ -4,7 +4,7 @@ import time
 import rawpy
 import numpy as np
 import cv2
-from simple_camera_pipeline.python.pipeline import run_pipeline_v2,get_metadata
+from simple_camera_pipeline_old.python.pipeline import run_pipeline_v2,get_metadata
 
 # im_path = "C:/Users/beixuan/Documents/testAdobedng/1P0A5070.dng"
 # im_path2 = "C:/Users/beixuan/Documents/testAdobedng/1P0A5070.cr2"

@@ -11,7 +11,7 @@ NEW_SCALES = [15,13,10,8,6,5,4,3.2,2.5,2,1.6,1.3,1,0.8,0.6,0.5,0.4,0.3,1/4,1/5,1
 means = []
 NUMBER_OF_IMAGES_PER_STACK = len(SCALE_LABELS)
 NUMBER_OF_IMAGES_PER_STACK_NEW = len(NEW_SCALES)
-TOTAL_IMS = 100* NUMBER_OF_IMAGES_PER_STACK_NEW
+TOTAL_IMS = 100 * NUMBER_OF_IMAGES_PER_STACK_NEW
 
 #image 3 4", 4 2", 5 1", approximate 4 with 3 and 5,
 def one_pixel_function(im1,im2,x1,x2,targetx):
@@ -46,7 +46,8 @@ def method_1_assume_line_across_origin(image_path1,image_path2,ind1,ind2,targetx
     im1,mean1 = get_normed_im(image_path1)
     im2,mean2 = get_normed_im(image_path2)
     x1 = SCALE_LABELS[ind1]
-    x2 = SCALE_LABELS[ind2]
+    x2 = SCALE_LABELS[
+        2]
     return one_pixel_function(im1,im2,x1,x2,targetx)
 
 def method_2(image_path1,image_path2,ind1,ind2,targetx):
@@ -81,7 +82,11 @@ def make_npy_data_for_algorithem_one_im(c1,c2,c3,c4,shape0,shape1):
     raw_bayer_downscaled[1::2, ::2] = c2_
     raw_bayer_downscaled[::2, 1::2] = c3_
     raw_bayer_downscaled[1::2, 1::2] = c4_
-    raw_bayer_downscaled = np.right_shift(raw_bayer_downscaled, 6)
+    #raw_bayer_downscaled = np.right_shift(raw_bayer_downscaled, 6)
+    black_level = 512
+    white_level = 14008
+    raw_bayer_downscaled = np.clip(raw_bayer_downscaled,black_level,white_level)
+    raw_bayer_downscaled = ((raw_bayer_downscaled-black_level)/(white_level - black_level)) * 255
     raw_bayer_downscaled = raw_bayer_downscaled.astype(np.uint8)
     return raw_bayer_downscaled
 
@@ -174,8 +179,8 @@ def save_im(raw_bayer,im_path):
 
 start_time = time.time()
 
-read_path = 'D:/project_data/4d_exposure/Final_dng/Scene19_Blackspace_dng/'
-scene_num = '19'
+read_path = 'D:/dngs/Scene12/'
+scene_num = '12'
 
 save_loc = os.path.join(os.path.dirname(__file__), 'Image_Arrays_exposure_separate')
 os.makedirs(save_loc, exist_ok=True)
@@ -200,8 +205,10 @@ else:
 #     # one_stack_isos_temp_list = []
 #     # one_stack_shutter_speeds_temp_list = []
     count = 0
+    count = 33*40
     i = 0
-    j = 1
+    i = 33*15
+    j = i+1
     k = 0
     image_path1 = images[i]
     im1,mean1,output_im_algorithm1,output_im_show1 = get_normed_im(image_path1)
@@ -211,11 +218,10 @@ else:
     show_one_stack_ims_temp_list.append(output_im_show1)
     print(count)
     count += 1
-    while count < TOTAL_IMS:
-        if count==42:
-            stop=0
+    #- 38*40
+    while count < TOTAL_IMS  + 1:
         image_path2 = images[j]
-        im2, mean2,output_im_algorithm2,output_im_show2 = get_normed_im(image_path2)
+        im2, mean2, output_im_algorithm2, output_im_show2 = get_normed_im(image_path2)
         if NEW_SCALES[k] == SCALE_LABELS[i % NUMBER_OF_IMAGES_PER_STACK]:
             k += 1
             # if k == len(NEW_SCALES):
@@ -231,8 +237,11 @@ else:
                 # list_of_ims.append(one_stack_ims_temp_list)
                 # list_of_ims_show.append(show_one_stack_ims_temp_list)
                 frame_number = count // NUMBER_OF_IMAGES_PER_STACK_NEW
-                np.save(save_loc + joinPathChar + 'Scene' + scene_num + '_ds_raw_imgs' + str(frame_number), np.asarray(one_stack_ims_temp_list))
-                np.save(save_loc_show + joinPathChar + 'Scene' + scene_num +'_show_dng_imgs'+ str(frame_number),
+                frame_number_s = str(frame_number)
+                if len(frame_number_s) == 1:
+                    frame_number_s = '0' + frame_number_s
+                np.save(save_loc + joinPathChar + 'Scene' + scene_num + '_ds_raw_imgs' + frame_number_s, np.asarray(one_stack_ims_temp_list))
+                np.save(save_loc_show + joinPathChar + 'Scene' + scene_num +'_show_dng_imgs'+ frame_number_s,
                         np.asarray(show_one_stack_ims_temp_list))
                 one_stack_ims_temp_list=[]
                 show_one_stack_ims_temp_list=[]
@@ -264,6 +273,6 @@ else:
 
             k += 1
     print(means)
-    np.save(save_loc + joinPathChar + 'Scene' + scene_num + '_ds_raw_imgs', np.asarray(list_of_ims))
-    np.save(save_loc_show + joinPathChar + 'Scene' + scene_num + '_show_dng_imgs', np.asarray(list_of_ims_show))
+    #np.save(save_loc + joinPathChar + 'Scene' + scene_num + '_ds_raw_imgs', np.asarray(list_of_ims))
+    #np.save(save_loc_show + joinPathChar + 'Scene' + scene_num + '_show_dng_imgs', np.asarray(list_of_ims_show))
 print("running time: {:.3f}".format(time.time()-start_time))

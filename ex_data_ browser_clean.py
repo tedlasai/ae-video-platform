@@ -19,8 +19,8 @@ from test_pipline import local_interested_grids_generater
 import pickle as pkl
 
 
-root = tk.Tk()
-root.geometry('1600x900'), root.title('Data Browser')  # 1900x1000+5+5
+# root = tk.Tk()
+# root.geometry('1600x900'), root.title('Data Browser')  # 1900x1000+5+5
 class Browser:
 
     def __init__(self, root):
@@ -39,8 +39,8 @@ class Browser:
         self.current_auto_exposure = "None"
         self.scene_index = 18
         # self.mertensVideo = []
-        self.bit_depth = 8
-        self.downscale_ratio = 0.12
+        # self.bit_depth = 8
+        # self.downscale_ratio = 0.12
         self.check = True
         self.temp_img_ind = 0
         self.making_a_serious_of_videos = 0
@@ -49,7 +49,7 @@ class Browser:
         if (platform.system() == "Windows"):
             self.joinPathChar = "\\"
 
-        self.imgSize = [int(4480 * self.downscale_ratio), int(6720 * self.downscale_ratio)]
+        self.imgSize = constants.imgSize
         self.widthToScale = self.imgSize[1]
         self.widPercent = (self.widthToScale / float(self.imgSize[1]))
         self.heightToScale = int(float(self.imgSize[0]) * float(self.widPercent))
@@ -59,14 +59,12 @@ class Browser:
                 self.scene_index] + '_show_dng_imgs' + '.npy')
 
         self.img = deepcopy(self.img_all[0,0])
-        self.useMertens = False
-        self.useRawIms = 1
         self.play = True
         self.video_speed = 50
         self.video_fps = 30
 
-        self.res_check = 0
-        self.hdr_mode_check = 0
+        # self.res_check = 0
+        # self.hdr_mode_check = 0
         self.make_crop_video_flag = 0
         self.temp_coords_for_video_producing = []
 
@@ -94,10 +92,10 @@ class Browser:
         # self.canvas.bind("<Button-4>", self.zoomerP)
         # self.canvas.bind("<Button-5>", self.zoomerM)
         # some defaults
-        self.col_num_grids = 8
-        self.row_num_grids = 8
-        self.rowGridSelect = 0
-        self.colGridSelect = 0
+        # self.col_num_grids = 8
+        # self.row_num_grids = 8
+        # self.rowGridSelect = 0
+        # self.colGridSelect = 0
         self.rect = None
         self.x = 0
         self.y = 0
@@ -105,7 +103,7 @@ class Browser:
         self.start_y = None
         self.curX = 0
         self.curY = 0
-        self.num_bins = 100
+        self.num_bins = constants.num_bins
         self.hists = []
         self.hists_before_ds_outlier = []
 
@@ -119,6 +117,6 @@ class Browser:
         # self.show_srgb_hist_check = self.show_srgb_hist_check_.get()
 
 
-b = Browser(root)
-
-root.mainloop()
+# b = Browser(root)
+#
+# root.mainloop()

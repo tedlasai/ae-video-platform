@@ -146,7 +146,9 @@ class Browser:
                 self.scene_index] + '_show_dng_imgs' + '.npy')
         # if self.stack_size[self.scene_index] == 40:
         #     self.img_all = self.img_raw
+
         self.img = deepcopy(self.img_all[0])
+        #self.img2 = deepcopy(self.img_raw[0])
         self.useMertens = False
         self.useRawIms = 1
         self.play = True

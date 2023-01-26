@@ -1,4 +1,4 @@
-import broswer_builder
+import browser_builder
 import tkinter as tk
 import constants
 
@@ -13,9 +13,10 @@ def fun1():
 def fun2():
     print(2)
 
-b = broswer_builder.Browser(root)
-b.buttons_builder(root,"xx",fun1,5,5)
-b.buttons_builder(root,"yy",fun2,7,6)
+b = browser_builder.Browser(root)
+b.init_functions()
+b.buttons_builder("xx",fun1,5,5)
+b.buttons_builder("yy",fun2,7,6)
 
 print(b.imgSize)
 root.mainloop()

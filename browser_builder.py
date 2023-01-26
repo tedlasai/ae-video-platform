@@ -25,6 +25,7 @@ class Browser:
 
     def __init__(self, root):
         super().__init__()
+        self.root = root
         self.folders = constants.folders
         self.widgetFont = constants.widgetFont
         self.widgetFontSize = constants.widgetFontSize
@@ -69,7 +70,7 @@ class Browser:
         self.temp_coords_for_video_producing = []
 
         # Image Convas
-        self.photo = ImageTk.PhotoImage(Image.fromarray(self.img))
+        self.photo = ImageTk.PhotoImage(Image.fromarray(self.img).resize((self.imgSize[1],self.imgSize[0])))
 
         self.canvas = tk.Canvas(root, cursor="cross", width=self.photo.width(), height=self.photo.height(),
                                 borderwidth=0, highlightthickness=0)
@@ -116,9 +117,60 @@ class Browser:
         # self.init_functions()
         # self.show_srgb_hist_check = self.show_srgb_hist_check_.get()
 
+    def init_functions(self):
 
-    def buttons_builder(self, root, text, command_function,row,column):
-        self.b = tk.Button(root,text =text,
+        self.horizontal_slider()
+        self.vertical_slider()
+
+    def horizontal_slider(self):
+        # Horizantal Slider
+        self.horSlider = tk.Scale(self.root, activebackground='black', cursor='sb_h_double_arrow', from_=0,
+                                  to=self.frame_num[0] - 1,
+                                  label='Frame Number', font=(self.widgetFont, self.widgetFontSize),
+                                  orient=tk.HORIZONTAL,
+                                  length=self.widthToScale, command=self.updateSlider)
+        self.horSlider.grid(row=27, column=1, columnspan=2, sticky=tk.SW)
+
+    def vertical_slider(self):
+        # Vertical Slider
+
+        self.verSliderLabel = tk.Label(self.root, text='Exposure Time', font=(self.widgetFont, self.widgetFontSize))
+        self.verSliderLabel.grid(row=0, column=0)
+
+        # self.verSlider = tk.Scale(root, activebackground='black', cursor='sb_v_double_arrow', from_=0,
+        #                      to=self.stack_size[self.scene_index] - 1, font=(self.widgetFont, self.widgetFontSize), length=self.heightToScale,
+        #                      command=self.updateSlider)
+
+        if self.stack_size[self.scene_index] == 40:
+            min_ = min(self.SCALE_LABELS_NEW)
+            max_ = max(self.SCALE_LABELS_NEW)
+            min_ = 0
+            max_ = len(self.SCALE_LABELS_NEW) - 1
+        else:
+            min_ = min(self.SCALE_LABELS)
+            max_ = max(self.SCALE_LABELS)
+            min_ = 0
+            max_ = len(self.SCALE_LABELS) - 1
+        max_ = 40
+        self.verSlider = tk.Scale(self.root, activebackground='black', cursor='sb_v_double_arrow', from_=min_, to=max_,
+                                  font=(self.widgetFont, self.widgetFontSize),
+                                  length=self.heightToScale,
+                                  command=self.scale_labels)
+
+        # print(self.verSlider.configure().keys())
+
+        self.verSlider.grid(row=1, column=0, rowspan=25)
+
+    def updateSlider(self, scale_value):
+        pass
+
+    def scale_labels(self, value):
+        pass
+
+
+
+    def buttons_builder(self, text, command_function,row,column):
+        self.b = tk.Button(self.root,text =text,
         fg ='#ffffff',
         bg ='#999999',
         activebackground ='#454545',
@@ -129,6 +181,19 @@ class Browser:
         font =(constants.widgetFont, constants.widgetFontSize),
                                                 command=command_function)
         self.b.grid(row=row, column=column, sticky=tk.E)
+
+    # def checkbox_builder(self, root, text, command_function,row,column):
+    #     self.b = tk.Button(root,text =text,
+    #     fg ='#ffffff',
+    #     bg ='#999999',
+    #     activebackground ='#454545',
+    #     relief =tk.RAISED,
+    #     width =16,
+    #     padx =10,
+    #     pady =5,
+    #     font =(constants.widgetFont, constants.widgetFontSize),
+    #                                             command=command_function)
+    #     self.b.grid(row=row, column=column, sticky=tk.E)
 
 
 # b = Browser(root)

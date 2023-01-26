@@ -1,5 +1,6 @@
 import browser_builder
 import tkinter as tk
+import browser_inputs_builder
 import constants
 
 
@@ -13,7 +14,8 @@ def fun1():
 def fun2():
     print(2)
 
-b = browser_builder.Browser(root)
+b = browser_inputs_builder.Broswer_with_inputs(root)
+#b = browser_builder.Browser(root)
 b.init_functions()
 b.buttons_builder("xx",fun1,5,5)
 b.buttons_builder("yy",fun2,7,6)

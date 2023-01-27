@@ -30,9 +30,9 @@ class Broswer_with_inputs(Browser):
     def target_intensity_text_box(self):
         self.target_intensity = tk.DoubleVar()
         self.target_intensity.set(0.13)
-        tk.Label(self.root, text="target intensity").grid(row=29, column=5)
+        tk.Label(self.root, text="target intensity").grid(row=28, column=1,sticky=tk.NSEW)
         self.e1 = tk.Entry(self.root, textvariable=self.target_intensity)
-        self.e1.grid(row=30, column=5, sticky=tk.E)
+        self.e1.grid(row=29, column=1)
 
 
     def local_interested_global_area_percentage_box(self):
@@ -74,7 +74,7 @@ class Broswer_with_inputs(Browser):
         #self.outlierSlider.
         #print("BUILDING OUTLIER SLIDER", self.high_threshold)
 
-        self.outlierSlider.grid(padx=10, pady=10, row=28, column=2, columnspan=1, sticky=tk.E)
+        self.outlierSlider.grid(padx=10, pady=10, row=28,rowspan=3, column=2, columnspan=2, sticky=tk.E)
         # self.show_threshold()
         self.start_index_text_box()
         self.high_rate_text_box()
@@ -82,16 +82,16 @@ class Broswer_with_inputs(Browser):
     def start_index_text_box(self):
         self.start_index = tk.StringVar()
         self.start_index.set("15")
-        tk.Label(self.root, text="start index").grid(row=29, column=2)
+        tk.Label(self.root, text="start index").grid(row=31, column=2)
         self.e1 = tk.Entry(self.root, textvariable=self.start_index)
-        self.e1.grid(row=30, column=2)
+        self.e1.grid(row=32, column=2)
 
     def high_rate_text_box(self):
         self.high_rate = tk.StringVar()
         self.high_rate.set("0.2")
-        tk.Label(self.root, text="above high threshold").grid(row=31, column=2)
+        tk.Label(self.root, text="above high threshold").grid(row=33, column=2)
         self.e1 = tk.Entry(self.root, textvariable=self.high_rate)
-        self.e1.grid(row=32, column=2)
+        self.e1.grid(row=34, column=2)
 
 
     def playback_text_box(self):
@@ -123,8 +123,7 @@ class Broswer_with_inputs(Browser):
 
 
     def switch_SRGB_Hist(self):
-        pass
-        # self.show_srgb_hist_check = self.show_srgb_hist_check_.get()
+        self.show_srgb_hist_check = self.show_srgb_hist_check_.get()
         # print("self.show_srgb_hist_chec is ", self.show_srgb_hist_check)
         # self.updateSlider(0)
 

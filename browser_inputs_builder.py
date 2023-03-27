@@ -13,11 +13,11 @@ class Broswer_with_inputs(Browser):
         self.video_fps_text()
         self.target_intensity_text_box()
         self.outlier_slider()
-        self.local_consider_outliers_checkbox()
+        #self.local_consider_outliers_checkbox() # consider outliear in sentimant or not
         self.number_of_previous_frames_text_box()
         self.stepsize_limit_text_box()
-        self.local_interested_name_text_box()
-        self.local_interested_global_area_percentage_box()
+        #self.local_interested_name_text_box() # take the discription of what area are included in the manu sentimant algorithm
+        #self.local_interested_global_area_percentage_box() # take the ratio of sentimant vs local
         self.show_SRGB_hist_check_box()
 
     def local_interested_name_text_box(self):
@@ -84,7 +84,8 @@ class Broswer_with_inputs(Browser):
         self.start_index.set("15")
         tk.Label(self.root, text="start index").grid(row=31, column=2)
         self.e1 = tk.Entry(self.root, textvariable=self.start_index)
-        self.e1.grid(row=32, column=2)
+        self.e1.grid(row=32
+                     , column=2)
 
     def high_rate_text_box(self):
         self.high_rate = tk.StringVar()

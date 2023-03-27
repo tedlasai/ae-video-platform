@@ -42,7 +42,7 @@ class Browser:
         # self.mertensVideo = []
         # self.bit_depth = 8
         # self.downscale_ratio = 0.12
-        self.check = True
+        # self.check = True
         self.temp_img_ind = 0
         self.making_a_serious_of_videos = 0
 
@@ -107,7 +107,6 @@ class Browser:
         self.num_bins = constants.num_bins
         self.hists = []
         self.hists_before_ds_outlier = []
-
         self.fig_2 = None
         self.fig = None
         self.fig_4 = None
@@ -141,17 +140,18 @@ class Browser:
         #                      to=self.stack_size[self.scene_index] - 1, font=(self.widgetFont, self.widgetFontSize), length=self.heightToScale,
         #                      command=self.updateSlider)
 
-        if self.stack_size[self.scene_index] == 40:
-            min_ = min(self.SCALE_LABELS_NEW)
-            max_ = max(self.SCALE_LABELS_NEW)
-            min_ = 0
-            max_ = len(self.SCALE_LABELS_NEW) - 1
-        else:
-            min_ = min(self.SCALE_LABELS)
-            max_ = max(self.SCALE_LABELS)
-            min_ = 0
-            max_ = len(self.SCALE_LABELS) - 1
-        max_ = 40
+        # if self.stack_size[self.scene_index] == 40:
+        #     min_ = min(self.SCALE_LABELS_NEW)
+        #     max_ = max(self.SCALE_LABELS_NEW)
+        #     min_ = 0
+        #     max_ = len(self.SCALE_LABELS_NEW) - 1
+        # else:
+        #     min_ = min(self.SCALE_LABELS)
+        #     max_ = max(self.SCALE_LABELS)
+        #     min_ = 0
+        #     max_ = len(self.SCALE_LABELS) - 1
+        min_ = 0
+        max_ = self.stack_size[self.scene_index]
         self.verSlider = tk.Scale(self.root, activebackground='black', cursor='sb_v_double_arrow', from_=min_, to=max_,
                                   font=(self.widgetFont, self.widgetFontSize),
                                   length=self.heightToScale,
@@ -169,7 +169,7 @@ class Browser:
 
 
 
-    def buttons_builder(self, text, command_function,row,column):
+    def buttons_builder(self, text, command_function,row,column,para=0):
         self.b = tk.Button(self.root,text =text,
         fg ='#ffffff',
         bg ='#999999',
@@ -179,7 +179,8 @@ class Browser:
         padx =10,
         pady =5,
         font =(constants.widgetFont, constants.widgetFontSize),
-                                                command=command_function)
+                                                command=lambda: command_function(para))
+        #self.b['command'] = lambda arg="live", kw="as the": command_function(arg, opt1=kw)
         self.b.grid(row=row, column=column, sticky=tk.E)
 
     # def checkbox_builder(self, root, text, command_function,row,column):

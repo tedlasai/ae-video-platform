@@ -117,55 +117,41 @@ class Browser:
         # self.show_srgb_hist_check = self.show_srgb_hist_check_.get()
 
     def init_functions(self):
+        pass
 
-        self.horizontal_slider()
-        self.vertical_slider()
 
-    def horizontal_slider(self):
+    def horizontal_slider(self, command_function):
         # Horizantal Slider
         self.horSlider = tk.Scale(self.root, activebackground='black', cursor='sb_h_double_arrow', from_=0,
                                   to=self.frame_num[0] - 1,
                                   label='Frame Number', font=(self.widgetFont, self.widgetFontSize),
                                   orient=tk.HORIZONTAL,
-                                  length=self.widthToScale, command=self.updateSlider)
+                                  length=self.widthToScale, command=command_function)
         self.horSlider.grid(row=27, column=1, columnspan=2, sticky=tk.SW)
 
-    def vertical_slider(self):
+    def vertical_slider(self, command_function):
         # Vertical Slider
 
         self.verSliderLabel = tk.Label(self.root, text='Exposure Time', font=(self.widgetFont, self.widgetFontSize))
         self.verSliderLabel.grid(row=0, column=0)
 
-        # self.verSlider = tk.Scale(root, activebackground='black', cursor='sb_v_double_arrow', from_=0,
-        #                      to=self.stack_size[self.scene_index] - 1, font=(self.widgetFont, self.widgetFontSize), length=self.heightToScale,
-        #                      command=self.updateSlider)
-
-        # if self.stack_size[self.scene_index] == 40:
-        #     min_ = min(self.SCALE_LABELS_NEW)
-        #     max_ = max(self.SCALE_LABELS_NEW)
-        #     min_ = 0
-        #     max_ = len(self.SCALE_LABELS_NEW) - 1
-        # else:
-        #     min_ = min(self.SCALE_LABELS)
-        #     max_ = max(self.SCALE_LABELS)
-        #     min_ = 0
-        #     max_ = len(self.SCALE_LABELS) - 1
         min_ = 0
-        max_ = self.stack_size[self.scene_index]
+        max_ = self.stack_size[self.scene_index] - 1
         self.verSlider = tk.Scale(self.root, activebackground='black', cursor='sb_v_double_arrow', from_=min_, to=max_,
                                   font=(self.widgetFont, self.widgetFontSize),
                                   length=self.heightToScale,
-                                  command=self.scale_labels)
+                                  command=command_function)
 
         # print(self.verSlider.configure().keys())
 
         self.verSlider.grid(row=1, column=0, rowspan=25)
 
-    def updateSlider(self, scale_value):
-        pass
 
-    def scale_labels(self, value):
-        pass
+    # def updateSlider(self, scale_value):
+    #     pass
+    #
+    # def scale_labels(self, value):
+    #     pass
 
 
 
@@ -183,20 +169,3 @@ class Browser:
         #self.b['command'] = lambda arg="live", kw="as the": command_function(arg, opt1=kw)
         self.b.grid(row=row, column=column, sticky=tk.E)
 
-    # def checkbox_builder(self, root, text, command_function,row,column):
-    #     self.b = tk.Button(root,text =text,
-    #     fg ='#ffffff',
-    #     bg ='#999999',
-    #     activebackground ='#454545',
-    #     relief =tk.RAISED,
-    #     width =16,
-    #     padx =10,
-    #     pady =5,
-    #     font =(constants.widgetFont, constants.widgetFontSize),
-    #                                             command=command_function)
-    #     self.b.grid(row=row, column=column, sticky=tk.E)
-
-
-# b = Browser(root)
-#
-# root.mainloop()

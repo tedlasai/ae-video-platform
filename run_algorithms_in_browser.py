@@ -2,6 +2,7 @@ import browser_builder
 import tkinter as tk
 import browser_inputs_builder
 import button_functions
+import set_auto_exposure
 import update_visulization
 import constants
 from copy import deepcopy
@@ -51,12 +52,17 @@ def updateHorSlider():
 b = browser_inputs_builder.Broswer_with_inputs(root)
 #b = browser_builder.Browser(root)
 b.init_functions()
+b.scene_select(set_auto_exposure.setValues,para=b)
+b.auto_exposure_select(set_auto_exposure.setAutoExposure,para=b)
+#b.canvas.bind('<Button-1>', lambda:button_functions.canvas_click(b,event=b.canvas.event))
+b.buttons_builder('Pause',button_functions.pauseRun,1,5,para=b)
+b.buttons_builder('Run',button_functions.runVideo,2,5,para=b)
+b.buttons_builder('Reset',button_functions.resetValues,3,5,para=b)
+b.buttons_builder('Clear Rectangles',button_functions.clear_rects,5,5,para=b)
 
-b.buttons_builder("Pause",button_functions.pauseRun,1,5,para=b)
-b.buttons_builder("Run",button_functions.runVideo,2,5,para=b)
 b.vertical_slider(scale_labels)
 b.horizontal_slider(updateSlider)
-#b.vertical_slider(update_visulization.scale_labels,para=b)
-#b.horizontal_slider(update_visulization.updateSlider,para=b)
+# b.vertical_slider(update_visulization.scale_labels,para=b)
+# b.horizontal_slider(update_visulization.updateSlider,para=b)
 print(b.imgSize)
 root.mainloop()

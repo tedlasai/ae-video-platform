@@ -93,10 +93,10 @@ class Browser:
         # self.canvas.bind("<Button-4>", self.zoomerP)
         # self.canvas.bind("<Button-5>", self.zoomerM)
         # some defaults
-        # self.col_num_grids = 8
-        # self.row_num_grids = 8
-        # self.rowGridSelect = 0
-        # self.colGridSelect = 0
+        self.col_num_grids = 8
+        self.row_num_grids = 8
+        self.rowGridSelect = 0
+        self.colGridSelect = 0
         self.rect = None
         self.x = 0
         self.y = 0
@@ -113,6 +113,7 @@ class Browser:
         self.local_consider_outliers_check = 0
         self.show_srgb_hist_check = 0
         self.srgb_mean = 0
+        self.check = True
         # self.init_functions()
         # self.show_srgb_hist_check = self.show_srgb_hist_check_.get()
 
@@ -146,7 +147,27 @@ class Browser:
 
         self.verSlider.grid(row=1, column=0, rowspan=25)
 
+    def scene_select(self,command_function,para=1):
+        # Select Scene List
+        self.defScene = tk.StringVar(self.root)
+        self.defScene.set(self.scene[self.scene_index])  # default value
+        self.selSceneLabel = tk.Label(self.root, text='Select Scene:', font=(self.widgetFont, self.widgetFontSize))
+        self.selSceneLabel.grid(row=0, column=3, sticky=tk.W)
+        self.sceneList = tk.OptionMenu(self.root, self.defScene, *self.scene, command=lambda: command_function(para))
+        self.sceneList.config(font=(self.widgetFont, self.widgetFontSize - 2), width=15, anchor=tk.W)
+        self.sceneList.grid(row=1, column=3, sticky=tk.NE)
 
+    def auto_exposure_select(self,command_function,para=1):
+        # Select Scene List
+        self.defAutoExposure = tk.StringVar(self.root)
+        self.defAutoExposure.set(self.auto_exposures[0])  # default value
+        self.selAutoExposureLabel = tk.Label(self.root, text='Select AutoExposure:',
+                                             font=(self.widgetFont, self.widgetFontSize))
+        self.selAutoExposureLabel.grid(row=0, column=4, sticky=tk.W)
+        self.AutoExposureList = tk.OptionMenu(self.root, self.defAutoExposure, *self.auto_exposures,
+                                              command=lambda: command_function(para))
+        self.AutoExposureList.config(font=(self.widgetFont, self.widgetFontSize - 2), width=15, anchor=tk.W)
+        self.AutoExposureList.grid(row=1, column=4, sticky=tk.NE)
     # def updateSlider(self, scale_value):
     #     pass
     #

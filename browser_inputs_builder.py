@@ -17,7 +17,7 @@ class Broswer_with_inputs(Browser):
         self.number_of_previous_frames_text_box()
         self.stepsize_limit_text_box()
         #self.local_interested_name_text_box() # take the discription of what area are included in the manu sentimant algorithm
-        #self.local_interested_global_area_percentage_box() # take the ratio of sentimant vs local
+        self.local_interested_global_area_percentage_box() # take the ratio of sentimant vs local
         self.show_SRGB_hist_check_box()
 
     def local_interested_name_text_box(self):

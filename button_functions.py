@@ -75,7 +75,7 @@ def clear_rects_local_wo_grids(self):
 def resetValues(self):
     # global verSlider, horSlider, photo, img, scene_index, play, useMertens
     # if self.current_auto_exposure == "Local" or self.current_auto_exposure == "Local without grids":
-    set_auto_exposure.setAutoExposure(self)
+    self.setAutoExposure()
     # self.useMertens = False
     # print("Reset")
     self.play = False

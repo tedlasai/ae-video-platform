@@ -1,8 +1,8 @@
 from RangeSlider import RangeSliderH
-
+import update_visulization
 from browser_builder import Browser
 import tkinter as tk
-
+import numpy as np
 class Broswer_with_inputs(Browser):
     def __init__(self, root):
         super().__init__(root)
@@ -19,6 +19,7 @@ class Broswer_with_inputs(Browser):
         #self.local_interested_name_text_box() # take the discription of what area are included in the manu sentimant algorithm
         self.local_interested_global_area_percentage_box() # take the ratio of sentimant vs local
         self.show_SRGB_hist_check_box()
+        update_visulization.hist_plot_three(self,stack_size=self.stack_size[0], curr_frame_mean_list=np.zeros(self.stack_size[0]))
 
     def local_interested_name_text_box(self):
         self.local_interested_name = tk.StringVar()

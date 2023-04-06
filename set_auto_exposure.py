@@ -3,7 +3,7 @@ import button_functions
 import exposure_class
 import numpy as np
 
-def setAutoExposure(self, dummy=False):
+def setAutoExposure(self,dummy):
     self.current_auto_exposure = self.defAutoExposure.get()
     self.scene_index = self.scene.index(self.defScene.get())
     input_ims = 'Image_Arrays_exposure_new/Scene' + str(self.scene_index + 1) + '_ds_raw_imgs.npy'
@@ -152,7 +152,7 @@ def setAutoExposure(self, dummy=False):
     # print(self.eV_original)
 
 
-def setValues(self, dummy=False):
+def setValues(self, dummy):
     button_functions.runVideo(self)
     # self.play = True
     # self.playVideo()

@@ -73,7 +73,7 @@ SCALE_LABELS_NEW = {
 }
 NEW_SCALES = [15,13,10,8,6,5,4,3.2,2.5,2,1.6,1.3,1,0.8,0.6,0.5,0.4,0.3,1/4,1/5,1/6,1/8,1/10,1/13,1/15,1/20,1/25,1/30,1/40,1/50,1/60,1/80,1/100,1/125,1/160,1/200,1/250,1/320,1/400,1/500]
 
-auto_exposures = ["None", "Global","Saliency_map", "Local", 'Local without grids', 'Local on moving objects','Max Gradient srgb','Entropy','HDR Histogram Method']
+auto_exposures = ["None", "Global","Saliency_map",'Semantic','Max Gradient srgb','Entropy','HDR Histogram Method']
 
 downscale_ratio = 0.12
 imgSize = [int(4480 * downscale_ratio), int(6720 * downscale_ratio)]

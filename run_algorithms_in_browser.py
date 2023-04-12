@@ -7,16 +7,10 @@ import update_visulization
 import constants
 from copy import deepcopy
 from PIL import Image, ImageTk
+import manual_semantic_functions
 
 root = tk.Tk()
 root.geometry('1600x900'), root.title('Data Browser')  # 1900x1000+5+5
-
-
-def fun1():
-    print(b.play)
-
-def fun2():
-    print(2)
 
 
 def scale_labels(value):
@@ -62,6 +56,13 @@ b.buttons_builder('Clear Rectangles',button_functions.clear_rects,5,5,para=b)
 
 b.vertical_slider(scale_labels)
 b.horizontal_slider(updateSlider)
+b.canvas.bind('<ButtonPress-1>', lambda event,arg=b:manual_semantic_functions.on_button_press(event,arg))
+b.canvas.bind('<B1-Motion>', lambda event,arg=b:manual_semantic_functions.on_move_press(event,arg))
+b.canvas.bind('<ButtonRelease-1>', lambda event,arg=b:manual_semantic_functions.on_button_release(event,arg))
+b.canvas.bind("<Button-3>", lambda event,arg=b:manual_semantic_functions.right_click(event,arg))
+b.canvas.bind("<MouseWheel>", lambda event,arg=b:manual_semantic_functions.zoomer(event,arg))
+b.canvas.bind("<Button-4>", lambda event,arg=b:manual_semantic_functions.zoomerP(event,arg))
+b.canvas.bind("<Button-5>", lambda event,arg=b:manual_semantic_functions.zoomerM(event,arg))
 # b.vertical_slider(update_visulization.scale_labels,para=b)
 # b.horizontal_slider(update_visulization.updateSlider,para=b)
 print(b.imgSize)

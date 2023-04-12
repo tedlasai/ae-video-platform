@@ -18,7 +18,7 @@ import exposure_class
 from test_pipline import local_interested_grids_generater
 import pickle as pkl
 import button_functions
-
+import manual_semantic_functions
 
 # root = tk.Tk()
 # root.geometry('1600x900'), root.title('Data Browser')  # 1900x1000+5+5
@@ -305,16 +305,16 @@ class Browser:
             # exposures = exposure_class.Exposure(params = self.exposureParams)
             self.eV, self.eV_original, self.weighted_means, self.hists, self.hists_before_ds_outlier = exposures.hdr_max_area_pipeline()
 
-        elif (self.current_auto_exposure == "Local on moving objects"):
+        elif (self.current_auto_exposure == "Semantic"):
             button_functions.clear_rects_local(self)
-            list_local = self.list_local_without_grids_moving_objects()
+            list_local = manual_semantic_functions.list_local_without_grids_moving_objects(self)
 
-            import pickle
-
-            name = f"local_pickle/Scene{self.scene_index + 1}.pkl"
-            print("LIST LOCAL", list_local)
-            with open(name, 'wb') as handle:
-                pickle.dump({'boxes': list_local}, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            # import pickle
+            #
+            # name = f"local_pickle/Scene{self.scene_index + 1}.pkl"
+            # print("LIST LOCAL", list_local)
+            # with open(name, 'wb') as handle:
+            #     pickle.dump({'boxes': list_local}, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
             exposures = exposure_class.Exposure(input_ims, downsample_rate=self.exposureParams["downsample_rate"],
                                                 target_intensity=self.exposureParams['target_intensity'],

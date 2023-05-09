@@ -53,6 +53,8 @@ b.buttons_builder('Pause',button_functions.pauseRun,1,5,para=b)
 b.buttons_builder('Run',button_functions.runVideo,2,5,para=b)
 b.buttons_builder('Reset',button_functions.resetValues,3,5,para=b)
 b.buttons_builder('Clear Rectangles',button_functions.clear_rects,5,5,para=b)
+b.buttons_builder('Save Interested Area',button_functions.save_interested_moving_objects_fuction,4,5,para=b)
+
 
 b.vertical_slider(scale_labels)
 b.horizontal_slider(updateSlider)

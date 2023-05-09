@@ -53,6 +53,19 @@ def clear_rects(self):
     print(len(self.the_moving_area_list))
 
 
+def save_interested_moving_objects_fuction(self):
+    if self.current_auto_exposure == 'Semantic' and len(self.moving_rectids) > 0:
+        w, h = self.canvas.winfo_width(), self.canvas.winfo_height()
+        curr_frame = self.horSlider.get()
+        temp = []
+        for id in self.moving_rectids:
+            coor = self.canvas.coords(id)
+            temp.append([coor[1] / h, coor[0] / w, coor[3] / h, coor[2] / w])
+        self.rects_without_grids_moving_objests[curr_frame] = temp.copy()
+        # self.moving_rectids = []
+        print("the dict of interests")
+        print(self.rects_without_grids_moving_objests)
+
 def clear_moving_rects(self):
     for rect in self.moving_rectids:
         self.canvas.delete(rect)

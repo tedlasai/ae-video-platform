@@ -23,12 +23,11 @@ def updateSlider(scale_value):
     if ((b.current_auto_exposure != "None") and (len(b.eV) > 0)):
         print(len(b.eV))
         b.verSlider.set(b.eV[b.horSlider.get()])
-
     updateHorSlider()
 
 
 def updateHorSlider():
-    autoExposureMode = True
+    # autoExposureMode = True
     # if b.useRawIms:
     # # print(self.verSlider.get())
     #     img = b.img_raw[b.horSlider.get()][b.verSlider.get()]
@@ -42,6 +41,7 @@ def updateHorSlider():
 
     b.canvas.tag_lower(b.canvas_img)
     #image_mean_plot()
+    update_visulization.updatePlot(b)
 
 b = browser_inputs_builder.Broswer_with_inputs(root)
 #b = browser_builder.Browser(root)

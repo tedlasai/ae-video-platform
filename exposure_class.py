@@ -138,6 +138,9 @@ class Exposure:
             result = self.add_two_4d_arrays(r_b, g)
         self.num_frame, self.num_ims_per_frame, self.h, self.w = result.shape
         self.set_grid_h_w()
+        print("h:{},w:{}".format(self.h,self.w))
+        print("oh:{},ow:{}".format(orig_h, orig_w))
+
         return result
 
     def set_grid_h_w(self):

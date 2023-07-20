@@ -364,8 +364,8 @@ class Browser:
             #     os.path.join(os.path.dirname(__file__), 'Image_Arrays') + self.joinPathChar + self.scene[
             #         self.scene_index] + '_mertens_imgs_' + str(self.downscale_ratio) + '.npy')
 
-            self.img_raw = np.load(
+            self.img_all = np.load(
                 os.path.join(os.path.dirname(__file__), 'Image_Arrays_from_dng') + self.joinPathChar + self.scene[
                     self.scene_index] + '_show_dng_imgs' + '.npy')
-            self.img_all = self.img_raw
+            #self.img_all = self.img_raw
             button_functions.resetValues(self)

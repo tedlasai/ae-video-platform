@@ -75,7 +75,7 @@ class Broswer_with_inputs(Browser):
         #self.outlierSlider.
         #print("BUILDING OUTLIER SLIDER", self.high_threshold)
 
-        self.outlierSlider.grid(padx=10, pady=10, row=28,rowspan=3, column=2, columnspan=2, sticky=tk.E)
+        self.outlierSlider.grid(padx=10, pady=10, row=28,rowspan=3, column=1, columnspan=2, sticky=tk.E)
         # self.show_threshold()
         self.start_index_text_box()
         self.high_rate_text_box()

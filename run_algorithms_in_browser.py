@@ -14,12 +14,18 @@ root.geometry('1600x900'), root.title('Data Browser')  # 1900x1000+5+5
 
 
 def scale_labels(value):
+    """
+    update the visualization of the scale label based on the index (value).
+    """
     text_ = b.SCALE_LABELS_NEW[int(value)]
     tk.Label(b.root, text=text_, font=("Times New Roman", 15)).grid(row=27, column=0)
     updateHorSlider()
 
 
 def updateSlider(scale_value):
+    """
+    update the visualization (images and plots) while the sliders were adjusted .
+    """
     if ((b.current_auto_exposure != "None") and (len(b.eV) > 0)):
         print(len(b.eV))
         b.verSlider.set(b.eV[b.horSlider.get()])
@@ -27,6 +33,9 @@ def updateSlider(scale_value):
 
 
 def updateHorSlider():
+    """
+    update the visualization (images and plots) while the horizontal slider was adjusted .
+    """
     # autoExposureMode = True
     # if b.useRawIms:
     # # print(self.verSlider.get())
@@ -43,6 +52,7 @@ def updateHorSlider():
     #image_mean_plot()
     update_visulization.updatePlot(b)
 
+
 b = browser_inputs_builder.Broswer_with_inputs(root)
 #b = browser_builder.Browser(root)
 b.init_functions()
@@ -54,7 +64,13 @@ b.buttons_builder('Run',button_functions.runVideo,2,5,para=b)
 b.buttons_builder('Reset',button_functions.resetValues,3,5,para=b)
 b.buttons_builder('Clear Rectangles',button_functions.clear_rects,5,5,para=b)
 b.buttons_builder('Save Interested Area',button_functions.save_interested_moving_objects_fuction,4,5,para=b)
+b.buttons_builder('Video',button_functions.export_video,6,5,para=b)
 
+def regular_video_button(self):
+    self.VideoButton = tk.Button(root, text='Video', fg='#ffffff', bg='#999999', activebackground='#454545',
+                                 relief=tk.RAISED, padx=10, pady=5,
+                                 width=16, font=(self.widgetFont, self.widgetFontSize), command=self.export_video)
+    self.VideoButton.grid(row=8 - 4, column=5, sticky=tk.E)
 
 b.vertical_slider(scale_labels)
 b.horizontal_slider(updateSlider)

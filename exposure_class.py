@@ -2,6 +2,8 @@ import math
 import numpy as np
 import scipy
 
+import constants
+
 
 class Exposure:
     def __init__(self, input_images, downsample_rate=1 / 64, r_percent=0, g_percent=1, col_num_grids=8, row_num_grids=8,
@@ -36,9 +38,9 @@ class Exposure:
         self.local_with_downsampled_outliers = local_with_downsampled_outliers  # a flag indicates if it should downsample the outlier areas when such area is the local interested area or not.("True" means it should downsample the outliers)
         self.stepsize = stepsize
         self.number_of_previous_frames = number_of_previous_frames
-        self.SCALE_LABELS = [15, 8, 6, 4, 2, 1, 1 / 2, 1 / 4, 1 / 8, 1 / 15, 1 / 30, 1 / 60, 1 / 125, 1 / 250, 1 / 500]
-        self.indexes_out_of_40 = [0, 3, 4, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39]
-        self.NEW_SCALES = [15,13,10,8,6,5,4,3.2,2.5,2,1.6,1.3,1,0.8,0.6,0.5,0.4,0.3,1/4,1/5,1/6,1/8,1/10,1/13,1/15,1/20,1/25,1/30,1/40,1/50,1/60,1/80,1/100,1/125,1/160,1/200,1/250,1/320,1/400,1/500]
+        self.SCALE_LABELS = constants.SCALES
+        self.indexes_out_of_40 = constants.indexes_out_of_40
+        self.NEW_SCALES = constants.NEW_SCALES
         self.start_index = start_index
 
     # helper function to add two 4d arrays those might have different shape in 3red and 4th dimrntions(trim thr larger one)
@@ -147,7 +149,7 @@ class Exposure:
         self.grid_h = int(self.h / self.row_num_grids)
         self.grid_w = int(self.w / self.col_num_grids)
 
-    # the function returns 2 arrays (the partition indexs of x axis & the partion indexs of y axis)
+    # the function returns 2 arrays (the partition indices of x-axis & the partition indices of y-axis)
     # 0 excluded and h,w included
     # the grid h/w is rounded down, the extra rows/cols will be dropped later
     def partition_boundaries(self):

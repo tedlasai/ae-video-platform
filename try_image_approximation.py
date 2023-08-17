@@ -151,6 +151,7 @@ def make_raw_im_show_data_one_im(c1,c2,c3,c4,shape0,shape1,im_path):
 
 def save_im(raw_bayer,im_path):
     # raw_bayer_ = np.right_shift(raw_bayer, 6)
+    print(type(raw_bayer))
     raw_bayer_ = raw_bayer[54:4544 - 10, 148:6868]
     c1 = raw_bayer_[::4, ::4]
     c2 = raw_bayer_[1::4, ::4]

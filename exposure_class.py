@@ -142,7 +142,12 @@ class Exposure:
         self.set_grid_h_w()
         print("h:{},w:{}".format(self.h,self.w))
         print("oh:{},ow:{}".format(orig_h, orig_w))
-
+        import matplotlib.pyplot as plt
+        for i in [1,3,6,7,18,29]:
+            arr = result[0,i]*255
+            plt.imshow(arr, cmap='gray', vmin=0, vmax=255)
+            plt.savefig(str(i)+'__')
+            plt.show()
         return result
 
     def set_grid_h_w(self):
@@ -643,6 +648,7 @@ class Exposure:
     def pipeline(self):
         downsampled_ims = self.downsample_blending_rgb_channels()
         #generate histograms
+        print(downsampled_ims.shape)
         hist_ims = np.array(downsampled_ims)
         hist_ims[hist_ims>self.high_threshold] = -0.01
         hist_ims = np.reshape(hist_ims, (self.num_frame, self.num_ims_per_frame, self.h * self.w))

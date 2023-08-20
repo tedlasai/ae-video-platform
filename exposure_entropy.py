@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from exposure_class import Exposure
+from exposure_general import Exposure
 from skimage.measure import shannon_entropy
 
 class Entropy(Exposure):

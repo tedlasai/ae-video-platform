@@ -7,7 +7,7 @@ import constants
 
 class Exposure:
     def __init__(self,
-                raw_images,
+                raw_imgs, # blended raw images 112_168
                 srgb_imgs,
                 #downsample_rate=1 / 64,
                 r_percent=0,
@@ -26,15 +26,15 @@ class Exposure:
         self.width = None
         self.height = None
         self.absolute_bit = 2 ** 8  # max bit number of the raw image
-        self.raw_images = raw_images
+        self.raw_imgs = raw_imgs
         self.srgb_imgs = srgb_imgs
         #self.downsample_rate = downsample_rate  # down sample rate of the original images, preferred value is as # 1/perfectsquare (i.e 1/36, 1/81)
-        self.g_percent = g_percent  # weight of green channel
-        if r_percent + g_percent > 1:
-            self.r_percent = 1 - g_percent
-        else:
-            self.r_percent = r_percent  # weight of red channel
-        self.b_percent = 1 - r_percent - g_percent
+        # self.g_percent = g_percent  # weight of green channel
+        # if r_percent + g_percent > 1:
+        #     self.r_percent = 1 - g_percent
+        # else:
+        #     self.r_percent = r_percent  # weight of red channel
+        # self.b_percent = 1 - r_percent - g_percent
         # self.col_num_grids = col_num_grids  # number of grids in x axis
         # self.row_num_grids = row_num_grids
         # self.low_threshold = low_threshold  # low outlier threshold
@@ -62,14 +62,15 @@ class Exposure:
     # helper function to add two 4d arrays those might have different shape in 3red and 4th dimrntions(trim thr larger one)
 
     def initial_functions(self):
-        self.compute_downsample_size()
+        #self.compute_downsample_size()
+        pass
 
-    def compute_downsample_size(self):
-        self.num_frame, self.num_ims_per_frame, self.height, self.width = self.raw_images.shape
-        if 0 < self.downsample_rate <= 1:
-            one_d_down_rate = math.sqrt(self.downsample_rate)
-            self.out_img_height = int(self.height * one_d_down_rate)
-            self.out_img_width = int(self.width * one_d_down_rate)
+    # def compute_downsample_size(self):
+    #     self.num_frame, self.num_ims_per_frame, self.height, self.width = self.raw_images.shape
+    #     if 0 < self.downsample_rate <= 1:
+    #         one_d_down_rate = math.sqrt(self.downsample_rate)
+    #         self.out_img_height = int(self.height * one_d_down_rate)
+    #         self.out_img_width = int(self.width * one_d_down_rate)
 
     def adjusted_opti_inds_v2_by_average_of_previous_n_frames(self, opti_inds):
         length = len(opti_inds)

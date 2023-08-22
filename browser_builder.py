@@ -20,12 +20,14 @@ import pickle as pkl
 import button_functions
 import manual_semantic_functions
 
+
 # root = tk.Tk()
 # root.geometry('1600x900'), root.title('Data Browser')  # 1900x1000+5+5
 class Browser:
 
     def __init__(self, root):
         super().__init__()
+        self.blended_raw_ims = None
         self.root = root
         self.folders = constants.folders
         self.widgetFont = constants.widgetFont
@@ -46,6 +48,9 @@ class Browser:
         # self.check = True
         self.temp_img_ind = 0
         self.making_a_serious_of_videos = 0
+        self.red_ratio = 0.25
+        self.green_ratio = 0.5
+        self.blue_ratio = 0.25
 
         self.joinPathChar = "/"
         if (platform.system() == "Windows"):
@@ -60,7 +65,11 @@ class Browser:
             os.path.join(os.path.dirname(__file__), 'Image_Arrays_from_dng') + self.joinPathChar + self.scene[
                 self.scene_index] + '_show_dng_imgs' + '.npy')
 
-        self.img = deepcopy(self.img_all[0,0])
+        self.raw_ims = np.load(
+            os.path.join(os.path.dirname(__file__), 'Image_Arrays_exposure_224_336') + self.joinPathChar + self.scene[
+                self.scene_index] + '_ds_raw_imgs' + '.npy')
+
+        self.img = deepcopy(self.img_all[0, 0])
         self.play = True
         self.video_speed = 50
         self.video_fps = 30
@@ -71,7 +80,7 @@ class Browser:
         self.temp_coords_for_video_producing = []
 
         # Image Convas
-        self.photo = ImageTk.PhotoImage(Image.fromarray(self.img).resize((self.imgSize[1],self.imgSize[0])))
+        self.photo = ImageTk.PhotoImage(Image.fromarray(self.img).resize((self.imgSize[1], self.imgSize[0])))
 
         self.canvas = tk.Canvas(root, cursor="cross", width=self.photo.width(), height=self.photo.height(),
                                 borderwidth=0, highlightthickness=0)
@@ -121,7 +130,15 @@ class Browser:
     def init_functions(self):
         self.scene_select()
         self.auto_exposure_select()
+        self.blend_rgb()
 
+    def blend_rgb(self):
+        self.red_ratio = 0.25
+        self.green_ratio = 0.5
+        self.blue_ratio = 0.25
+        self.blended_raw_ims = (self.raw_ims[:, :, ::2, 1::2] + self.raw_ims[:, :, 1::2, ::2]) * self.green_ratio / 2 \
+                               + self.raw_ims[:, :, ::2, ::2] * self.red_ratio + self[:, :, 1::2,
+                                                                                 1::2] * self.blue_ratio
 
     def horizontal_slider(self, command_function):
         # Horizantal Slider
@@ -170,32 +187,33 @@ class Browser:
                                               command=self.setAutoExposure)
         self.AutoExposureList.config(font=(self.widgetFont, self.widgetFontSize - 2), width=15, anchor=tk.W)
         self.AutoExposureList.grid(row=1, column=4, sticky=tk.NE)
+
     # def updateSlider(self, scale_value):
     #     pass
     #
     # def scale_labels(self, value):
     #     pass
 
-
-
-    def buttons_builder(self, text, command_function,row,column,para=0):
-        self.b = tk.Button(self.root,text =text,
-        fg ='#ffffff',
-        bg ='#999999',
-        activebackground ='#454545',
-        relief =tk.RAISED,
-        width =16,
-        padx =10,
-        pady =5,
-        font =(constants.widgetFont, constants.widgetFontSize),
-                                                command=lambda: command_function(para))
-        #self.b['command'] = lambda arg="live", kw="as the": command_function(arg, opt1=kw)
+    def buttons_builder(self, text, command_function, row, column, para=0):
+        self.b = tk.Button(self.root, text=text,
+                           fg='#ffffff',
+                           bg='#999999',
+                           activebackground='#454545',
+                           relief=tk.RAISED,
+                           width=16,
+                           padx=10,
+                           pady=5,
+                           font=(constants.widgetFont, constants.widgetFontSize),
+                           command=lambda: command_function(para))
+        # self.b['command'] = lambda arg="live", kw="as the": command_function(arg, opt1=kw)
         self.b.grid(row=row, column=column, sticky=tk.E)
 
     def setAutoExposure(self, dummy=1):
         self.current_auto_exposure = self.defAutoExposure.get()
         self.scene_index = self.scene.index(self.defScene.get())
-        input_ims = 'Image_Arrays_exposure_new/Scene' + str(self.scene_index + 1) + '_ds_raw_imgs.npy'
+        #input_ims = 'Image_Arrays_exposure_new/Scene' + str(self.scene_index + 1) + '_ds_raw_imgs.npy'
+        input_ims = self.blended_raw_ims
+        srgb_ims = self.img_all
         # self.check_num_grids()
         self.exposureParams = {"downsample_rate": 1 / 25, 'r_percent': 0.25, 'g_percent': 0.5,
                                'col_num_grids': self.col_num_grids, 'row_num_grids': self.row_num_grids,
@@ -207,7 +225,7 @@ class Browser:
                                "target_intensity": self.target_intensity.get()}
         if (self.current_auto_exposure == "Global"):
             button_functions.clear_rects(self)
-            exposures = exposure_class.Exposure(input_ims, downsample_rate=self.exposureParams["downsample_rate"],
+            exposures = exposure_class.Exposure(input_ims, srgb_ims, downsample_rate=self.exposureParams["downsample_rate"],
                                                 target_intensity=self.exposureParams['target_intensity'],
                                                 r_percent=self.exposureParams['r_percent'],
                                                 g_percent=self.exposureParams['g_percent'],
@@ -236,7 +254,7 @@ class Browser:
             salient_map = salient_map_mbd
             # print(self.scene[self.scene_index] + "_salient_maps_rbd.npy")
             # salient_map = np.load("Scene22_salient_maps_rbd.npy")
-            exposures = exposure_class.Exposure(input_ims, downsample_rate=self.exposureParams["downsample_rate"],
+            exposures = exposure_class.Exposure(input_ims, srgb_ims, downsample_rate=self.exposureParams["downsample_rate"],
                                                 target_intensity=self.exposureParams['target_intensity'],
                                                 r_percent=self.exposureParams['r_percent'],
                                                 g_percent=self.exposureParams['g_percent'],
@@ -257,7 +275,7 @@ class Browser:
         elif (self.current_auto_exposure == "Entropy"):
             button_functions.clear_rects(self)
             srgb_ims = 'Image_Arrays_from_dng/Scene' + str(self.scene_index + 1) + '_show_dng_imgs.npy'
-            exposures = exposure_class.Exposure(input_ims, downsample_rate=self.exposureParams["downsample_rate"],
+            exposures = exposure_class.Exposure(input_ims, srgb_ims, downsample_rate=self.exposureParams["downsample_rate"],
                                                 target_intensity=self.exposureParams['target_intensity'],
                                                 r_percent=self.exposureParams['r_percent'],
                                                 g_percent=self.exposureParams['g_percent'],
@@ -275,7 +293,7 @@ class Browser:
         elif (self.current_auto_exposure == "Max Gradient srgb"):
             button_functions.clear_rects(self)
             input_ims = 'Image_Arrays_from_dng/Scene' + str(self.scene_index + 1) + '_show_dng_imgs.npy'
-            exposures = exposure_class.Exposure(input_ims, downsample_rate=self.exposureParams["downsample_rate"],
+            exposures = exposure_class.Exposure(input_ims, srgb_ims, downsample_rate=self.exposureParams["downsample_rate"],
                                                 target_intensity=self.exposureParams['target_intensity'],
                                                 r_percent=self.exposureParams['r_percent'],
                                                 g_percent=self.exposureParams['g_percent'],
@@ -291,7 +309,7 @@ class Browser:
 
         elif (self.current_auto_exposure == "HDR Histogram Method"):
             button_functions.clear_rects(self)
-            exposures = exposure_class.Exposure(input_ims, downsample_rate=self.exposureParams["downsample_rate"],
+            exposures = exposure_class.Exposure(input_ims, srgb_ims, downsample_rate=self.exposureParams["downsample_rate"],
                                                 target_intensity=self.exposureParams['target_intensity'],
                                                 r_percent=self.exposureParams['r_percent'],
                                                 g_percent=self.exposureParams['g_percent'],
@@ -316,7 +334,7 @@ class Browser:
             # with open(name, 'wb') as handle:
             #     pickle.dump({'boxes': list_local}, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-            exposures = exposure_class.Exposure(input_ims, downsample_rate=self.exposureParams["downsample_rate"],
+            exposures = exposure_class.Exposure(input_ims, srgb_ims, downsample_rate=self.exposureParams["downsample_rate"],
                                                 target_intensity=self.exposureParams['target_intensity'],
                                                 r_percent=self.exposureParams['r_percent'],
                                                 g_percent=self.exposureParams['g_percent'],
@@ -367,5 +385,11 @@ class Browser:
             self.img_all = np.load(
                 os.path.join(os.path.dirname(__file__), 'Image_Arrays_from_dng') + self.joinPathChar + self.scene[
                     self.scene_index] + '_show_dng_imgs' + '.npy')
-            #self.img_all = self.img_raw
+
+            self.raw_ims = np.load(
+                os.path.join(os.path.dirname(__file__), 'Image_Arrays_exposure_224_336') + self.joinPathChar +
+                self.scene[
+                    self.scene_index] + '_ds_raw_imgs' + '.npy')
+            self.blend_rgb()
+            # self.img_all = self.img_raw
             button_functions.resetValues(self)

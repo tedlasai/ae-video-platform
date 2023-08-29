@@ -1,9 +1,9 @@
 import numpy as np
 
-from exposure_general import Exposure
+from exposure_histogram_base import HistogramBase
 
 
-class HistogramBase(Exposure):
+class ExposureGlobal(HistogramBase):
     def __init__(self,
                  raw_images,
                  srgb_imgs,
@@ -25,16 +25,16 @@ class HistogramBase(Exposure):
             # downsample_rate=downsample_rate,
 
             srgb_imgs,
+            target_intensity=target_intensity,
+            high_threshold=high_threshold,
+            low_threshold=low_threshold,
+            high_rate=high_rate,
+            low_rate=low_rate,
             num_hist_bins=num_hist_bins,
 
             start_index=start_index,
 
         )
-        self.low_threshold = low_threshold  # low outlier threshold
-        self.high_threshold = high_threshold
-        self.high_rate = high_rate  # down sample rate of the areas over high outlier threshold
-        self.low_rate = low_rate
-        self.target_intensity = target_intensity
 
         # def imput_imgs_processing(self):
         #     raw_bayer = np.load(self.srgb_images)
@@ -46,12 +46,16 @@ class HistogramBase(Exposure):
         #     rgb_blended_ims = np.sum(current_rgb_img, axis=4)
         #     return rgb_blended_ims
 
-        def get_optimal_img_index(self, weighted_means):
-            abs_weighted_errs_between_means_target = np.abs(weighted_means - self.target_intensity)
-            return np.argmin(abs_weighted_errs_between_means_target, axis=1)
 
         def produce_map(self, im):
-            return np.ones(im.shape),im.shape[0]*im.shape[1]
+            new_map_step = np.where(im > self.high_threshold, 0, 1)
+            new_map = np.where(im < self.low_threshold, 0, new_map_step)
+            # map_sum = np.sum(new_map)
+            # new_map = new_map #* 18816 / map_sum
+            # new_map = np.where(current_frame[i] > self.high_threshold, 0, new_map)
+            # new_map = np.where(current_frame[i] < self.low_threshold, 0, new_map)
+            num_good_pixels = np.count_nonzero(new_map)
+            return new_map,num_good_pixels
 
         def get_means(self):
             return np.zeros(100)
@@ -83,7 +87,7 @@ class HistogramBase(Exposure):
                     # new_map = new_map #* 18816 / map_sum
                     # new_map = np.where(current_frame[i] > self.high_threshold, 0, new_map)
                     # new_map = np.where(current_frame[i] < self.low_threshold, 0, new_map)
-                    new_map,num_good_pixels = produce_map(current_frame[i])
+                    new_map = produce_map(current_frame[i])
 
                     current_weighted_ims.append(np.multiply(current_frame[i], new_map))
                 current_weighted_ims = np.array(current_weighted_ims)

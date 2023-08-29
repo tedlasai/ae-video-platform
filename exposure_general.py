@@ -63,14 +63,7 @@ class Exposure:
 
     def initial_functions(self):
         #self.compute_downsample_size()
-        pass
-
-    # def compute_downsample_size(self):
-    #     self.num_frame, self.num_ims_per_frame, self.height, self.width = self.raw_images.shape
-    #     if 0 < self.downsample_rate <= 1:
-    #         one_d_down_rate = math.sqrt(self.downsample_rate)
-    #         self.out_img_height = int(self.height * one_d_down_rate)
-    #         self.out_img_width = int(self.width * one_d_down_rate)
+        self.raw_imgs /= self.absolute_bit
 
     def adjusted_opti_inds_v2_by_average_of_previous_n_frames(self, opti_inds):
         length = len(opti_inds)
@@ -124,3 +117,4 @@ class Exposure:
                 i += 1
         print("OPT NEW", opti_inds_new)
         return opti_inds_new
+

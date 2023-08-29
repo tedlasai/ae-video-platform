@@ -3,7 +3,9 @@ import update_visulization
 from browser_builder import Browser
 import tkinter as tk
 import numpy as np
-class Broswer_with_inputs(Browser):
+
+
+class BrowserWithInputs(Browser):
     def __init__(self, root):
         super().__init__(root)
 
@@ -13,13 +15,14 @@ class Broswer_with_inputs(Browser):
         self.video_fps_text()
         self.target_intensity_text_box()
         self.outlier_slider()
-        #self.local_consider_outliers_checkbox() # consider outliear in sentimant or not
+        # self.local_consider_outliers_checkbox() # consider outliear in sentimant or not
         self.number_of_previous_frames_text_box()
         self.stepsize_limit_text_box()
-        #self.local_interested_name_text_box() # take the discription of what area are included in the manu sentimant algorithm
-        self.local_interested_global_area_percentage_box() # take the ratio of sentimant vs local
+        # self.local_interested_name_text_box() # take the discription of what area are included in the manu sentimant algorithm
+        self.local_interested_global_area_percentage_box()  # take the ratio of sentimant vs local
         self.show_SRGB_hist_check_box()
-        update_visulization.hist_plot_three(self,stack_size=self.stack_size[0], curr_frame_mean_list=np.zeros(self.stack_size[0]))
+        update_visulization.hist_plot_three(self, stack_size=self.stack_size[0],
+                                            curr_frame_mean_list=np.zeros(self.stack_size[0]))
 
     def local_interested_name_text_box(self):
         self.local_interested_name = tk.StringVar()
@@ -31,10 +34,9 @@ class Broswer_with_inputs(Browser):
     def target_intensity_text_box(self):
         self.target_intensity = tk.DoubleVar()
         self.target_intensity.set(0.13)
-        tk.Label(self.root, text="target intensity").grid(row=28, column=1,sticky=tk.NSEW)
+        tk.Label(self.root, text="target intensity").grid(row=28, column=1, sticky=tk.NSEW)
         self.e1 = tk.Entry(self.root, textvariable=self.target_intensity)
         self.e1.grid(row=29, column=1)
-
 
     def local_interested_global_area_percentage_box(self):
         self.local_interested_global_area_percentage = tk.DoubleVar()
@@ -45,7 +47,8 @@ class Broswer_with_inputs(Browser):
 
     def show_SRGB_hist_check_box(self):
         self.show_srgb_hist_check_ = tk.IntVar()
-        self.c1 = tk.Checkbutton(self.root, text='Show SRGB Hist', variable=self.show_srgb_hist_check_, offvalue=0, onvalue=1,
+        self.c1 = tk.Checkbutton(self.root, text='Show SRGB Hist', variable=self.show_srgb_hist_check_, offvalue=0,
+                                 onvalue=1,
                                  command=self.switch_SRGB_Hist)
         self.c1.grid(row=27, column=5)
 
@@ -63,19 +66,18 @@ class Broswer_with_inputs(Browser):
         self.e1 = tk.Entry(self.root, textvariable=self.stepsize_limit)
         self.e1.grid(row=34, column=5, sticky=tk.E)
 
-
     def outlier_slider(self):
         self.low_threshold = tk.DoubleVar()
         self.high_threshold = tk.DoubleVar()
-        #print("BUILDING OUTLIER SLIDER", self.high_threshold)
+        # print("BUILDING OUTLIER SLIDER", self.high_threshold)
         self.outlierSlider = RangeSliderH(self.root, [self.low_threshold, self.high_threshold], Width=400, Height=65,
                                           min_val=0, max_val=0.9, show_value=True, padX=25
                                           , line_s_color="#7eb1c2", digit_precision='.2f')
-        #self.high_threshold.set(0.95)
-        #self.outlierSlider.
-        #print("BUILDING OUTLIER SLIDER", self.high_threshold)
+        # self.high_threshold.set(0.95)
+        # self.outlierSlider.
+        # print("BUILDING OUTLIER SLIDER", self.high_threshold)
 
-        self.outlierSlider.grid(padx=10, pady=10, row=28,rowspan=3, column=1, columnspan=2, sticky=tk.E)
+        self.outlierSlider.grid(padx=10, pady=10, row=28, rowspan=3, column=1, columnspan=2, sticky=tk.E)
         # self.show_threshold()
         self.start_index_text_box()
         self.high_rate_text_box()
@@ -94,7 +96,6 @@ class Broswer_with_inputs(Browser):
         tk.Label(self.root, text="above high threshold").grid(row=33, column=2)
         self.e1 = tk.Entry(self.root, textvariable=self.high_rate)
         self.e1.grid(row=34, column=2)
-
 
     def playback_text_box(self):
         # TextBox
@@ -123,15 +124,7 @@ class Broswer_with_inputs(Browser):
         self.local_consider_outliers_check = self.local_consider_outliers_check_.get()
         print("local_consider_outliers_check is ", self.local_consider_outliers_check)
 
-
     def switch_SRGB_Hist(self):
         self.show_srgb_hist_check = self.show_srgb_hist_check_.get()
         # print("self.show_srgb_hist_chec is ", self.show_srgb_hist_check)
         # self.updateSlider(0)
-
-
-
-
-
-
-

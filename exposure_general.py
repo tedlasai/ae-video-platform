@@ -3,7 +3,7 @@ import numpy as np
 import scipy
 import collections
 import constants
-
+import collections
 
 class Exposure:
     def __init__(self,
@@ -63,17 +63,14 @@ class Exposure:
 
     def initial_functions(self):
         #self.compute_downsample_size()
-        self.raw_imgs /= self.absolute_bit
+        pass
 
     def adjusted_opti_inds_v2_by_average_of_previous_n_frames(self, opti_inds):
         length = len(opti_inds)
         opti_inds_new = np.array(opti_inds)
-        # print("# previes frames")
-        # print(opti_inds)
-        # print(self.number_of_previous_frames)
-        # print("step size")
-        # print(self.stepsize)
-        current_index = opti_inds_new[0]
+        print("# previes frames")
+        print(opti_inds)
+        #current_index = opti_inds_new[0]
         # if length > 1:
         #     i = 1
         #     while i < length:
@@ -86,9 +83,8 @@ class Exposure:
         #         if diff > self.stepsize:
         #             opti_inds_new[i] = round(average_of_previous_n_frames - self.stepsize)
         #         i += 1
-        init_list = np.ones(self.number_of_previous_frames)*opti_inds[0]
-        #lastVisitedIndices = collections.deque([opti_inds[0],opti_inds[0],opti_inds[0]], maxlen=3)
-        lastVisitedIndices = collections.deque(init_list, maxlen=self.number_of_previous_frames)
+
+        lastVisitedIndices = collections.deque([opti_inds[0],opti_inds[0],opti_inds[0]], maxlen=3)
 
         if length > 2:
             i = 1
@@ -97,7 +93,7 @@ class Exposure:
                 sum = 0
                 for index in lastVisitedIndices:
                     sum+=index
-                average_of_previous_n_frames = sum/self.number_of_previous_frames
+                average_of_previous_n_frames = sum/3
                 #print(f"i{i}, average_of_previous_n_frames {average_of_previous_n_frames},  opti_inds_new[i] { opti_inds_new[i]}")
                 if(abs(average_of_previous_n_frames - opti_inds_new[i] )> 1):
                    # print(lastVisitedIndices)

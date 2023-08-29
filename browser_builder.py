@@ -1,5 +1,7 @@
 import constants
 import tkinter as tk
+
+import exposure_global
 import set_auto_exposure
 import pandas as pd
 from RangeSlider.RangeSlider import RangeSliderH
@@ -136,8 +138,10 @@ class Browser:
         self.red_ratio = 0.25
         self.green_ratio = 0.5
         self.blue_ratio = 0.25
+        print(type(self.raw_ims))
+        print(self.raw_ims.shape)
         self.blended_raw_ims = (self.raw_ims[:, :, ::2, 1::2] + self.raw_ims[:, :, 1::2, ::2]) * self.green_ratio / 2 \
-                               + self.raw_ims[:, :, ::2, ::2] * self.red_ratio + self[:, :, 1::2,
+                               + self.raw_ims[:, :, ::2, ::2] * self.red_ratio + self.raw_ims[:, :, 1::2,
                                                                                  1::2] * self.blue_ratio
 
     def horizontal_slider(self, command_function):
@@ -225,19 +229,13 @@ class Browser:
                                "target_intensity": self.target_intensity.get()}
         if (self.current_auto_exposure == "Global"):
             button_functions.clear_rects(self)
-            exposures = exposure_class.Exposure(input_ims, srgb_ims, downsample_rate=self.exposureParams["downsample_rate"],
+            exposures = exposure_global.ExposureGlobal(input_ims, srgb_ims,
                                                 target_intensity=self.exposureParams['target_intensity'],
-                                                r_percent=self.exposureParams['r_percent'],
-                                                g_percent=self.exposureParams['g_percent'],
-                                                col_num_grids=self.exposureParams['col_num_grids'],
-                                                row_num_grids=self.exposureParams['row_num_grids'],
                                                 low_threshold=self.exposureParams['low_threshold'],
                                                 start_index=self.exposureParams['start_index'],
                                                 high_threshold=self.exposureParams['high_threshold'],
                                                 high_rate=self.exposureParams['high_rate'],
-                                                stepsize=self.exposureParams['stepsize'],
-                                                number_of_previous_frames=self.exposureParams[
-                                                    'number_of_previous_frames'])
+                                              )
             # exposures = exposure_class.Exposure(params = self.exposureParams)
 
             self.eV, self.eV_original, self.weighted_means, self.hists, self.hists_before_ds_outlier = exposures.pipeline()

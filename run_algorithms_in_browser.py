@@ -49,22 +49,23 @@ def updateHorSlider():
     b.canvas.itemconfig(b.canvas_img, image=b.photo)
 
     b.canvas.tag_lower(b.canvas_img)
-    #image_mean_plot()
+    # image_mean_plot()
     update_visulization.updatePlot(b)
 
 
-b = browser_inputs_builder.Broswer_with_inputs(root)
-#b = browser_builder.Browser(root)
+b = browser_inputs_builder.BrowserWithInputs(root)
+# b = browser_builder.Browser(root)
 b.init_functions()
 # b.scene_select(set_auto_exposure.setValues,para=b)
 # b.auto_exposure_select(set_auto_exposure.setAutoExposure,para=b)
-#b.canvas.bind('<Button-1>', lambda:button_functions.canvas_click(b,event=b.canvas.event))
-b.buttons_builder('Pause',button_functions.pauseRun,1,5,para=b)
-b.buttons_builder('Run',button_functions.runVideo,2,5,para=b)
-b.buttons_builder('Reset',button_functions.resetValues,3,5,para=b)
-b.buttons_builder('Clear Rectangles',button_functions.clear_rects,5,5,para=b)
-b.buttons_builder('Save Interested Area',button_functions.save_interested_moving_objects_fuction,4,5,para=b)
-b.buttons_builder('Video',button_functions.export_video,6,5,para=b)
+# b.canvas.bind('<Button-1>', lambda:button_functions.canvas_click(b,event=b.canvas.event))
+b.buttons_builder('Pause', button_functions.pauseRun, 1, 5, para=b)
+b.buttons_builder('Run', button_functions.runVideo, 2, 5, para=b)
+b.buttons_builder('Reset', button_functions.resetValues, 3, 5, para=b)
+b.buttons_builder('Clear Rectangles', button_functions.clear_rects, 5, 5, para=b)
+b.buttons_builder('Save Interested Area', button_functions.save_interested_moving_objects_fuction, 4, 5, para=b)
+b.buttons_builder('Video', button_functions.export_video, 6, 5, para=b)
+
 
 def regular_video_button(self):
     self.VideoButton = tk.Button(root, text='Video', fg='#ffffff', bg='#999999', activebackground='#454545',
@@ -72,15 +73,16 @@ def regular_video_button(self):
                                  width=16, font=(self.widgetFont, self.widgetFontSize), command=self.export_video)
     self.VideoButton.grid(row=8 - 4, column=5, sticky=tk.E)
 
+
 b.vertical_slider(scale_labels)
 b.horizontal_slider(updateSlider)
-b.canvas.bind('<ButtonPress-1>', lambda event,arg=b:manual_semantic_functions.on_button_press(event,arg))
-b.canvas.bind('<B1-Motion>', lambda event,arg=b:manual_semantic_functions.on_move_press(event,arg))
-b.canvas.bind('<ButtonRelease-1>', lambda event,arg=b:manual_semantic_functions.on_button_release(event,arg))
-b.canvas.bind("<Button-3>", lambda event,arg=b:manual_semantic_functions.right_click(event,arg))
-b.canvas.bind("<MouseWheel>", lambda event,arg=b:manual_semantic_functions.zoomer(event,arg))
-b.canvas.bind("<Button-4>", lambda event,arg=b:manual_semantic_functions.zoomerP(event,arg))
-b.canvas.bind("<Button-5>", lambda event,arg=b:manual_semantic_functions.zoomerM(event,arg))
+b.canvas.bind('<ButtonPress-1>', lambda event, arg=b: manual_semantic_functions.on_button_press(event, arg))
+b.canvas.bind('<B1-Motion>', lambda event, arg=b: manual_semantic_functions.on_move_press(event, arg))
+b.canvas.bind('<ButtonRelease-1>', lambda event, arg=b: manual_semantic_functions.on_button_release(event, arg))
+b.canvas.bind("<Button-3>", lambda event, arg=b: manual_semantic_functions.right_click(event, arg))
+b.canvas.bind("<MouseWheel>", lambda event, arg=b: manual_semantic_functions.zoomer(event, arg))
+b.canvas.bind("<Button-4>", lambda event, arg=b: manual_semantic_functions.zoomerP(event, arg))
+b.canvas.bind("<Button-5>", lambda event, arg=b: manual_semantic_functions.zoomerM(event, arg))
 # b.vertical_slider(update_visulization.scale_labels,para=b)
 # b.horizontal_slider(update_visulization.updateSlider,para=b)
 print(b.imgSize)

@@ -69,7 +69,7 @@ def updatePlot(self):
             # print(count2)
         else:
             count2 = self.hists_before_ds_outlier[first_ind][send_ind]
-
+        print(f'first_ind:{first_ind}')
         curr_frame_mean_list = self.weighted_means[first_ind]
         ind = send_ind
         val = curr_frame_mean_list[send_ind]

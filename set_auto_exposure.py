@@ -17,6 +17,7 @@ def setAutoExposure(self,dummy):
                            "global_rate": self.local_interested_global_area_percentage.get(),
                            "target_intensity": self.target_intensity.get()}
     if (self.current_auto_exposure == "Global"):
+        print("using set_auto_exposure")
         button_functions.clear_rects(self)
         exposures = exposure_class.Exposure(input_ims, downsample_rate=self.exposureParams["downsample_rate"],
                                             target_intensity=self.exposureParams['target_intensity'],

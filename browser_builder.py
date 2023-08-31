@@ -252,7 +252,7 @@ class Browser:
             salient_map = salient_map_mbd
             # print(self.scene[self.scene_index] + "_salient_maps_rbd.npy")
             # salient_map = np.load("Scene22_salient_maps_rbd.npy")
-            exposures = exposure_class.Exposure(input_ims, srgb_ims, downsample_rate=self.exposureParams["downsample_rate"],
+            exposures = exposure_class.Exposure(input_ims, srgb_ims, salient_map,downsample_rate=self.exposureParams["downsample_rate"],
                                                 target_intensity=self.exposureParams['target_intensity'],
                                                 r_percent=self.exposureParams['r_percent'],
                                                 g_percent=self.exposureParams['g_percent'],
@@ -267,8 +267,7 @@ class Browser:
                                                     'number_of_previous_frames'])
             # exposures = exposure_class.Exposure(params = self.exposureParams)
 
-            self.eV, self.eV_original, self.weighted_means, self.hists, self.hists_before_ds_outlier = exposures.pipeline_with_salient_map(
-                salient_map)
+            self.eV, self.eV_original, self.weighted_means, self.hists, self.hists_before_ds_outlier = exposures.pipeline_with_salient_map()
 
         elif (self.current_auto_exposure == "Entropy"):
             button_functions.clear_rects(self)

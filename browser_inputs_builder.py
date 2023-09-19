@@ -71,7 +71,7 @@ class BrowserWithInputs(Browser):
         self.high_threshold = tk.DoubleVar()
         # print("BUILDING OUTLIER SLIDER", self.high_threshold)
         self.outlierSlider = RangeSliderH(self.root, [self.low_threshold, self.high_threshold], Width=400, Height=65,
-                                          min_val=0, max_val=0.9, show_value=True, padX=25
+                                          min_val=0, max_val=1, show_value=True, padX=25
                                           , line_s_color="#7eb1c2", digit_precision='.2f')
         # self.high_threshold.set(0.95)
         # self.outlierSlider.

@@ -56,6 +56,7 @@ class HistogramBase(Exposure):
     def get_means(self,good_pixel_ims,num_good_pixels):
         n_ev,h,w = good_pixel_ims.shape
         good_pixel_ims = np.reshape(good_pixel_ims,(n_ev,h*w))
+
         return np.sum(good_pixel_ims, axis=1) / np.array(num_good_pixels)
 
     def pipeline(self):

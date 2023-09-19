@@ -3,6 +3,7 @@ import tkinter as tk
 
 import exposure_global
 import exposure_saliency
+import exposure_semantic
 import set_auto_exposure
 import pandas as pd
 from RangeSlider.RangeSlider import RangeSliderH
@@ -326,22 +327,20 @@ class Browser:
             # with open(name, 'wb') as handle:
             #     pickle.dump({'boxes': list_local}, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-            exposures = exposure_class.Exposure(input_ims, srgb_ims, downsample_rate=self.exposureParams["downsample_rate"],
+            exposures = exposure_semantic.ExposureSemantic(input_ims, srgb_ims, list_local,
                                                 target_intensity=self.exposureParams['target_intensity'],
-                                                r_percent=self.exposureParams['r_percent'],
-                                                g_percent=self.exposureParams['g_percent'],
-                                                col_num_grids=self.exposureParams['col_num_grids'],
-                                                row_num_grids=self.exposureParams['row_num_grids'],
+
+
                                                 low_threshold=self.exposureParams['low_threshold'],
                                                 start_index=self.exposureParams['start_index'],
                                                 high_threshold=self.exposureParams['high_threshold'],
-                                                high_rate=self.exposureParams['high_rate'], local_indices=list_local,
-                                                stepsize=self.exposureParams['stepsize'],
-                                                number_of_previous_frames=self.exposureParams[
-                                                    'number_of_previous_frames'],
-                                                global_rate=self.exposureParams['global_rate']
+                                                high_rate=self.exposureParams['high_rate'],
+                                                # stepsize=self.exposureParams['stepsize'],
+                                                # number_of_previous_frames=self.exposureParams[
+                                                #     'number_of_previous_frames'],
+                                                # global_rate=self.exposureParams['global_rate']
                                                 )
-            self.eV, self.eV_original, self.weighted_means, self.hists, self.hists_before_ds_outlier = exposures.pipeline_local_without_grids_moving_object()
+            self.eV, self.eV_original, self.weighted_means, self.hists, self.hists_before_ds_outlier = exposures.pipeline()
             # print("list_local:")
             # print(list_local)
         # print("CURRENT AUTO EXPOSURE", self.current_auto_exposure)

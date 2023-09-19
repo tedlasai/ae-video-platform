@@ -21,10 +21,6 @@ class Exposure:
                 # number_of_previous_frames=5,
                 start_index = 20,):
         #self.global_rate = global_rate
-        self.out_img_width = 168  # default downsized width
-        self.out_img_height = 112  # default downsized height
-        self.width = None
-        self.height = None
         self.absolute_bit = 2 ** 8  # max bit number of the raw image
         self.raw_imgs = raw_imgs
         self.srgb_imgs = srgb_imgs
@@ -44,10 +40,10 @@ class Exposure:
         # self.local_indices = local_indices  # a list of 4d coordinates [0:self.num_frame,0:num_ims_per_frame,0:y_num_grids,0:col_num_grids], which indicates the interested grids
         # self.grid_h = 0  # hight of a grid
         # self.grid_w = 0
-        self.num_frame = 0
-        self.num_ims_per_frame = 0
-        self.h = 0  # hight of a downsampled image
-        self.w = 0
+        self.num_frame = self.raw_imgs.shape[0]
+        self.num_ims_per_frame = self.raw_imgs.shape[1]
+        self.h = self.raw_imgs.shape[2]  # hight of a downsampled image
+        self.w = self.raw_imgs.shape[3]
         # self.target_intensity = target_intensity
         self.num_hist_bins = num_hist_bins
         # self.local_with_downsampled_outliers = local_with_downsampled_outliers  # a flag indicates if it should downsample the outlier areas when such area is the local interested area or not.("True" means it should downsample the outliers)

@@ -1,6 +1,7 @@
 import constants
 import tkinter as tk
 
+import exposure_entropy
 import exposure_global
 import exposure_saliency
 import exposure_semantic
@@ -231,7 +232,7 @@ class Browser:
                                "target_intensity": self.target_intensity.get()}
         if (self.current_auto_exposure == "Global"):
             button_functions.clear_rects(self)
-            exposures = exposure_global.ExposureGlobal(input_ims, srgb_ims,
+            exposures = exposure_global.ExposureGlobal(input_ims,
                                                 target_intensity=self.exposureParams['target_intensity'],
                                                 low_threshold=self.exposureParams['low_threshold'],
                                                 start_index=self.exposureParams['start_index'],
@@ -254,7 +255,7 @@ class Browser:
             salient_map = salient_map_mbd
             # print(self.scene[self.scene_index] + "_salient_maps_rbd.npy")
             # salient_map = np.load("Scene22_salient_maps_rbd.npy")
-            exposures = exposure_saliency.ExposureSaliency(input_ims, srgb_ims, salient_map,
+            exposures = exposure_saliency.ExposureSaliency(input_ims, salient_map,
                                                 target_intensity=self.exposureParams['target_intensity'],
 
                                                 low_threshold=self.exposureParams['low_threshold'],
@@ -267,21 +268,16 @@ class Browser:
 
         elif (self.current_auto_exposure == "Entropy"):
             button_functions.clear_rects(self)
-            srgb_ims = 'Image_Arrays_from_dng/Scene' + str(self.scene_index + 1) + '_show_dng_imgs.npy'
-            exposures = exposure_class.Exposure(input_ims, srgb_ims, downsample_rate=self.exposureParams["downsample_rate"],
-                                                target_intensity=self.exposureParams['target_intensity'],
-                                                r_percent=self.exposureParams['r_percent'],
-                                                g_percent=self.exposureParams['g_percent'],
-                                                low_threshold=0,
+            srgb_ims = np.load('Image_Arrays_from_dng/Scene' + str(self.scene_index + 1) + '_show_dng_imgs.npy')
+            srgb_ims = self.img_all[:, :, ::8, ::8, :]
+            exposures = exposure_entropy.ExposureEntropy(input_ims, srgb_ims,
+
+
                                                 start_index=self.exposureParams['start_index'],
-                                                high_threshold=1.0,
-                                                high_rate=0,
-                                                stepsize=self.exposureParams['stepsize'],
-                                                number_of_previous_frames=self.exposureParams[
-                                                    'number_of_previous_frames'])
+
+)
             # exposures = exposure_class.Exposure(params = self.exposureParams)
-            self.eV, self.eV_original, self.weighted_means, self.hists, self.hists_before_ds_outlier = exposures.entropy_pipeline(
-                srgb_ims)
+            self.eV, self.eV_original, self.weighted_means, self.hists, self.hists_before_ds_outlier = exposures.pipeline()
 
         elif (self.current_auto_exposure == "Max Gradient srgb"):
             button_functions.clear_rects(self)
@@ -327,7 +323,7 @@ class Browser:
             # with open(name, 'wb') as handle:
             #     pickle.dump({'boxes': list_local}, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-            exposures = exposure_semantic.ExposureSemantic(input_ims, srgb_ims, list_local,
+            exposures = exposure_semantic.ExposureSemantic(input_ims, list_local,
                                                 target_intensity=self.exposureParams['target_intensity'],
 
 

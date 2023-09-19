@@ -8,7 +8,7 @@ import collections
 class Exposure:
     def __init__(self,
                 raw_imgs, # blended raw images 112_168
-                srgb_imgs,
+                # srgb_imgs,
                 #downsample_rate=1 / 64,
                 r_percent=0,
                 g_percent=1,
@@ -19,11 +19,11 @@ class Exposure:
                 num_hist_bins=100,
                 # stepsize=3,
                 # number_of_previous_frames=5,
-                start_index = 20,):
+                start_index =20,):
         #self.global_rate = global_rate
         self.absolute_bit = 2 ** 8  # max bit number of the raw image
         self.raw_imgs = raw_imgs
-        self.srgb_imgs = srgb_imgs
+        # self.srgb_imgs = srgb_imgs
         #self.downsample_rate = downsample_rate  # down sample rate of the original images, preferred value is as # 1/perfectsquare (i.e 1/36, 1/81)
         # self.g_percent = g_percent  # weight of green channel
         # if r_percent + g_percent > 1:

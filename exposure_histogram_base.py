@@ -6,7 +6,7 @@ from exposure_general import Exposure
 class HistogramBase(Exposure):
     def __init__(self,
                  raw_images,
-                 srgb_imgs,
+
                  # downsample_rate=1 / 64,
                  target_intensity=0.13,
                  high_threshold=1,
@@ -24,7 +24,7 @@ class HistogramBase(Exposure):
             raw_images,
             # downsample_rate=downsample_rate,
 
-            srgb_imgs,
+
             num_hist_bins=num_hist_bins,
 
             start_index=start_index,

@@ -6,7 +6,7 @@ from exposure_histogram_base import HistogramBase
 class ExposureSemantic(HistogramBase):
     def __init__(self,
                  raw_images,
-                 srgb_imgs,
+
                  list_local,
                  # downsample_rate=1 / 64,
                  target_intensity=0.18,
@@ -26,7 +26,7 @@ class ExposureSemantic(HistogramBase):
             raw_images,
             # downsample_rate=downsample_rate,
 
-            srgb_imgs,
+
             target_intensity=target_intensity,
             high_threshold=high_threshold,
             low_threshold=low_threshold,

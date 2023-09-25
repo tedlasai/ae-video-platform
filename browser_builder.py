@@ -126,7 +126,7 @@ class Browser:
         self.fig = None
         self.fig_4 = None
         self.local_consider_outliers_check = 0
-        self.show_srgb_hist_check = 0
+        self.show_srgb_hist_check = 1
         self.srgb_mean = 0
         self.check = True
         # self.init_functions()
@@ -226,8 +226,8 @@ class Browser:
                                'col_num_grids': self.col_num_grids, 'row_num_grids': self.row_num_grids,
                                'low_threshold': self.low_threshold.get(), 'start_index': float(self.start_index.get()),
                                'high_threshold': self.high_threshold.get(), 'high_rate': float(self.high_rate.get()),
-                               'stepsize': self.stepsize_limit.get(),
-                               "number_of_previous_frames": self.number_of_previous_frames.get(),
+                               'stepsize': 3,
+                               "number_of_previous_frames": 5,
                                "global_rate": self.local_interested_global_area_percentage.get(),
                                "target_intensity": self.target_intensity.get()}
         if (self.current_auto_exposure == "Global"):

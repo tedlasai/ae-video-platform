@@ -62,7 +62,6 @@ class ExposureSaliency(HistogramBase):
         return new_map,num_good_pixels
 
     def pipeline(self):
-        print('here')
         downsampled_ims = self.raw_imgs
         total_n_pixs = self.h * self.w
 
@@ -96,10 +95,15 @@ class ExposureSaliency(HistogramBase):
                 combined = np.where(current_frame[i] < self.low_threshold, 0, combined)
                 total_number = len(saliency)
                 number_nonzeros = np.count_nonzero(combined) #number of salient pixels between the thresholds
-                salient_weight = self.salient_pix_ratio/(total_number + number_nonzeros*13)
-                None_salient_weight = self.non_salient_pix_ration/(total_number + number_nonzeros*13)
+                total_n_pixs_weighted = total_n_pixs + number_nonzeros*(self.salient_pix_ratio-1)
+                salient_weight = self.salient_pix_ratio/total_n_pixs_weighted
+                None_salient_weight = self.non_salient_pix_ration/total_n_pixs_weighted
                 new_map = np.where(combined == 0, None_salient_weight,salient_weight) #build a map with the salient weights
                 #zero out stuff above and below threshold
+                new_map_ = np.where(current_frame[i] > self.high_threshold, 0, new_map)
+                new_map_ = np.where(current_frame[i] < self.low_threshold, 0, new_map_)
+                print(np.array_equal(new_map,new_map_))
+
                 new_map = np.where(current_frame[i] > self.high_threshold, 0, new_map)
                 new_map = np.where(current_frame[i] < self.low_threshold, 0, new_map)
                 map_sum = np.sum(new_map)

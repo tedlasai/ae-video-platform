@@ -51,9 +51,9 @@ class ExposureEntropy(Exposure):
             for i in range(self.num_ims_per_frame):
                 current_frame_exposure = current_frame[i]
                 # the default output_image_shape is (168, 112)
-                output_image_shape = (self.w, self.h)
-
-                current_frame_exposure = cv2.resize(current_frame_exposure, output_image_shape)
+                # output_image_shape = (self.w, self.h)
+                #
+                # current_frame_exposure = cv2.resize(current_frame_exposure, output_image_shape)
                 current_frame_exposure = current_frame_exposure.flatten()
                 # raw_frame_exposure = raw_frame[i].flatten()
                 thresholded_current_frame = current_frame_exposure  # [raw_frame_exposure<self.high_threshold]

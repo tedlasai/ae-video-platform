@@ -16,11 +16,11 @@ class BrowserWithInputs(Browser):
         self.target_intensity_text_box()
         self.outlier_slider()
         # self.local_consider_outliers_checkbox() # consider outliear in sentimant or not
-        self.number_of_previous_frames_text_box()
-        self.stepsize_limit_text_box()
+        # self.number_of_previous_frames_text_box()
+        # self.stepsize_limit_text_box()
         # self.local_interested_name_text_box() # take the discription of what area are included in the manu sentimant algorithm
         self.local_interested_global_area_percentage_box()  # take the ratio of sentimant vs local
-        self.show_SRGB_hist_check_box()
+        #self.show_SRGB_hist_check_box()
         update_visulization.hist_plot_three(self, stack_size=self.stack_size[0],
                                             curr_frame_mean_list=np.zeros(self.stack_size[0]))
 

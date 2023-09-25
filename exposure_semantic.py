@@ -72,24 +72,24 @@ class ExposureSemantic(HistogramBase):
     def pipeline(self):
         downsampled_ims = self.raw_imgs
 
-        local_area, local_area_before_outlier, global_area, global_area_before_outlier = self.get_flatten_weighted_imgs_local_wo_grids_moving_object_v2(
+        local_area = self.get_flatten_weighted_imgs_local_wo_grids_moving_object_v2(
             downsampled_ims)
 
         # flatten_weighted_ims_before_ds_outlier = self.get_flatten_weighted_imgs(weights_before_ds_outlier, grided_ims)
         local_hists, local_dropped = self.get_hists(local_area)
-        local_hists_before_ds_outlier, local_dropped_before_ds_outlier = self.get_hists(local_area_before_outlier)
+        # local_hists_before_ds_outlier, local_dropped_before_ds_outlier = self.get_hists(local_area_before_outlier)
         local_weighted_means = self.get_means(local_dropped, local_area)
 
         weighted_means = local_weighted_means
         opti_inds = self.get_optimal_img_index(weighted_means)
         opti_inds[0] = self.start_index*1.0
 
-        hists_before_ds_outlier = np.zeros((100, 40, 101))
-        hists = np.zeros((100, 40, 101))
+        # hists_before_ds_outlier = np.zeros((100, 40, 101))
+        # hists = np.zeros((100, 40, 101))
         # opti_inds_adjusted = self.adjusted_opti_inds(opti_inds)
         opti_inds_adjusted_previous_n_frames = self.adjusted_opti_inds_v2_by_average_of_previous_n_frames(opti_inds)
 
-        return opti_inds_adjusted_previous_n_frames, opti_inds, weighted_means, hists, hists_before_ds_outlier
+        return opti_inds_adjusted_previous_n_frames, opti_inds, weighted_means, local_hists, #hists_before_ds_outlier
 
     def get_flatten_weighted_imgs_local_wo_grids_moving_object_v2(self, ims):
         if len(self.local_indices) == 0:
@@ -107,18 +107,18 @@ class ExposureSemantic(HistogramBase):
         # if self.global_rate > 0:
         #     global_area = np.where(local_area == -0.01, ims, -0.01)
         # else:
-        global_area = np.ones((self.num_frame, self.num_ims_per_frame, self.h, self.w)) * (-0.01)
+        # global_area = np.ones((self.num_frame, self.num_ims_per_frame, self.h, self.w)) * (-0.01)
         local_area = local_area.reshape((self.num_frame, self.num_ims_per_frame, self.h * self.w))
-        local_area_before_outlier = np.array(local_area)
+        # local_area_before_outlier = np.array(local_area)
         local_area[local_area < self.low_threshold] = -0.01
         local_area[local_area > self.high_threshold] = -0.01
 
-        global_area = global_area.reshape((self.num_frame, self.num_ims_per_frame, self.h * self.w))
-        global_area_before_outlier = np.array(global_area)
-        global_area[global_area < self.low_threshold] = -0.01
-        global_area[global_area > self.high_threshold] = -0.01
+        # global_area = global_area.reshape((self.num_frame, self.num_ims_per_frame, self.h * self.w))
+        # global_area_before_outlier = np.array(global_area)
+        # global_area[global_area < self.low_threshold] = -0.01
+        # global_area[global_area > self.high_threshold] = -0.01
 
-        return local_area, local_area_before_outlier, global_area, global_area_before_outlier
+        return local_area #, local_area_before_outlier, global_area, global_area_before_outlier
 
     def get_hists(self, flatten_weighted_ims):
         scene_hists_include_drooped_counts = self.hist_laxis(flatten_weighted_ims, self.num_hist_bins + 2, (

@@ -223,12 +223,12 @@ class Browser:
         srgb_ims = self.img_all
         # self.check_num_grids()
         self.exposureParams = {"downsample_rate": 1 / 25, 'r_percent': 0.25, 'g_percent': 0.5,
-                               'col_num_grids': self.col_num_grids, 'row_num_grids': self.row_num_grids,
+                               # 'col_num_grids': self.col_num_grids, 'row_num_grids': self.row_num_grids,
                                'low_threshold': self.low_threshold.get(), 'start_index': float(self.start_index.get()),
-                               'high_threshold': self.high_threshold.get(), 'high_rate': float(self.high_rate.get()),
-                               'stepsize': 3,
-                               "number_of_previous_frames": 5,
-                               "global_rate": self.local_interested_global_area_percentage.get(),
+                               'high_threshold': self.high_threshold.get(), #'high_rate': float(self.high_rate.get()),
+                               # 'stepsize': 3,
+                               # "number_of_previous_frames": 5,
+                               # "global_rate": self.local_interested_global_area_percentage.get(),
                                "target_intensity": self.target_intensity.get()}
         if (self.current_auto_exposure == "Global"):
             button_functions.clear_rects(self)
@@ -330,13 +330,13 @@ class Browser:
                                                 low_threshold=self.exposureParams['low_threshold'],
                                                 start_index=self.exposureParams['start_index'],
                                                 high_threshold=self.exposureParams['high_threshold'],
-                                                high_rate=self.exposureParams['high_rate'],
+                                                # high_rate=self.exposureParams['high_rate'],
                                                 # stepsize=self.exposureParams['stepsize'],
                                                 # number_of_previous_frames=self.exposureParams[
                                                 #     'number_of_previous_frames'],
                                                 # global_rate=self.exposureParams['global_rate']
                                                 )
-            self.eV, self.eV_original, self.weighted_means, self.hists, self.hists_before_ds_outlier = exposures.pipeline()
+            self.eV, self.eV_original, self.weighted_means, self.hists = exposures.pipeline()
             # print("list_local:")
             # print(list_local)
         # print("CURRENT AUTO EXPOSURE", self.current_auto_exposure)

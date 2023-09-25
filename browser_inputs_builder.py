@@ -19,7 +19,7 @@ class BrowserWithInputs(Browser):
         # self.number_of_previous_frames_text_box()
         # self.stepsize_limit_text_box()
         # self.local_interested_name_text_box() # take the discription of what area are included in the manu sentimant algorithm
-        self.local_interested_global_area_percentage_box()  # take the ratio of sentimant vs local
+        # self.local_interested_global_area_percentage_box()  # take the ratio of sentimant vs local
         #self.show_SRGB_hist_check_box()
         update_visulization.hist_plot_three(self, stack_size=self.stack_size[0],
                                             curr_frame_mean_list=np.zeros(self.stack_size[0]))
@@ -38,12 +38,12 @@ class BrowserWithInputs(Browser):
         self.e1 = tk.Entry(self.root, textvariable=self.target_intensity)
         self.e1.grid(row=29, column=1)
 
-    def local_interested_global_area_percentage_box(self):
-        self.local_interested_global_area_percentage = tk.DoubleVar()
-        self.local_interested_global_area_percentage.set(0.0)
-        tk.Label(self.root, text="Global percentage on local selection").grid(row=25, column=5)
-        self.e1 = tk.Entry(self.root, textvariable=self.local_interested_global_area_percentage)
-        self.e1.grid(row=26, column=5, sticky=tk.E)
+    # def local_interested_global_area_percentage_box(self):
+    #     self.local_interested_global_area_percentage = tk.DoubleVar()
+    #     self.local_interested_global_area_percentage.set(0.0)
+    #     tk.Label(self.root, text="Global percentage on local selection").grid(row=25, column=5)
+    #     self.e1 = tk.Entry(self.root, textvariable=self.local_interested_global_area_percentage)
+    #     self.e1.grid(row=26, column=5, sticky=tk.E)
 
     def show_SRGB_hist_check_box(self):
         self.show_srgb_hist_check_ = tk.IntVar()

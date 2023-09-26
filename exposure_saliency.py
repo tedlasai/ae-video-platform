@@ -63,12 +63,13 @@ class ExposureSaliency(HistogramBase):
         opti_inds=[]
         ind = int(self.start_index)
         opti_inds.append(ind)
-
-        for j in range(1,100):
+        means = []
+        hists = []
+        for j in range(1,self.num_frame):
             current_frame = downsampled_ims1[j]
             current_map = np.reshape(self.salient_map[j-1][ind],(total_n_pixs))
             current_weighted_ims = []
-            for i in range(40):
+            for i in range(self.num_ims_per_frame):
                 #
                 if j > 1:
                     pre_maps = np.empty((self.h,self.w,2))
@@ -83,7 +84,7 @@ class ExposureSaliency(HistogramBase):
                 mask = np.where(saliency < 0.1, 0, 1)
                 combined = np.where(current_frame[i] > self.high_threshold, 0, mask)
                 combined = np.where(current_frame[i] < self.low_threshold, 0, combined)
-                total_number = len(saliency)
+                # total_number = len(saliency)
                 number_nonzeros = np.count_nonzero(combined) #number of salient pixels between the thresholds
                 total_n_pixs_weighted = total_n_pixs + number_nonzeros*(self.salient_pix_ratio-1)
                 salient_weight = self.salient_pix_ratio/total_n_pixs_weighted
@@ -94,11 +95,11 @@ class ExposureSaliency(HistogramBase):
                 # new_map_ = np.where(current_frame[i] < self.low_threshold, 0, new_map_)
                 # print(np.array_equal(new_map,new_map_))
 
-                new_map = np.where(current_frame[i] > self.high_threshold, 0, new_map)
-                new_map = np.where(current_frame[i] < self.low_threshold, 0, new_map)
+                # new_map = np.where(current_frame[i] > self.high_threshold, 0, new_map)
+                # new_map = np.where(current_frame[i] < self.low_threshold, 0, new_map)
                 map_sum = np.sum(new_map)
-                num_good_pixels = np.logical_not(np.logical_or(current_frame[i] > self.high_threshold,
-                                                               current_frame[i] < self.low_threshold))
+                # num_good_pixels = np.logical_not(np.logical_or(current_frame[i] > self.high_threshold,
+                #                                                current_frame[i] < self.low_threshold))
                 # num_good_pixels = np.sum(num_good_pixels)
                 # new_map_ = new_map*(total_number + number_nonzeros*13)
                 new_map = (new_map/map_sum)*total_n_pixs #normalizes the map(this might be wrong)
@@ -108,20 +109,22 @@ class ExposureSaliency(HistogramBase):
                 current_weighted_ims.append(np.multiply(current_frame[i], new_map))
             current_weighted_ims = np.array(current_weighted_ims)
 
-
+            frame_hists, _ = self.get_hists(current_weighted_ims)
             #I THINK ALL YOU NEED IS
-            the_means = np.mean(current_weighted_ims, axis=1)
+            frame_means = np.mean(current_weighted_ims, axis=1)
 
 
 
             ind = 0
-            min_residual = abs(the_means[0] - self.target_intensity)
+            min_residual = abs(frame_means[0] - self.target_intensity)
             for i in range(1, 40):
-                if abs(the_means[i] - self.target_intensity) < min_residual:
+                if abs(frame_means[i] - self.target_intensity) < min_residual:
                     ind = i
-                    min_residual = abs(the_means[i] - self.target_intensity)
+                    min_residual = abs(frame_means[i] - self.target_intensity)
 
             opti_inds.append(ind)
+        means.append(frame_means)
+        hists.append(frame_hists)
         opti_inds_adjusted_previous_n_frames = self.adjusted_opti_inds_v2_by_average_of_previous_n_frames(opti_inds)
 
 
@@ -129,5 +132,5 @@ class ExposureSaliency(HistogramBase):
         hists = np.zeros((100,40,101))
         hists_before_ds_outlier = np.zeros((100,40,101))
 
-        return opti_inds_adjusted_previous_n_frames, opti_inds, weighted_means, hists, hists_before_ds_outlier
+        return opti_inds_adjusted_previous_n_frames, opti_inds, means, hists
 

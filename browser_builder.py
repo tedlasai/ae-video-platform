@@ -278,24 +278,21 @@ class Browser:
 
 )
             # exposures = exposure_class.Exposure(params = self.exposureParams)
-            self.eV, self.eV_original, self.weighted_means, self.hists, self.hists_before_ds_outlier = exposures.pipeline()
+            self.eV, self.eV_original, self.weighted_means, self.hists = exposures.pipeline()
 
         elif (self.current_auto_exposure == "Max Gradient srgb"):
             button_functions.clear_rects(self)
             input_ims = 'Image_Arrays_from_dng/Scene' + str(self.scene_index + 1) + '_show_dng_imgs.npy'
-            exposures = exposure_class.Exposure(input_ims, srgb_ims, downsample_rate=self.exposureParams["downsample_rate"],
-                                                target_intensity=self.exposureParams['target_intensity'],
+            exposures = exposure_class.Exposure(input_ims, srgb_ims,
+
                                                 r_percent=self.exposureParams['r_percent'],
                                                 g_percent=self.exposureParams['g_percent'],
-                                                low_threshold=0,
+
                                                 start_index=self.exposureParams['start_index'],
-                                                high_threshold=1.0,
-                                                high_rate=0,
-                                                stepsize=self.exposureParams['stepsize'],
-                                                number_of_previous_frames=self.exposureParams[
-                                                    'number_of_previous_frames'])
+
+                                             )
             # exposures = exposure_class.Exposure(params = self.exposureParams)
-            self.eV, self.eV_original, self.weighted_means, self.hists, self.hists_before_ds_outlier = exposures.gradient_srgb_exposure_pipeline()
+            self.eV, self.eV_original, self.weighted_means, self.hists = exposures.gradient_srgb_exposure_pipeline()
 
         elif (self.current_auto_exposure == "HDR Histogram Method"):
             button_functions.clear_rects(self)

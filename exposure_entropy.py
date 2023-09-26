@@ -67,9 +67,9 @@ class ExposureEntropy(Exposure):
 
         opti_inds_adjusted_previous_n_frames = self.adjusted_opti_inds_v2_by_average_of_previous_n_frames(opti_inds)
 
-        weighted_means = np.zeros((100, 40))
-        hists = np.zeros((100, 40, 101))
-        hists_before_ds_outlier = np.zeros((100, 40, 101))
+        flatten_ims = np.reshape(self.raw_imgs, (self.num_frame, self.num_ims_per_frame, self.h * self.w))
+        hists, _ = self.get_hists(flatten_ims)
+        weighted_means = np.mean(flatten_ims,axis=2)
         print(np.round(opti_inds_adjusted_previous_n_frames).astype(int))
 
-        return opti_inds_adjusted_previous_n_frames, opti_inds, weighted_means, hists, hists_before_ds_outlier
+        return opti_inds_adjusted_previous_n_frames, opti_inds, weighted_means, hists

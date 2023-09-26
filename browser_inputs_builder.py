@@ -11,8 +11,8 @@ class BrowserWithInputs(Browser):
 
     def init_functions(self):
         super().init_functions()
-        self.playback_text_box()
-        self.video_fps_text()
+        # self.playback_text_box()
+        # self.video_fps_text()
         self.target_intensity_text_box()
         self.outlier_slider()
         # self.local_consider_outliers_checkbox() # consider outliear in sentimant or not
@@ -80,7 +80,7 @@ class BrowserWithInputs(Browser):
         self.outlierSlider.grid(padx=10, pady=10, row=28, rowspan=3, column=1, columnspan=2, sticky=tk.E)
         # self.show_threshold()
         self.start_index_text_box()
-        self.high_rate_text_box()
+        # self.high_rate_text_box()
 
     def start_index_text_box(self):
         self.start_index = tk.StringVar()
@@ -90,28 +90,28 @@ class BrowserWithInputs(Browser):
         self.e1.grid(row=32
                      , column=2)
 
-    def high_rate_text_box(self):
-        self.high_rate = tk.StringVar()
-        self.high_rate.set("0.2")
-        tk.Label(self.root, text="above high threshold").grid(row=33, column=2)
-        self.e1 = tk.Entry(self.root, textvariable=self.high_rate)
-        self.e1.grid(row=34, column=2)
+    # def high_rate_text_box(self):
+    #     self.high_rate = tk.StringVar()
+    #     self.high_rate.set("0.2")
+    #     tk.Label(self.root, text="above high threshold").grid(row=33, column=2)
+    #     self.e1 = tk.Entry(self.root, textvariable=self.high_rate)
+    #     self.e1.grid(row=34, column=2)
 
-    def playback_text_box(self):
-        # TextBox
-        self.video_speed = tk.StringVar()
-        # video_speed = 1
-        tk.Label(self.root, text="Browser Playback Speed (ms delay)").grid(row=30, column=1)
-        self.e1 = tk.Entry(self.root, textvariable=self.video_speed)
-        self.e1.grid(row=31, column=1)
+    # def playback_text_box(self):
+    #     # TextBox
+    #     self.video_speed = tk.StringVar()
+    #     # video_speed = 1
+    #     tk.Label(self.root, text="Browser Playback Speed (ms delay)").grid(row=30, column=1)
+    #     self.e1 = tk.Entry(self.root, textvariable=self.video_speed)
+    #     self.e1.grid(row=31, column=1)
 
-    def video_fps_text(self):
-        # TextBox
-        self.save_video_fps = tk.StringVar()
-        # video_speed = 1
-        tk.Label(self.root, text="Video FPS").grid(row=32, column=1)
-        self.e1 = tk.Entry(self.root, textvariable=self.save_video_fps)
-        self.e1.grid(row=33, column=1)
+    # def video_fps_text(self):
+    #     # TextBox
+    #     self.save_video_fps = tk.StringVar()
+    #     # video_speed = 1
+    #     tk.Label(self.root, text="Video FPS").grid(row=32, column=1)
+    #     self.e1 = tk.Entry(self.root, textvariable=self.save_video_fps)
+    #     self.e1.grid(row=33, column=1)
 
     def local_consider_outliers_checkbox(self):
         self.local_consider_outliers_check_ = tk.IntVar()

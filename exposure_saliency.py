@@ -63,8 +63,11 @@ class ExposureSaliency(HistogramBase):
         opti_inds=[]
         ind = int(self.start_index)
         opti_inds.append(ind)
-        means = []
-        hists = []
+        first_frame_flatten_ims = downsampled_ims1[0]
+        first_frame_means = np.mean(first_frame_flatten_ims,axis=1)
+        first_frame_hists = self.get_hists_frame(first_frame_flatten_ims)
+        means = [first_frame_means]
+        hists = [first_frame_hists]
         for j in range(1,self.num_frame):
             current_frame = downsampled_ims1[j]
             current_map = np.reshape(self.salient_map[j-1][ind],(total_n_pixs))
@@ -109,7 +112,7 @@ class ExposureSaliency(HistogramBase):
                 current_weighted_ims.append(np.multiply(current_frame[i], new_map))
             current_weighted_ims = np.array(current_weighted_ims)
 
-            frame_hists, _ = self.get_hists(current_weighted_ims)
+            frame_hists, _ = self.get_hists_frame(current_weighted_ims)
             #I THINK ALL YOU NEED IS
             frame_means = np.mean(current_weighted_ims, axis=1)
 
@@ -123,14 +126,14 @@ class ExposureSaliency(HistogramBase):
                     min_residual = abs(frame_means[i] - self.target_intensity)
 
             opti_inds.append(ind)
-        means.append(frame_means)
-        hists.append(frame_hists)
+            means.append(frame_means)
+            hists.append(frame_hists)
         opti_inds_adjusted_previous_n_frames = self.adjusted_opti_inds_v2_by_average_of_previous_n_frames(opti_inds)
 
 
-        weighted_means = np.zeros((100,40))
-        hists = np.zeros((100,40,101))
-        hists_before_ds_outlier = np.zeros((100,40,101))
+        # weighted_means = np.zeros((100,40))
+        # hists = np.zeros((100,40,101))
+        # hists_before_ds_outlier = np.zeros((100,40,101))
 
         return opti_inds_adjusted_previous_n_frames, opti_inds, means, hists
 

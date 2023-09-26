@@ -76,8 +76,8 @@ class Browser:
 
         self.img = deepcopy(self.img_all[0, 0])
         self.play = True
-        self.video_speed = 50
-        self.video_fps = 30
+        self.video_speed = constants.video_speed
+        self.video_fps = constants.video_fps
 
         # self.res_check = 0
         # self.hdr_mode_check = 0
@@ -265,7 +265,7 @@ class Browser:
                                                            )
             # exposures = exposure_class.Exposure(params = self.exposureParams)
 
-            self.eV, self.eV_original, self.weighted_means, self.hists, self.hists_before_ds_outlier = exposures.pipeline()
+            self.eV, self.eV_original, self.weighted_means, self.hists = exposures.pipeline()
 
         elif (self.current_auto_exposure == "Entropy"):
             button_functions.clear_rects(self)

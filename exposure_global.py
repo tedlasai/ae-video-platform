@@ -53,12 +53,7 @@ class ExposureGlobal(HistogramBase):
         num_good_pixels = np.count_nonzero(new_map)
         return new_map,num_good_pixels
 
-    def get_hists(self, flatten_weighted_ims):
-        scene_hists_include_drooped_counts = self.hist_laxis(flatten_weighted_ims, self.num_hist_bins + 2, (
-            -0.01, 1.01))  # 2 extra bin is used to count the number of -0.01 and 1
-        num_dropped_pixels = scene_hists_include_drooped_counts[:, 0]
-        scene_hists = scene_hists_include_drooped_counts[:, 1:]
-        return scene_hists, num_dropped_pixels
+
 
     def pipeline(self):
         downsampled_ims = self.raw_imgs
@@ -79,7 +74,7 @@ class ExposureGlobal(HistogramBase):
                 current_weighted_ims.append(np.multiply(current_frame[i], new_map))
                 current_weighted_im_for_hist = np.where(new_map==0,-0.01,current_frame[i])
                 curr_hists.append(current_weighted_im_for_hist.flatten())
-            frame_hists, num_dropped_pixels = self.get_hists(np.array(curr_hists))
+            frame_hists, num_dropped_pixels = self.get_hists_frame(np.array(curr_hists))
             hists.append(frame_hists)
             current_weighted_ims = np.array(current_weighted_ims)
             the_means = self.get_means(current_weighted_ims,current_num_good_pixels)

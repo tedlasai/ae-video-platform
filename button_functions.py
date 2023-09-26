@@ -30,16 +30,16 @@ def validate_video_speed(speed):
 def playVideo(self):
     # global horSlider, scene, scene_index, defScene, img, img_all, img_mean_list, downscale_ratio, bit_depth, play, video_speed, useMertens
 
-    if validate_video_speed(self.video_speed.get()) is True:
-        try:
-            set_speed = int(self.video_speed.get())
-            # print(set_speed)
-        except ValueError:
-            set_speed = 360  # set as default speed
-    else:
-        set_speed = 360
+    # if validate_video_speed(self.video_speed) is True:
+    #     try:
+    #         set_speed = int(self.video_speed)
+    #         # print(set_speed)
+    #     except ValueError:
+    #         set_speed = 360  # set as default speed
+    # else:
+    #     set_speed = 360
     # print('screen index is ', scene_index)
-
+    set_speed = self.video_speed
     if (self.horSlider.get() < (self.frame_num[self.scene_index] - 1) and self.play):
         self.horSlider.set(self.horSlider.get() + 1)
         # print("HELLO", horSlider.get())
@@ -126,8 +126,8 @@ def export_video(self):
     self.mertensVideo = []
     self.mertens_pic = []
 
-    if self.res_check == 0 and self.current_auto_exposure == "None":
-
+    #if self.res_check == 0 and self.current_auto_exposure == "None":
+    if self.current_auto_exposure == "None":
         for i in range(100):
             self.temp_img_ind = int(i) * self.stack_size[self.scene_index] + int(self.verSlider.get())
             self.check = False
@@ -164,11 +164,15 @@ def export_video(self):
 
         video.release()
 
-    elif self.res_check == 0 and self.current_auto_exposure != "None":
+    # elif self.res_check == 0 and self.current_auto_exposure != "None":
+    else:
         if not len(self.eV) == 100:
+            print(self.eV)
+            print("1")
             return
 
         for i in range(100):
+            print("2")
             self.temp_img_ind = int(i) * self.stack_size[self.scene_index] + self.eV[i]
             self.check = False
             self.updatePlot()
@@ -212,15 +216,15 @@ def export_video(self):
 
         self.check_fps()
 
-    elif self.res_check == 1 and self.current_auto_exposure == "None":
-
-        self.check_fps()
-
-        regular.main(self.scene[self.scene_index], self.video_fps, self.verSlider.get(), list, self.folders)
-
-    elif self.res_check == 1 and self.current_auto_exposure == "Global" or self.current_auto_exposure == 'Local':
-
-        self.check_fps()
-
-        high_res_auto_ex_video.main(self.scene[self.scene_index], self.video_fps, self.eV,
-                                    self.current_auto_exposure, self.folders)
+    # elif self.res_check == 1 and self.current_auto_exposure == "None":
+    #
+    #     self.check_fps()
+    #
+    #     regular.main(self.scene[self.scene_index], self.video_fps, self.verSlider.get(), list, self.folders)
+    #
+    # elif self.res_check == 1 and self.current_auto_exposure == "Global" or self.current_auto_exposure == 'Local':
+    #
+    #     self.check_fps()
+    #
+    #     high_res_auto_ex_video.main(self.scene[self.scene_index], self.video_fps, self.eV,
+    #                                 self.current_auto_exposure, self.folders)

@@ -117,6 +117,13 @@ class Exposure:
         scene_hists = scene_hists_include_drooped_counts[:, :, 1:]
         return scene_hists, num_dropped_pixels
 
+    def get_hists_frame(self, flatten_weighted_ims):
+        scene_hists_include_drooped_counts = self.hist_laxis(flatten_weighted_ims, self.num_hist_bins + 2, (
+            -0.01, 1.01))  # 2 extra bin is used to count the number of -0.01 and 1
+        num_dropped_pixels = scene_hists_include_drooped_counts[:, 0]
+        scene_hists = scene_hists_include_drooped_counts[:, 1:]
+        return scene_hists, num_dropped_pixels
+
     def hist_laxis(self, data, n_bins,
                    range_limits):  # https://stackoverflow.com/questions/44152436/calculate-histograms-along-axis
         # Setup bins and determine the bin location for each element for the bins

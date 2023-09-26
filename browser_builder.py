@@ -237,11 +237,11 @@ class Browser:
                                                 low_threshold=self.exposureParams['low_threshold'],
                                                 start_index=self.exposureParams['start_index'],
                                                 high_threshold=self.exposureParams['high_threshold'],
-                                                high_rate=self.exposureParams['high_rate'],
+                                                # high_rate=self.exposureParams['high_rate'],
                                               )
             # exposures = exposure_class.Exposure(params = self.exposureParams)
 
-            self.eV, self.eV_original, self.weighted_means, self.hists, self.hists_before_ds_outlier = exposures.pipeline()
+            self.eV, self.eV_original, self.weighted_means, self.hists = exposures.pipeline()
 
         elif (self.current_auto_exposure == "Saliency_map"):
             button_functions.clear_rects(self)
@@ -261,7 +261,8 @@ class Browser:
                                                 low_threshold=self.exposureParams['low_threshold'],
                                                 start_index=self.exposureParams['start_index'],
                                                 high_threshold=self.exposureParams['high_threshold'],
-                                                high_rate=self.exposureParams['high_rate'])
+                                                # high_rate=self.exposureParams['high_rate']
+                                                           )
             # exposures = exposure_class.Exposure(params = self.exposureParams)
 
             self.eV, self.eV_original, self.weighted_means, self.hists, self.hists_before_ds_outlier = exposures.pipeline()

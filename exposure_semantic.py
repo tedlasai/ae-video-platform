@@ -12,8 +12,8 @@ class ExposureSemantic(HistogramBase):
                  target_intensity=0.18,
                  high_threshold=1,
                  low_threshold=0,
-                 high_rate=0.2,
-                 low_rate=0.2,
+                 # high_rate=0.2,
+                 # low_rate=0.2,
                  num_hist_bins=100,
                  # stepsize=3,
                  # number_of_previous_frames=5,
@@ -30,8 +30,8 @@ class ExposureSemantic(HistogramBase):
             target_intensity=target_intensity,
             high_threshold=high_threshold,
             low_threshold=low_threshold,
-            high_rate=high_rate,
-            low_rate=low_rate,
+            # high_rate=high_rate,
+            # low_rate=low_rate,
             num_hist_bins=num_hist_bins,
 
             start_index=start_index,
@@ -53,15 +53,15 @@ class ExposureSemantic(HistogramBase):
         abs_weighted_errs_between_means_target = np.abs(weighted_means - self.target_intensity)
         return np.argmin(abs_weighted_errs_between_means_target, axis=1)
 
-    def produce_map(self, im):
-        new_map_step = np.where(im > self.high_threshold, 0, 1)
-        new_map = np.where(im < self.low_threshold, 0, new_map_step)
-        # map_sum = np.sum(new_map)
-        # new_map = new_map #* 18816 / map_sum
-        # new_map = np.where(current_frame[i] > self.high_threshold, 0, new_map)
-        # new_map = np.where(current_frame[i] < self.low_threshold, 0, new_map)
-        num_good_pixels = np.count_nonzero(new_map)
-        return new_map, num_good_pixels
+    # def produce_map(self, im):
+    #     new_map_step = np.where(im > self.high_threshold, 0, 1)
+    #     new_map = np.where(im < self.low_threshold, 0, new_map_step)
+    #     # map_sum = np.sum(new_map)
+    #     # new_map = new_map #* 18816 / map_sum
+    #     # new_map = np.where(current_frame[i] > self.high_threshold, 0, new_map)
+    #     # new_map = np.where(current_frame[i] < self.low_threshold, 0, new_map)
+    #     num_good_pixels = np.count_nonzero(new_map)
+    #     return new_map, num_good_pixels
 
     # def get_means(self):
     #     return np.zeros(100)
@@ -120,38 +120,6 @@ class ExposureSemantic(HistogramBase):
 
         return local_area #, local_area_before_outlier, global_area, global_area_before_outlier
 
-    def get_hists(self, flatten_weighted_ims):
-        scene_hists_include_drooped_counts = self.hist_laxis(flatten_weighted_ims, self.num_hist_bins + 2, (
-            -0.01, 1.01))  # 2 extra bin is used to count the number of -0.01 and 1
-        num_dropped_pixels = scene_hists_include_drooped_counts[:, :, 0]
-        scene_hists = scene_hists_include_drooped_counts[:, :, 1:]
-        return scene_hists, num_dropped_pixels
-
-    def hist_laxis(self, data, n_bins,
-                   range_limits):  # https://stackoverflow.com/questions/44152436/calculate-histograms-along-axis
-        # Setup bins and determine the bin location for each element for the bins
-        R = range_limits
-        N = data.shape[-1]
-        bins = np.linspace(R[0], R[1], n_bins + 1)
-        data2D = data.reshape(-1, N)
-        idx = np.searchsorted(bins, data2D, 'right') - 1
-
-        # Some elements would be off limits, so get a mask for those
-        bad_mask = (idx == -1) | (idx == n_bins)
-
-        # We need to use bincount to get bin based counts. To have unique IDs for
-        # each row and not get confused by the ones from other rows, we need to
-        # offset each row by a scale (using row length for this).
-        scaled_idx = n_bins * np.arange(data2D.shape[0])[:, None] + idx
-
-        # Set the bad ones to be last possible index+1 : n_bins*data2D.shape[0]
-        limit = n_bins * data2D.shape[0]
-        scaled_idx[bad_mask] = limit
-
-        # Get the counts and reshape to multi-dim
-        counts = np.bincount(scaled_idx.ravel(), minlength=limit + 1)[:-1]
-        counts.shape = data.shape[:-1] + (n_bins,)
-        return counts
 
     def correct_one_mean(self, input_):
         mean, num_drooped_pixels_per_im = input_

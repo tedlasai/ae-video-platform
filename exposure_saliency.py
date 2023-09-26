@@ -32,8 +32,6 @@ class ExposureSaliency(HistogramBase):
             target_intensity=target_intensity,
             high_threshold=high_threshold,
             low_threshold=low_threshold,
-            high_rate=high_rate,
-            low_rate=low_rate,
             num_hist_bins=num_hist_bins,
 
             start_index=start_index,
@@ -51,15 +49,11 @@ class ExposureSaliency(HistogramBase):
         #     return rgb_blended_ims
 
 
-    def produce_map(self, im):
-        new_map_step = np.where(im > self.high_threshold, 0, 1)
-        new_map = np.where(im < self.low_threshold, 0, new_map_step)
-        # map_sum = np.sum(new_map)
-        # new_map = new_map #* 18816 / map_sum
-        # new_map = np.where(current_frame[i] > self.high_threshold, 0, new_map)
-        # new_map = np.where(current_frame[i] < self.low_threshold, 0, new_map)
-        num_good_pixels = np.count_nonzero(new_map)
-        return new_map,num_good_pixels
+    # def produce_map(self, im):
+    #     new_map_step = np.where(im > self.high_threshold, 0, 1)
+    #     new_map = np.where(im < self.low_threshold, 0, new_map_step)
+    #     num_good_pixels = np.count_nonzero(new_map)
+    #     return new_map,num_good_pixels
 
     def pipeline(self):
         downsampled_ims = self.raw_imgs
@@ -73,11 +67,7 @@ class ExposureSaliency(HistogramBase):
         for j in range(1,100):
             current_frame = downsampled_ims1[j]
             current_map = np.reshape(self.salient_map[j-1][ind],(total_n_pixs))
-            #current_map = current_map/np.sum(current_map)
-            #current_weighted_ims = np.multiply(current_frame,current_map[None,:])
             current_weighted_ims = []
-
-            #current_map = current_map-0.10392
             for i in range(40):
                 #
                 if j > 1:
@@ -100,17 +90,17 @@ class ExposureSaliency(HistogramBase):
                 None_salient_weight = self.non_salient_pix_ration/total_n_pixs_weighted
                 new_map = np.where(combined == 0, None_salient_weight,salient_weight) #build a map with the salient weights
                 #zero out stuff above and below threshold
-                new_map_ = np.where(current_frame[i] > self.high_threshold, 0, new_map)
-                new_map_ = np.where(current_frame[i] < self.low_threshold, 0, new_map_)
-                print(np.array_equal(new_map,new_map_))
+                # new_map_ = np.where(current_frame[i] > self.high_threshold, 0, new_map)
+                # new_map_ = np.where(current_frame[i] < self.low_threshold, 0, new_map_)
+                # print(np.array_equal(new_map,new_map_))
 
                 new_map = np.where(current_frame[i] > self.high_threshold, 0, new_map)
                 new_map = np.where(current_frame[i] < self.low_threshold, 0, new_map)
                 map_sum = np.sum(new_map)
                 num_good_pixels = np.logical_not(np.logical_or(current_frame[i] > self.high_threshold,
                                                                current_frame[i] < self.low_threshold))
-                num_good_pixels = np.sum(num_good_pixels)
-                new_map_ = new_map*(total_number + number_nonzeros*13)
+                # num_good_pixels = np.sum(num_good_pixels)
+                # new_map_ = new_map*(total_number + number_nonzeros*13)
                 new_map = (new_map/map_sum)*total_n_pixs #normalizes the map(this might be wrong)
 
 
@@ -118,20 +108,11 @@ class ExposureSaliency(HistogramBase):
                 current_weighted_ims.append(np.multiply(current_frame[i], new_map))
             current_weighted_ims = np.array(current_weighted_ims)
 
-            # num_good_pixels = np.logical_not(np.logical_or(downsampled_ims1[j] > self.high_threshold,
-            #                                 downsampled_ims1[j] < self.low_threshold))
-            # num_good_pixels = np.sum(num_good_pixels, axis=1)
-            # num_good_pixels[
-            #     num_good_pixels == 0] = -1  # this allows for division when values are 0(usally really bright stuff)
-            # good_pixel_ims = current_weighted_ims
-            # good_pixel_ims[good_pixel_ims < 0] = 0  # make all the negative 0.01s to 0
-            #
-            # the_means = np.sum(good_pixel_ims, axis=1)/num_good_pixels
 
             #I THINK ALL YOU NEED IS
             the_means = np.mean(current_weighted_ims, axis=1)
 
-            #the_means = np.mean(current_weighted_ims, axis=1)
+
 
             ind = 0
             min_residual = abs(the_means[0] - self.target_intensity)

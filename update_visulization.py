@@ -48,7 +48,7 @@ def updateHorSlider(b, _):
 
 def updatePlot(self):
     # global verSlider, horSlider, photo, photo_2, stack_size, img_all, img, img_mean_list, scene_index, fig
-    stack_size = self.stack_size[self.scene_index]
+    stack_size = 40
     if self.check == True:
         self.temp_img_ind = int(self.horSlider.get()) * stack_size + int(self.verSlider.get())
     else:
@@ -60,6 +60,8 @@ def updatePlot(self):
 
         first_ind = round(self.temp_img_ind // stack_size)
         send_ind = round(self.temp_img_ind % stack_size)
+        print(f'first_ind:{first_ind}')
+        print(f'second_ind:{send_ind}')
         count1 = self.hists[first_ind][send_ind]
         # print("current srgb hist check")
         # print(self.show_srgb_hist_check)
@@ -69,13 +71,16 @@ def updatePlot(self):
             # print(count2)
         else:
             count2 = self.hists_before_ds_outlier[first_ind][send_ind]
-        print(f'first_ind:{first_ind}')
+        # print(f'first_ind:{first_ind}')
         curr_frame_mean_list = self.weighted_means[first_ind]
         ind = send_ind
         val = curr_frame_mean_list[send_ind]
         ind2 = int(self.eV[self.horSlider.get()])
         val2 = curr_frame_mean_list[ind2]
         count3 = self.hists[first_ind][ind2]
+        print("---")
+        print(f'first_ind:{first_ind}')
+        print(f'ind2:{ind2}')
 
     else:
         count1 = np.zeros(self.num_bins + 1)

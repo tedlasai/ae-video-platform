@@ -60,7 +60,7 @@ class ExposureGlobal(HistogramBase):
         weighted_means = []
         opti_inds = []
         ind = self.start_index
-        opti_inds.append(ind)
+
         hists = []
         for j in range(self.num_frame):
             current_frame = downsampled_ims[j]
@@ -81,7 +81,8 @@ class ExposureGlobal(HistogramBase):
             weighted_means.append(the_means)
             ind = self.get_optimal_img_index(the_means)
             opti_inds.append(ind)
+        opti_inds[0] = ind
         opti_inds_adjusted_previous_n_frames = self.adjusted_opti_inds_v2_by_average_of_previous_n_frames(opti_inds)
-        hists_before_ds_outlier = np.zeros((100, 40, 101))
+
 
         return opti_inds_adjusted_previous_n_frames, opti_inds, weighted_means, np.array(hists)

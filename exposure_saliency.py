@@ -65,7 +65,7 @@ class ExposureSaliency(HistogramBase):
         opti_inds.append(ind)
         first_frame_flatten_ims = downsampled_ims1[0]
         first_frame_means = np.mean(first_frame_flatten_ims,axis=1)
-        first_frame_hists = self.get_hists_frame(first_frame_flatten_ims)
+        first_frame_hists,_ = self.get_hists_frame(first_frame_flatten_ims)
         means = [first_frame_means]
         hists = [first_frame_hists]
         for j in range(1,self.num_frame):
@@ -130,10 +130,6 @@ class ExposureSaliency(HistogramBase):
             hists.append(frame_hists)
         opti_inds_adjusted_previous_n_frames = self.adjusted_opti_inds_v2_by_average_of_previous_n_frames(opti_inds)
 
-
-        # weighted_means = np.zeros((100,40))
-        # hists = np.zeros((100,40,101))
-        # hists_before_ds_outlier = np.zeros((100,40,101))
 
         return opti_inds_adjusted_previous_n_frames, opti_inds, means, hists
 

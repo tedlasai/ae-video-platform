@@ -175,11 +175,11 @@ def export_video(self):
             print("2")
             self.temp_img_ind = int(i) * self.stack_size[self.scene_index] + self.eV[i]
             self.check = False
-            self.updatePlot()
+            #self.updatePlot()
             # reg_vid_plot.append(self.tempImg_2)
 
             # img = deepcopy(self.img_all[self.temp_img_ind])
-            img = deepcopy(self.img_raw[i][self.eV[i]])
+            img = deepcopy(self.img_all[i][self.eV[i]])
             print("IMG", img.shape)
 
             reg_vid.append(img)
@@ -189,7 +189,7 @@ def export_video(self):
         # sv = self.get_concat_h_blank(m1, m2)
         sv = m1
 
-        self.check_fps()
+        #self.check_fps()
 
         fold_name = self.scene[self.scene_index] + "_dng_pipeline_" + self.current_auto_exposure + "_FPS_" + str(
             self.video_fps)
@@ -214,7 +214,7 @@ def export_video(self):
 
         video.release()
 
-        self.check_fps()
+        # self.check_fps()
 
     # elif self.res_check == 1 and self.current_auto_exposure == "None":
     #

@@ -79,6 +79,6 @@ auto_exposures = ["None", "Global","Saliency_map",'Semantic','Max Gradient srgb'
 
 downscale_ratio = 0.12
 imgSize = [int(4480 * downscale_ratio), int(6720 * downscale_ratio)]
-video_fps = 50
+video_fps = 8
 video_speed = 360
 num_bins = 100

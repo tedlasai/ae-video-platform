@@ -4,6 +4,8 @@ import numpy as np
 from exposure_general import Exposure
 from skimage.measure import shannon_entropy
 
+from update_visulization import get_hists
+
 
 class ExposureEntropy(Exposure):
     def __init__(self,
@@ -68,7 +70,7 @@ class ExposureEntropy(Exposure):
         opti_inds_adjusted_previous_n_frames = self.adjusted_opti_inds_v2_by_average_of_previous_n_frames(opti_inds)
 
         flatten_ims = np.reshape(self.raw_imgs, (self.num_frame, self.num_ims_per_frame, self.h * self.w))
-        hists, _ = self.get_hists(flatten_ims)
+        hists, _ = get_hists(flatten_ims)
         weighted_means = np.mean(flatten_ims,axis=2)
         print(np.round(opti_inds_adjusted_previous_n_frames).astype(int))
 

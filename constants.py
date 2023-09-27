@@ -4,19 +4,11 @@ folders = "E:\Final"  # link to directory containing all the dataset image folde
 widgetFont = 'Arial'
 widgetFontSize = 12
 
-# scene = ['Scene1', 'Scene2', 'Scene3', 'Scene4', 'Scene5', 'Scene6',
-#               'Scene7', 'Scene8', 'Scene9', 'Scene10', 'Scene11', 'Scene12', 'Scene13', 'Scene14', 'Scene15',
-#               'Scene16', 'Scene17', 'Scene18', 'Scene19', 'Scene20', 'Scene21','Scene22']
-# frame_num = [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,
-#                   100, 100, 100, 100, 100,100]  # number of frames per position
-# stack_size = [40, 15, 40, 15, 15, 40, 15, 15, 15, 40, 40, 15, 15, 15, 40, 40, 40,
-#                    40, 40, 40, 40, 40]  # number of shutter options per position
 scene = ['Scene1', 'Scene2', 'Scene3', 'Scene4', 'Scene5', 'Scene6',
               'Scene7', 'Scene8', 'Scene9']
 frame_num = [100, 100, 100, 100, 100, 100, 100, 100, 100]  # number of frames per position
-stack_size = [40, 40, 40, 40,
-                   40, 40, 40, 40, 40]  # number of shutter options per position
-
+stack_size = [40, 40, 40, 40, 40, 40, 40, 40, 40]  # number of shutter options per position
+num_hist_bins = 100
 SCALE_LABELS = {
     0: '15"',
     1: '8"',

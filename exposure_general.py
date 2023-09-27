@@ -1,4 +1,4 @@
-import math
+from update_visulization import hist_laxis, get_hists
 import numpy as np
 import scipy
 import collections
@@ -110,44 +110,21 @@ class Exposure:
         print("OPT NEW", opti_inds_new)
         return opti_inds_new
 
-    def get_hists(self, flatten_weighted_ims):
-        scene_hists_include_drooped_counts = self.hist_laxis(flatten_weighted_ims, self.num_hist_bins + 2, (
-            -0.01, 1.01))  # 2 extra bin is used to count the number of -0.01 and 1
-        num_dropped_pixels = scene_hists_include_drooped_counts[:, :, 0]
-        scene_hists = scene_hists_include_drooped_counts[:, :, 1:]
-        return scene_hists, num_dropped_pixels
+    # def get_hists(self, flatten_weighted_ims):
+    #     scene_hists_include_drooped_counts = hist_laxis(flatten_weighted_ims, self.num_hist_bins + 2, (
+    #         -0.01, 1.01))  # 2 extra bin is used to count the number of -0.01 and 1
+    #     num_dropped_pixels = scene_hists_include_drooped_counts[:, :, 0]
+    #     scene_hists = scene_hists_include_drooped_counts[:, :, 1:]
+    #     return scene_hists, num_dropped_pixels
 
     def get_hists_frame(self, flatten_weighted_ims):
-        scene_hists_include_drooped_counts = self.hist_laxis(flatten_weighted_ims, self.num_hist_bins + 2, (
+        scene_hists_include_drooped_counts = hist_laxis(flatten_weighted_ims, self.num_hist_bins + 2, (
             -0.01, 1.01))  # 2 extra bin is used to count the number of -0.01 and 1
         num_dropped_pixels = scene_hists_include_drooped_counts[:, 0]
         scene_hists = scene_hists_include_drooped_counts[:, 1:]
         return scene_hists, num_dropped_pixels
 
-    def hist_laxis(self, data, n_bins,
-                   range_limits):  # https://stackoverflow.com/questions/44152436/calculate-histograms-along-axis
-        # Setup bins and determine the bin location for each element for the bins
-        R = range_limits
-        N = data.shape[-1]
-        bins = np.linspace(R[0], R[1], n_bins + 1)
-        data2D = data.reshape(-1, N)
-        idx = np.searchsorted(bins, data2D, 'right') - 1
-
-        # Some elements would be off limits, so get a mask for those
-        bad_mask = (idx == -1) | (idx == n_bins)
-
-        # We need to use bincount to get bin based counts. To have unique IDs for
-        # each row and not get confused by the ones from other rows, we need to
-        # offset each row by a scale (using row length for this).
-        scaled_idx = n_bins * np.arange(data2D.shape[0])[:, None] + idx
-
-        # Set the bad ones to be last possible index+1 : n_bins*data2D.shape[0]
-        limit = n_bins * data2D.shape[0]
-        scaled_idx[bad_mask] = limit
-
-        # Get the counts and reshape to multi-dim
-        counts = np.bincount(scaled_idx.ravel(), minlength=limit + 1)[:-1]
-        counts.shape = data.shape[:-1] + (n_bins,)
-        return counts
+    # def hist_laxis(self, data, n_bins, range_limits):
+    #     return hist_laxis(data, n_bins, range_limits)
 
 

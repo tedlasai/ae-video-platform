@@ -1,6 +1,7 @@
 import numpy as np
 
 from exposure_histogram_base import HistogramBase
+from update_visulization import get_hists
 
 
 class ExposureSemantic(HistogramBase):
@@ -76,7 +77,7 @@ class ExposureSemantic(HistogramBase):
             downsampled_ims)
 
         # flatten_weighted_ims_before_ds_outlier = self.get_flatten_weighted_imgs(weights_before_ds_outlier, grided_ims)
-        local_hists, local_dropped = self.get_hists(local_area)
+        local_hists, local_dropped = get_hists(local_area)
         # local_hists_before_ds_outlier, local_dropped_before_ds_outlier = self.get_hists(local_area_before_outlier)
         local_weighted_means = self.get_means(local_dropped, local_area)
 

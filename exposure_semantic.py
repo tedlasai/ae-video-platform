@@ -15,8 +15,6 @@ class ExposureSemantic(HistogramBase):
                  low_threshold=0,
                  # high_rate=0.2,
                  # low_rate=0.2,
-                 num_hist_bins=100,
-                 # stepsize=3,
                  # number_of_previous_frames=5,
                  start_index=20, ):
         # self.gender = gender
@@ -32,8 +30,6 @@ class ExposureSemantic(HistogramBase):
             high_threshold=high_threshold,
             low_threshold=low_threshold,
             # high_rate=high_rate,
-            # low_rate=low_rate,
-            num_hist_bins=num_hist_bins,
 
             start_index=start_index,
 

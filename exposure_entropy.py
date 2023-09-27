@@ -11,23 +11,15 @@ class ExposureEntropy(Exposure):
     def __init__(self,
                  raw_images,
                  srgb_imgs,
+                 start_index=20):
 
-                 num_hist_bins=100,
-
-                 start_index=20, ):
-        # self.gender = gender
-        # Prototype initialization 3.x:
         self.r_percent = 0.2126,
         self.g_percent = 0.7152,
         self.b_percent = 0.0722,
         self.srgb_imgs = srgb_imgs
         super().__init__(
             raw_images,
-            srgb_imgs,
-
-            num_hist_bins=num_hist_bins,
-
-            start_index=start_index, )
+            start_index=start_index)
 
     def imput_imgs_processing(self):
         # raw_bayer = np.load(self.srgb_images)

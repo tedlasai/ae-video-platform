@@ -22,11 +22,6 @@ class HistogramBase(Exposure):
 
         super().__init__(
             raw_images,
-            # downsample_rate=downsample_rate,
-
-
-            num_hist_bins=num_hist_bins,
-
             start_index=start_index,
 
         )

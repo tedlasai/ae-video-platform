@@ -8,15 +8,9 @@ class ExposureSaliency(HistogramBase):
                  raw_images,
 
                  salient_map,
-                 # downsample_rate=1 / 64,
                  target_intensity=0.18,
                  high_threshold=1,
                  low_threshold=0,
-                 high_rate=0.2,
-                 low_rate=0.2,
-                 num_hist_bins=100,
-                 # stepsize=3,
-                 # number_of_previous_frames=5,
                  start_index=20, ):
         # self.gender = gender
         # Prototype initialization 3.x:
@@ -32,7 +26,7 @@ class ExposureSaliency(HistogramBase):
             target_intensity=target_intensity,
             high_threshold=high_threshold,
             low_threshold=low_threshold,
-            num_hist_bins=num_hist_bins,
+
 
             start_index=start_index,
 

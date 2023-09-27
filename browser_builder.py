@@ -89,7 +89,7 @@ class Browser:
 
         self.canvas = tk.Canvas(root, cursor="cross", width=self.photo.width(), height=self.photo.height(),
                                 borderwidth=0, highlightthickness=0)
-        self.canvas.grid(row=1, column=1, columnspan=2, rowspan=27, padx=0, pady=0, sticky=tk.NW)
+        self.canvas.grid(row=1, column=1, columnspan=3, rowspan=27, padx=0, pady=0, sticky=tk.NW)
         self.canvas_img = self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
         self.current_rects = []  # the rectangles drawn in canvas
         self.rectangles = []  # the coordinates of the rectangles
@@ -154,7 +154,7 @@ class Browser:
                                   label='Frame Number', font=(self.widgetFont, self.widgetFontSize),
                                   orient=tk.HORIZONTAL,
                                   length=self.widthToScale, command=command_function)
-        self.horSlider.grid(row=27, column=1, columnspan=2, sticky=tk.SW)
+        self.horSlider.grid(row=27, column=1, columnspan=3, sticky=tk.SW)
 
     def vertical_slider(self, command_function):
         # Vertical Slider
@@ -178,10 +178,10 @@ class Browser:
         self.defScene = tk.StringVar(self.root)
         self.defScene.set(self.scene[self.scene_index])  # default value
         self.selSceneLabel = tk.Label(self.root, text='Select Scene:', font=(self.widgetFont, self.widgetFontSize))
-        self.selSceneLabel.grid(row=0, column=3, sticky=tk.W)
+        self.selSceneLabel.grid(row=0, column=4, sticky=tk.W)
         self.sceneList = tk.OptionMenu(self.root, self.defScene, *self.scene, command=self.setValues)
         self.sceneList.config(font=(self.widgetFont, self.widgetFontSize - 2), width=15, anchor=tk.W)
-        self.sceneList.grid(row=1, column=3, sticky=tk.NE)
+        self.sceneList.grid(row=1, column=4, sticky=tk.NE)
 
     def auto_exposure_select(self):
         # Select Scene List
@@ -189,11 +189,11 @@ class Browser:
         self.defAutoExposure.set(self.auto_exposures[0])  # default value
         self.selAutoExposureLabel = tk.Label(self.root, text='Select AutoExposure:',
                                              font=(self.widgetFont, self.widgetFontSize))
-        self.selAutoExposureLabel.grid(row=0, column=4, sticky=tk.W)
+        self.selAutoExposureLabel.grid(row=0, column=5, sticky=tk.W)
         self.AutoExposureList = tk.OptionMenu(self.root, self.defAutoExposure, *self.auto_exposures,
                                               command=self.setAutoExposure)
         self.AutoExposureList.config(font=(self.widgetFont, self.widgetFontSize - 2), width=15, anchor=tk.W)
-        self.AutoExposureList.grid(row=1, column=4, sticky=tk.NE)
+        self.AutoExposureList.grid(row=1, column=5, sticky=tk.NE)
 
     # def updateSlider(self, scale_value):
     #     pass

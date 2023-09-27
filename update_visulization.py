@@ -217,13 +217,11 @@ def hist_plot_three(self, stack_size, curr_frame_mean_list, count1=np.zeros(101)
     if ind == ind2:
         color1 = 'blue'
         axes[1].bar(bins, vals2, align='center', color=color1)
-        if self.show_srgb_hist_check == 1:
-            axes[1].set_title('srgb histogram', **font)
-            axes[1].text(70, 0.2, '( mean: ' + str("%.2f" % self.srgb_mean) + ')', color='blue',
-                         fontsize=13, position=(70, 0.2))
-        else:
-            axes[1].set_title('histogram with outlier', **font)
-        axes[0].set_title('histogram without outlier', **font)
+
+        axes[1].set_title('sRGB image histogram', **font)
+        axes[1].text(70, 0.2, '( mean: ' + str("%.2f" % self.srgb_mean) + ')', color='blue',
+                     fontsize=13, position=(70, 0.2))
+        axes[0].set_title('RAW image histogram', **font)
         for i, x in enumerate(vals2):
             if x > 0.25:
                 axes[1].text(i, 0.25, str("%.2f" % x), color=color1,
@@ -268,4 +266,4 @@ def hist_plot_three(self, stack_size, curr_frame_mean_list, count1=np.zeros(101)
                                      self.fig_2.canvas.tostring_rgb())
     self.photo_3 = ImageTk.PhotoImage(self.tempImg_3)
     self.imagePrevlabel_3 = tk.Label(self.root, image=self.photo_3)
-    self.imagePrevlabel_3.grid(row=2, column=3, columnspan=2, rowspan=45, sticky=tk.NE)
+    self.imagePrevlabel_3.grid(row=2, column=4, columnspan=2, rowspan=34, padx=20, pady=10, sticky=tk.NE)

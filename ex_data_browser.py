@@ -383,6 +383,8 @@ class Browser:
                                    font=(self.widgetFont, self.widgetFontSize), command=self.runVideo)
         self.RunButton.grid(row=5 - 4, column=5, sticky=tk.E)
 
+
+
     def hdr_pause_button(self):
         self.PauseButton = tk.Button(root, text='Pause', fg='#ffffff', bg='#999999', activebackground='#454545',
                                      relief=tk.RAISED, padx=10, pady=5,

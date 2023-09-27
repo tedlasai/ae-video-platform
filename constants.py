@@ -4,12 +4,17 @@ folders = "E:\Final"  # link to directory containing all the dataset image folde
 widgetFont = 'Arial'
 widgetFontSize = 12
 
+# scene = ['Scene1', 'Scene2', 'Scene3', 'Scene4', 'Scene5', 'Scene6',
+#               'Scene7', 'Scene8', 'Scene9', 'Scene10', 'Scene11', 'Scene12', 'Scene13', 'Scene14', 'Scene15',
+#               'Scene16', 'Scene17', 'Scene18', 'Scene19', 'Scene20', 'Scene21','Scene22']
+# frame_num = [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,
+#                   100, 100, 100, 100, 100,100]  # number of frames per position
+# stack_size = [40, 15, 40, 15, 15, 40, 15, 15, 15, 40, 40, 15, 15, 15, 40, 40, 40,
+#                    40, 40, 40, 40, 40]  # number of shutter options per position
 scene = ['Scene1', 'Scene2', 'Scene3', 'Scene4', 'Scene5', 'Scene6',
-              'Scene7', 'Scene8', 'Scene9', 'Scene10', 'Scene11', 'Scene12', 'Scene13', 'Scene14', 'Scene15',
-              'Scene16', 'Scene17', 'Scene18', 'Scene19', 'Scene20', 'Scene21','Scene22']
-frame_num = [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,
-                  100, 100, 100, 100, 100,100]  # number of frames per position
-stack_size = [40, 15, 40, 15, 15, 40, 15, 15, 15, 40, 40, 15, 15, 15, 40, 40, 40,
+              'Scene7', 'Scene8', 'Scene9']
+frame_num = [100, 100, 100, 100, 100, 100, 100, 100, 100]  # number of frames per position
+stack_size = [40, 40, 40, 40,
                    40, 40, 40, 40, 40]  # number of shutter options per position
 
 SCALE_LABELS = {
@@ -75,8 +80,8 @@ SCALE_LABELS_NEW = {
 SCALES = [15, 8, 6, 4, 2, 1, 1 / 2, 1 / 4, 1 / 8, 1 / 15, 1 / 30, 1 / 60, 1 / 125, 1 / 250, 1 / 500]
 NEW_SCALES = [15,13,10,8,6,5,4,3.2,2.5,2,1.6,1.3,1,0.8,0.6,0.5,0.4,0.3,1/4,1/5,1/6,1/8,1/10,1/13,1/15,1/20,1/25,1/30,1/40,1/50,1/60,1/80,1/100,1/125,1/160,1/200,1/250,1/320,1/400,1/500]
 indexes_out_of_40 = [0, 3, 4, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39]
-auto_exposures = ["None", "Global","Saliency_map",'Semantic','Max Gradient srgb','Entropy','HDR Histogram Method']
-
+auto_exposures = ["None", "Global","Saliency_map",'Semantic','Entropy']
+# auto_exposures = ["None", "Global","Saliency_map",'Semantic','Max Gradient srgb','Entropy','HDR Histogram Method']
 downscale_ratio = 0.12
 imgSize = [int(4480 * downscale_ratio), int(6720 * downscale_ratio)]
 video_fps = 8

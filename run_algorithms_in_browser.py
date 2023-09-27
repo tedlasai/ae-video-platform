@@ -59,12 +59,12 @@ b.init_functions()
 # b.scene_select(set_auto_exposure.setValues,para=b)
 # b.auto_exposure_select(set_auto_exposure.setAutoExposure,para=b)
 # b.canvas.bind('<Button-1>', lambda:button_functions.canvas_click(b,event=b.canvas.event))
-b.buttons_builder('Pause', button_functions.pauseRun, 1, 5, para=b)
-b.buttons_builder('Run', button_functions.runVideo, 2, 5, para=b)
-b.buttons_builder('Reset', button_functions.resetValues, 3, 5, para=b)
-b.buttons_builder('Clear Rectangles', button_functions.clear_rects, 5, 5, para=b)
-b.buttons_builder('Save Interested Area', button_functions.save_interested_moving_objects_fuction, 4, 5, para=b)
-b.buttons_builder('Video', button_functions.export_video, 6, 5, para=b)
+b.buttons_builder('Pause', button_functions.pauseRun, 30, 2, para=b)
+b.buttons_builder('Run', button_functions.runVideo, 29, 2, para=b)
+b.buttons_builder('Reset', button_functions.resetValues, 29, 3, para=b)
+b.buttons_builder('Clear Rectangles', button_functions.clear_rects, 32, 3, para=b)
+b.buttons_builder('Save Interested Area', button_functions.save_interested_moving_objects_fuction, 32, 2, para=b)
+b.buttons_builder('Video', button_functions.export_video, 30, 3, para=b)
 
 
 def regular_video_button(self):

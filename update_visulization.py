@@ -153,7 +153,10 @@ def show_srgb_hist(self):  # assuming the channel order is RGB
             temp_img[h_start:h_end, w_start:w_end] = current_rgb_img_[h_start:h_end, w_start:w_end]
         temp_img = temp_img.flatten()
         srgb_hist, dropped = get_hists_single_im(temp_img)
-        mean = self.get_means(dropped, temp_img)
+        if dropped < len(temp_img):
+            mean = np.sum(temp_img)//(len(temp_img)-dropped)
+        else:
+            mean = 0
     else:
         mean = np.mean(current_rgb_img_)
         current_rgb_img_ = current_rgb_img_.flatten()

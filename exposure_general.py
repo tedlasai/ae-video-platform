@@ -40,7 +40,7 @@ class Exposure:
                 current_index = opti_inds_new[i]
                 last_visited_indices.append(current_index)
                 i += 1
-        print("OPT NEW", opti_inds_new)
+        print("OPT NEW", np.round(opti_inds_new).astype(int))
         return opti_inds_new
 
     def get_hists_frame(self, flatten_weighted_ims):

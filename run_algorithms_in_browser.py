@@ -23,7 +23,6 @@ def updateSlider(scale_value):
     update the visualization (images and plots) while the sliders were adjusted .
     """
     if ((b.current_auto_exposure != "None") and (len(b.eV) > 0)):
-        print(len(b.eV))
         b.verSlider.set(b.eV[b.horSlider.get()])
     updateHorSlider()
 
@@ -43,7 +42,7 @@ b.buttons_builder('Pause', button_functions.pauseRun, 30, 2, para=b)
 b.buttons_builder('Run', button_functions.runVideo, 29, 2, para=b)
 b.buttons_builder('Reset', button_functions.resetValues, 29, 3, para=b)
 b.buttons_builder('Clear Rectangles', button_functions.clear_rects, 32, 3, para=b)
-b.buttons_builder('Save Interested Area', button_functions.save_interested_moving_objects_fuction, 32, 2, para=b)
+b.buttons_builder('Save Interested Area', button_functions.save_interested_moving_objects_function, 32, 2, para=b)
 b.buttons_builder('Video', button_functions.export_video, 30, 3, para=b)
 
 

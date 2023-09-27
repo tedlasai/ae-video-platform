@@ -18,6 +18,10 @@ class Browser:
 
     def __init__(self, root):
         super().__init__()
+        self.target_intensity = None
+        self.high_threshold = None
+        self.start_index = None
+        self.low_threshold = None
         self.AutoExposureList = None
         self.weighted_means = None
         self.eV_original = None
@@ -180,6 +184,7 @@ class Browser:
             'high_threshold': self.high_threshold.get(),
             "target_intensity": self.target_intensity.get()
         }
+        print(self.current_auto_exposure)
         if self.current_auto_exposure == "Global":
             button_functions.clear_rects(self)
             exposures = exposure_global.ExposureGlobal(input_ims,
@@ -188,8 +193,6 @@ class Browser:
                                                        start_index=self.exposureParams['start_index'],
                                                        high_threshold=self.exposureParams['high_threshold'],
                                                        )
-            # exposures = exposure_class.Exposure(params = self.exposureParams)
-
             self.eV, self.eV_original, self.weighted_means, self.hists = exposures.pipeline()
 
         elif self.current_auto_exposure == "Saliency_map":
@@ -215,7 +218,6 @@ class Browser:
                                                          srgb_ims,
                                                          start_index=self.exposureParams['start_index'],
                                                          )
-            # exposures = exposure_class.Exposure(params = self.exposureParams)
             self.eV, self.eV_original, self.weighted_means, self.hists = exposures.pipeline()
 
         elif self.current_auto_exposure == "Semantic":

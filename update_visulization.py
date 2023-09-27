@@ -1,10 +1,10 @@
 from copy import deepcopy
 from PIL import Image, ImageTk
 
+import matplotlib.pyplot as plt
 import tkinter as tk
 import numpy as np
 import button_functions
-import matplotlib.pyplot as plt
 
 import constants
 
@@ -98,6 +98,14 @@ def get_hists(flatten_weighted_ims):
     return scene_hists, num_dropped_pixels
 
 
+def get_hists_single_im(flatten_weighted_ims):
+    scene_hists_include_drooped_counts = hist_laxis(flatten_weighted_ims, constants.num_hist_bins + 2, (
+        -0.01, 1.01))  # 2 extra bin is used to count the number of -0.01 and 1
+    num_dropped_pixels = scene_hists_include_drooped_counts[0]
+    scene_hists = scene_hists_include_drooped_counts[1:]
+    return scene_hists, num_dropped_pixels
+
+
 def hist_laxis(data,
                n_bins,
                range_limits):  # https://stackoverflow.com/questions/44152436/calculate-histograms-along-axis
@@ -137,7 +145,6 @@ def show_srgb_hist(self):  # assuming the channel order is RGB
         interested_boundaries = self.the_moving_area_list[self.horSlider.get()]
         temp_img = np.ones(current_rgb_img_.shape) * (-0.01)
         h, w = current_rgb_img_.shape
-        # w, h = self.canvas.winfo_width(), self.canvas.winfo_height()
         for coord in interested_boundaries:
             w_start = int(coord[1] * w)
             h_start = int(coord[0] * h)
@@ -145,7 +152,7 @@ def show_srgb_hist(self):  # assuming the channel order is RGB
             h_end = min(int(coord[2] * h) + 1, h + 1)
             temp_img[h_start:h_end, w_start:w_end] = current_rgb_img_[h_start:h_end, w_start:w_end]
         temp_img = temp_img.flatten()
-        srgb_hist, dropped = get_hists(temp_img)
+        srgb_hist, dropped = get_hists_single_im(temp_img)
         mean = self.get_means(dropped, temp_img)
     else:
         mean = np.mean(current_rgb_img_)
@@ -153,23 +160,6 @@ def show_srgb_hist(self):  # assuming the channel order is RGB
         srgb_hist = hist_laxis(current_rgb_img_, self.num_bins + 1,
                                (0, 1.01))
     return srgb_hist, mean
-
-
-# def get_hists(self, flatten_weighted_ims):
-#     scene_hists_include_drooped_counts = hist_laxis(flatten_weighted_ims, self.num_bins + 2, (
-#         -0.01, 1.01))  # one extra bin is used to count the number of -0.01
-#     num_dropped_pixels = scene_hists_include_drooped_counts[0]
-#     scene_hists = scene_hists_include_drooped_counts[1:]
-#     return scene_hists, num_dropped_pixels
-
-
-# def get_means(num_dropped_pixels, flatten_weighted_ims):
-#     weighted_all_means = np.mean(flatten_weighted_ims)
-#     if num_dropped_pixels == 0:
-#         return weighted_all_means
-#     c = len(flatten_weighted_ims)
-#     mean = (c * weighted_all_means + 0.01 * num_dropped_pixels) / (c - num_dropped_pixels)
-#     return mean
 
 
 def hist_plot_three(self, stack_size, curr_frame_mean_list, count1=np.zeros(101), count2=np.zeros(101),
@@ -219,7 +209,6 @@ def hist_plot_three(self, stack_size, curr_frame_mean_list, count1=np.zeros(101)
         if x > 0.25:
             axes[0].text(i, 0.25, str("%.2f" % x), color='violet',
                          fontsize=13, position=(i, 0.251))
-
     axes[2].plot(np.arange(stack_size), curr_frame_mean_list, color='green',
                  linewidth=2)  # ,label='Exposure stack mean')
     axes[2].plot(ind, val, color='violet', marker='o', markersize=12)
@@ -232,11 +221,8 @@ def hist_plot_three(self, stack_size, curr_frame_mean_list, count1=np.zeros(101)
     axes[2].set_title('Exposure stack mean', **font)
     axes[2].set_ylim([-0.1, 1.1])
     axes[2].set_xlim(-1, stack_size)
-
     axes[2].set_xticks(np.arange(0, stack_size, 2))
-
     self.fig_2.canvas.draw()
-
     self.tempImg_3 = Image.frombytes('RGB', self.fig_2.canvas.get_width_height(),
                                      self.fig_2.canvas.tostring_rgb())
     self.photo_3 = ImageTk.PhotoImage(self.tempImg_3)

@@ -46,7 +46,7 @@ class Browser:
         self.eV = []
         self.auto_exposures = constants.auto_exposures
         self.current_auto_exposure = "None"
-        self.scene_index = 18
+        self.scene_index = 0
         # self.mertensVideo = []
         # self.bit_depth = 8
         # self.downscale_ratio = 0.12

@@ -72,7 +72,7 @@ def updatePlot(self):
         val2 = 0
     hist_plot_three(self, count1=count1, count2=count2, count3=count3, stack_size=stack_size,
                     curr_frame_mean_list=curr_frame_mean_list, ind=ind, val=val, ind2=ind2, val2=val2)
-    if self.current_auto_exposure == "Local on moving objects":
+    if self.current_auto_exposure == "Semantic":
         draw_interested_moving_areas_per_frame(self)
 
 

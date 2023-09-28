@@ -1,13 +1,14 @@
 
 folders = "E:\Final"  # link to directory containing all the dataset image folders
 
-
 srgb_img_folder_name = 'Image_Arrays_srgb_imgs'
 srgb_npy_file_name = '_show_dng_imgs.npy'
 raw_img_folder_name = 'Image_Arrays_raw_imgs'
 raw_npy_file_name = '_ds_raw_imgs.npy'
 saliency_maps_folder_name = 'saliency_maps'
 saliency_maps_npy_file_name = "_salient_maps_mbd.npy"
+
+# following are sample code from the browser_builder.py taking above variables'
 
 # os.path.join(os.path.dirname(__file__), constants.srgb_img_folder_name) + self.joinPathChar + self.scene[
 #     self.scene_index] + constants.srgb_npy_file_name)

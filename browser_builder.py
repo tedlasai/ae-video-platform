@@ -63,11 +63,11 @@ class Browser:
         self.widPercent = (self.widthToScale / float(self.imgSize[1]))
         self.heightToScale = int(float(self.imgSize[0]) * float(self.widPercent))
         self.img_all = np.load(
-            os.path.join(os.path.dirname(__file__), 'Image_Arrays_from_dng') + self.joinPathChar + self.scene[
-                self.scene_index] + '_show_dng_imgs' + '.npy')
+            os.path.join(os.path.dirname(__file__), constants.srgb_img_folder_name) + self.joinPathChar + self.scene[
+                self.scene_index] + constants.srgb_npy_file_name)
         self.raw_ims = np.load(
-            os.path.join(os.path.dirname(__file__), 'Image_Arrays_exposure_224_336') + self.joinPathChar + self.scene[
-                self.scene_index] + '_ds_raw_imgs' + '.npy')
+            os.path.join(os.path.dirname(__file__), constants.raw_img_folder_name) + self.joinPathChar + self.scene[
+                self.scene_index] + constants.raw_npy_file_name)
         self.img = deepcopy(self.img_all[0, 0])
         self.play = True
         self.video_speed = constants.video_speed
@@ -135,7 +135,6 @@ class Browser:
                                   font=(self.widgetFont, self.widgetFontSize),
                                   length=self.heightToScale,
                                   command=command_function)
-
         self.verSlider.grid(row=1, column=0, rowspan=25)
 
     def scene_select(self):
@@ -197,18 +196,15 @@ class Browser:
 
         elif self.current_auto_exposure == "Saliency_map":
             button_functions.clear_rects(self)
-            map_name = self.scene[self.scene_index] + "_salient_maps_mbd.npy"
-            salient_map_mbd = np.load("saliency_maps/" + map_name)
-            salient_map = salient_map_mbd
+            salient_map = np.load(
+                os.path.join(os.path.dirname(__file__), constants.saliency_maps_folder_name) + self.joinPathChar + self.scene[
+                    self.scene_index] + constants.saliency_maps_npy_file_name)
             exposures = exposure_saliency.ExposureSaliency(input_ims, salient_map,
                                                            target_intensity=self.exposureParams['target_intensity'],
                                                            low_threshold=self.exposureParams['low_threshold'],
                                                            start_index=self.exposureParams['start_index'],
                                                            high_threshold=self.exposureParams['high_threshold'],
-
                                                            )
-            # exposures = exposure_class.Exposure(params = self.exposureParams)
-
             self.eV, self.eV_original, self.weighted_means, self.hists = exposures.pipeline()
 
         elif self.current_auto_exposure == "Entropy":
@@ -238,12 +234,11 @@ class Browser:
             self.scene_index = self.scene.index(self.defScene.get())
             self.setAutoExposure()
             self.img_all = np.load(
-                os.path.join(os.path.dirname(__file__), 'Image_Arrays_from_dng') + self.joinPathChar + self.scene[
-                    self.scene_index] + '_show_dng_imgs' + '.npy')
-
-            self.raw_ims = np.load(
-                os.path.join(os.path.dirname(__file__), 'Image_Arrays_exposure_224_336') + self.joinPathChar +
+                os.path.join(os.path.dirname(__file__), constants.srgb_img_folder_name) + self.joinPathChar +
                 self.scene[
-                    self.scene_index] + '_ds_raw_imgs' + '.npy')
+                    self.scene_index] + constants.srgb_npy_file_name)
+            self.raw_ims = np.load(
+                os.path.join(os.path.dirname(__file__), constants.raw_img_folder_name) + self.joinPathChar + self.scene[
+                    self.scene_index] + constants.raw_npy_file_name)
             self.blend_rgb()
             button_functions.resetValues(self)

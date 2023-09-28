@@ -1,9 +1,31 @@
 
 folders = "E:\Final"  # link to directory containing all the dataset image folders
 
+
+srgb_img_folder_name = 'Image_Arrays_srgb_imgs'
+srgb_npy_file_name = '_show_dng_imgs.npy'
+raw_img_folder_name = 'Image_Arrays_raw_imgs'
+raw_npy_file_name = '_ds_raw_imgs.npy'
+saliency_maps_folder_name = 'saliency_maps'
+saliency_maps_npy_file_name = "_salient_maps_mbd.npy"
+
+# os.path.join(os.path.dirname(__file__), constants.srgb_img_folder_name) + self.joinPathChar + self.scene[
+#     self.scene_index] + constants.srgb_npy_file_name)
+
+# self.raw_ims = np.load(
+# os.path.join(os.path.dirname(__file__), constants.raw_img_folder_name) + self.joinPathChar + self.scene[
+#     self.scene_index] + constants.raw_npy_file_nam)
+
+# salient_map = np.load(
+#     os.path.join(os.path.dirname(__file__), constants.saliency_maps_folder_name) + self.joinPathChar + self.scene[
+#         self.scene_index] + constants.saliency_maps_npy_file_name)
+
+
 widgetFont = 'Arial'
 widgetFontSize = 12
 
+single_stack_size = 40
+single_frame_num = 100
 scene = ['Scene1', 'Scene2', 'Scene3', 'Scene4', 'Scene5', 'Scene6',
               'Scene7', 'Scene8', 'Scene9']
 frame_num = [100, 100, 100, 100, 100, 100, 100, 100, 100]  # number of frames per position

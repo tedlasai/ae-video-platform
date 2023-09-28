@@ -38,7 +38,7 @@ def updateHorSlider(b, _):
 
 def updatePlot(self):
     # global verSlider, horSlider, photo, photo_2, stack_size, img_all, img, img_mean_list, scene_index, fig
-    stack_size = 40
+    stack_size = constants.single_stack_size
     if self.check == True:
         self.temp_img_ind = int(self.horSlider.get()) * stack_size + int(self.verSlider.get())
     else:

@@ -142,6 +142,7 @@ def show_srgb_hist(self):  # assuming the channel order is RGB
     current_rgb_img_ = np.sum(current_rgb_img, axis=2)
 
     if self.current_auto_exposure == "Semantic" and len(self.the_moving_area_list) > 0:
+        print("here")
         interested_boundaries = self.the_moving_area_list[self.horSlider.get()]
         temp_img = np.ones(current_rgb_img_.shape) * (-0.01)
         h, w = current_rgb_img_.shape
@@ -154,7 +155,7 @@ def show_srgb_hist(self):  # assuming the channel order is RGB
         temp_img = temp_img.flatten()
         srgb_hist, dropped = get_hists_single_im(temp_img)
         if dropped < len(temp_img):
-            mean = np.sum(temp_img)//(len(temp_img)-dropped)
+            mean = np.sum(temp_img)/(len(temp_img)-dropped)
         else:
             mean = 0
     else:

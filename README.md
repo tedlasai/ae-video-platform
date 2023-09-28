@@ -82,9 +82,9 @@ cd ./4d-data-browser/
 * Modify the variables (path and file names) from line 1 to line 9 in the 'constants.py' file as needed. Or, you may modify
   the paths in the 'browser_builder.py' directly if your data is stored in other directories.
  
-* run the 'run_algorithms_in_browser.py'
+* Run the 'run_algorithms_in_browser.py'
 
-* following the steps in the video.
+* Follow the steps in the video.
 
 * Note that we implemented a step size limit function to prevent a large jump of exposure.
 

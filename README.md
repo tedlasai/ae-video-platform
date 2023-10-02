@@ -82,9 +82,19 @@ cd ./4d-data-browser/
 * Modify the variables (path and file names) from line 1 to line 9 in the 'constants.py' file as needed. Or, you may modify
   the paths in the 'browser_builder.py' directly if your data is stored in other directories.
  
-* Run the 'run_algorithms_in_browser.py'
+* Run the 'run_algorithms_in_browser.py'.
 
-* Follow the steps in the video.
+* Select a method and a scene.
+  
+* Set parameters, including the outlier, target intensity and starting index.
+
+* Push 'reset' button to run the algorithm.
+
+* Push 'run' and 'pause' to visualize the rusult.
+
+* The 'video' button is for recording the current result as a video.
+
+* For the 'Semantic' method, before hitting the 'reset' button, an user should manuly draw the interested area (a rectanglar bounding box) and push 'save interested area'. If an interested object is a moving object, after saved the interested area on the first frame, please slide the horizontal slider to the last frame (#99), and drag the rectangle to the corresponding location (the new position of the object), and then push 'save interested area' button again. After that, the user may hit 'reset' and 'run' to view the result.
 
 * Note that we implemented a step size limit function to prevent a large jump of exposure.
 

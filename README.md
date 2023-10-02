@@ -84,7 +84,11 @@ cd ./4d-data-browser/
  
 * Run the 'run_algorithms_in_browser.py'.
 
-* Select a method and a scene.
+* Select a scene.
+
+* Under the 'None' method mode, the user may use the vertical and horizontal silders to view the dataset. The vertical silder controls the exposure (40 steps from 15s to 1/500s), and the horizontal silder controls the time steps (100 frames from 0 to 99).
+
+* Select a method .
   
 * Set parameters, including the outlier, target intensity and starting index.
 

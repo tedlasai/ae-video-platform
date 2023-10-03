@@ -1,7 +1,7 @@
 # Examining Autoexposure for Challenging Scenes
 
 <p align="center">
-												<a href="https://techsaico.com/">SaiKiran Tedla*</a>
+												<a href="https://sites.google.com/view/tedlasai/">SaiKiran Tedla*</a>
 			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 	<a href="https://beixuanyang.com/">Beixuan Yang*</a>
 			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;	<a href="https://www.eecs.yorku.ca/~mbrown/">Michael S. Brown</a>
 	<br>

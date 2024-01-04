@@ -70,7 +70,7 @@ A Python-based AE evaluation platform is also developed to work with our dataset
 ### Installation
 * Clone with HTTPS this project to your local machine 
 ```bash
-git clone https://github.com/tedlasai/4d-data-browser.git
+git clone https://github.com/tedlasai/ae-video-platform.git
 cd ./4d-data-browser/
 ```
 

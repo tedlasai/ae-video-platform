@@ -27,12 +27,14 @@ We captured a temporal exposure dataset with four dimensions: time * exposure * 
 
 The [Download Link](https://ln5.sync.com/dl/8b886b5b0/mp2h6pjc-3kkmhqr4-7gjgvpae-czxz58jn) redirects you to the download page of the 4D AE dataset. 
 
-It contains 4 folders named as 'dng', 'sRGB_npy', 'Saliency_map_npy', and 'RAW_npy'.
+It contains 5 folders named as 'dng', 'sRGB_npy', 'Saliency_map_npy', 'RAW_npy', and 'RAW_npy_downsized_100_40_224_336'.
 In the 'dng' folder, 9 sub-folders are listed where each of them has 1500 RAW images (6720 * 4480 pixels) stored in the dng formate.
 They are ordered as 100 frame * 15 exposure (15 s, 8 s, 6 s, 4 s, 2 s, 1 s, 1/2 s, 1/4 s, 1/8 s, 1/15 s, 1/30 s, 1/60 s,
 1/125 s, 1/250 s, 1/500 s). The 'sRGB_npy' folder contains 9 npy files in the size of 100 frame * 40 exposure * 640 * 960 * 3,
 the 'Saliency_map_npy' folder contains 9 npy files with the Saliency maps produced for the "Saliency AE algorithm",
-and 'RAW_npy' has 9 files for each scene in the size of 100 frame * 40 exposure * 1120 * 1680. The 40 exposure time includes 15 s, 
+and the 'RAW_npy' has 9 files for each scene in the size of 100 frame * 40 exposure * 1120 * 1680. We also provids the downsized (224 * 336) RAW npy files which are compatible with the current released code. Please use
+the npy files in 'RAW_npy_downsized_100_40_224_336' as the input file with the platform for better performance.
+The 40 exposure time includes 15 s, 
 13 s, 10 s, 8 s, 6 s, 5 s, 4 s, 3.2 s, 2.5 s, 2 s, 1.6 s, 1.3 s, 1 s, 0.8 s, 0.6 s, 0.5 s, 0.4 s, 0.3 s, 1/4 s, 1/5 s, 1/6 s, 1/8 s, 
 1/10 s, 1/13 s, 1/15 s, 1/20 s, 1/25 s, 1/30 s, 1/40 s, 1/50 s, 1/60 s, 1/80 s, 1/100 s, 1/125 s, 1/160 s, 1/200 s, 1/250 s, 1/320 s,
 1/400 s, 1/500 s.
@@ -75,7 +77,7 @@ cd ./4d-data-browser/
 ```
 
 ### Testing
-* Download the npy files in 'sRGB_npy', 'Saliency_map_npy', and 'RAW_npy' from the [4D AE Dataset](https://ln5.sync.com/dl/8b886b5b0/mp2h6pjc-3kkmhqr4-7gjgvpae-czxz58jn)
+* Download the npy files in 'sRGB_npy', 'Saliency_map_npy', and 'RAW_npy_downsized_100_40_224_336' from the [4D AE Dataset](https://ln5.sync.com/dl/8b886b5b0/mp2h6pjc-3kkmhqr4-7gjgvpae-czxz58jn)
 
 * Create three directories under the root of the project to store the downloaded npy files .
 

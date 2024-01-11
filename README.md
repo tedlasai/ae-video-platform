@@ -32,7 +32,7 @@ In the 'dng' folder, 9 sub-folders are listed where each of them has 1500 RAW im
 They are ordered as 100 frame * 15 exposure (15 s, 8 s, 6 s, 4 s, 2 s, 1 s, 1/2 s, 1/4 s, 1/8 s, 1/15 s, 1/30 s, 1/60 s,
 1/125 s, 1/250 s, 1/500 s). The 'sRGB_npy' folder contains 9 npy files in the size of 100 frame * 40 exposure * 640 * 960 * 3,
 the 'Saliency_map_npy' folder contains 9 npy files with the Saliency maps produced for the "Saliency AE algorithm",
-and the 'RAW_npy' has 9 files for each scene in the size of 100 frame * 40 exposure * 1120 * 1680. We also provids the downsized (224 * 336) RAW npy files which are compatible with the current released code. Please use
+and the 'RAW_npy' has 9 files for each scene in the size of 100 frame * 40 exposure * 1120 * 1680. We also provid the downsized (224 * 336) RAW npy files which are compatible with the current released code. Please use
 the npy files in 'RAW_npy_downsized_100_40_224_336' as the input file with the platform for better performance.
 The 40 exposure time includes 15 s, 
 13 s, 10 s, 8 s, 6 s, 5 s, 4 s, 3.2 s, 2.5 s, 2 s, 1.6 s, 1.3 s, 1 s, 0.8 s, 0.6 s, 0.5 s, 0.4 s, 0.3 s, 1/4 s, 1/5 s, 1/6 s, 1/8 s, 

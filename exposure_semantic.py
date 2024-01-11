@@ -11,7 +11,8 @@ class ExposureSemantic(HistogramBase):
                  target_intensity=0.18,
                  high_threshold=1,
                  low_threshold=0,
-                 start_index=20, ):
+                 start_index=20,
+                 smoothness_number=3):
         self.local_indices = list_local
 
         super().__init__(
@@ -20,6 +21,7 @@ class ExposureSemantic(HistogramBase):
             high_threshold=high_threshold,
             low_threshold=low_threshold,
             start_index=start_index,
+            smoothness_number=smoothness_number,
         )
 
     def get_optimal_img_index(self, weighted_means):
@@ -36,7 +38,7 @@ class ExposureSemantic(HistogramBase):
         weighted_means = local_weighted_means
         opti_inds = self.get_optimal_img_index(weighted_means)
         opti_inds[0] = self.start_index * 1.0
-        opti_inds_adjusted_previous_n_frames = self.adjusted_opti_inds_v2_by_average_of_previous_n_frames(opti_inds)
+        opti_inds_adjusted_previous_n_frames = self.adjusted_opti_inds_v3_by_average_of_n_frames(opti_inds, self.smoothness_number)
         return opti_inds_adjusted_previous_n_frames, opti_inds, weighted_means, local_hists,  # hists_before_ds_outlier
 
     def get_flatten_weighted_imgs_local_wo_grids_moving_object_v2(self, ims):

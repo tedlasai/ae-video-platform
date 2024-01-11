@@ -107,6 +107,10 @@ cd ./4d-data-browser/
 * Note that the outlier setting of our user study discussed on our paper is set to be 'over 0.9'. If you would like to reproduce the result,
   please set the outlier slider to be '0-0.9'.
 
+* A new feature was added to allow smoothing the outputs. Users may enter any integer (1 to 100) to prevent jarring changes. For instance,
+  to input an '1', it gives an output without smoothness, and with an '8' it would smooth each frames with the previous 7 frames and itself (with some weight based on the distance).
+  To reproduce our experiment, please enter '3' for smoothness.
+
 ## Contact
 
 Should you have any question/suggestion, please feel free to reach out:

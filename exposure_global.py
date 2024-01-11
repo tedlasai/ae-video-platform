@@ -9,7 +9,8 @@ class ExposureGlobal(HistogramBase):
                  target_intensity=0.18,
                  high_threshold=1,
                  low_threshold=0,
-                 start_index=20, ):
+                 start_index=20,
+                 smoothness_number=3):
 
         super().__init__(
             raw_images,
@@ -17,6 +18,7 @@ class ExposureGlobal(HistogramBase):
             high_threshold=high_threshold,
             low_threshold=low_threshold,
             start_index=start_index,
+            smoothness_number=smoothness_number,
         )
 
     def produce_map(self, im):
@@ -51,6 +53,6 @@ class ExposureGlobal(HistogramBase):
             ind = self.get_optimal_img_index(the_means)
             opti_inds.append(ind)
         opti_inds[0] = ind
-        opti_inds_adjusted_previous_n_frames = self.adjusted_opti_inds_v2_by_average_of_previous_n_frames(opti_inds)
+        opti_inds_adjusted_previous_n_frames = self.adjusted_opti_inds_v3_by_average_of_n_frames(opti_inds, self.smoothness_number)
 
         return opti_inds_adjusted_previous_n_frames, opti_inds, weighted_means, hists

@@ -10,7 +10,8 @@ class ExposureSaliency(HistogramBase):
                  target_intensity=0.18,
                  high_threshold=1,
                  low_threshold=0,
-                 start_index=20, ):
+                 start_index=20,
+                 smoothness_number=3):
         self.salient_map = salient_map
         self.salient_pix_ratio = 14
         self.non_salient_pix_ration = 1
@@ -21,6 +22,7 @@ class ExposureSaliency(HistogramBase):
             high_threshold=high_threshold,
             low_threshold=low_threshold,
             start_index=start_index,
+            smoothness_number=smoothness_number,
         )
 
     def pipeline(self):
@@ -37,7 +39,7 @@ class ExposureSaliency(HistogramBase):
         hists = [first_frame_hists]
         for j in range(1,self.num_frame):
             current_frame = downsampled_ims1[j]
-            current_map = np.reshape(self.salient_map[j-1][ind],(total_n_pixs))
+            current_map = np.reshape(self.salient_map[j-1][ind], total_n_pixs)
             current_weighted_ims = []
             for i in range(self.num_ims_per_frame):
                 if j > 1:
@@ -70,6 +72,6 @@ class ExposureSaliency(HistogramBase):
             opti_inds.append(ind)
             means.append(frame_means)
             hists.append(frame_hists)
-        opti_inds_adjusted_previous_n_frames = self.adjusted_opti_inds_v2_by_average_of_previous_n_frames(opti_inds)
+        opti_inds_adjusted_previous_n_frames = self.adjusted_opti_inds_v3_by_average_of_n_frames(opti_inds, self.smoothness_number)
         return opti_inds_adjusted_previous_n_frames, opti_inds, means, hists
 

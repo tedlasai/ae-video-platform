@@ -38,19 +38,19 @@ def updateHorSlider():
 
 b = browser_inputs_builder.BrowserWithInputs(root)
 b.init_functions()
-b.buttons_builder('Pause', button_functions.pauseRun, 30, 2, para=b)
-b.buttons_builder('Run', button_functions.runVideo, 29, 2, para=b)
-b.buttons_builder('Reset', button_functions.resetValues, 29, 3, para=b)
-b.buttons_builder('Clear Rectangles', button_functions.clear_rects, 32, 3, para=b)
-b.buttons_builder('Save Interested Area', button_functions.save_interested_moving_objects_function, 32, 2, para=b)
-b.buttons_builder('Video', button_functions.export_video, 30, 3, para=b)
+b.buttons_builder('Pause', button_functions.pauseRun, 30, 3, para=b)
+b.buttons_builder('Run', button_functions.runVideo, 29, 3, para=b)
+b.buttons_builder('Reset', button_functions.resetValues, 29, 4, para=b)
+b.buttons_builder('Clear Rectangles', button_functions.clear_rects, 32, 4, para=b)
+b.buttons_builder('Save Interested Area', button_functions.save_interested_moving_objects_function, 32, 3, para=b)
+b.buttons_builder('Video', button_functions.export_video, 30, 4, para=b)
 
 
 def regular_video_button(self):
     self.VideoButton = tk.Button(root, text='Video', fg='#ffffff', bg='#999999', activebackground='#454545',
                                  relief=tk.RAISED, padx=10, pady=5,
                                  width=16, font=(self.widgetFont, self.widgetFontSize), command=self.export_video)
-    self.VideoButton.grid(row=8 - 4, column=5, sticky=tk.E)
+    self.VideoButton.grid(row=8 - 4, column=6, sticky=tk.E)
 
 
 b.vertical_slider(scale_labels)

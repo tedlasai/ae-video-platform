@@ -9,14 +9,16 @@ class ExposureEntropy(Exposure):
     def __init__(self,
                  raw_images,
                  srgb_imgs,
-                 start_index=20):
+                 start_index=20,
+                 smoothness_number=3):
         self.r_percent = 0.2126,
         self.g_percent = 0.7152,
         self.b_percent = 0.0722,
         self.srgb_imgs = srgb_imgs
         super().__init__(
             raw_images,
-            start_index=start_index)
+            start_index=start_index,
+            smoothness_number=smoothness_number)
 
     def input_imgs_processing(self):
         current_rgb_img = self.srgb_imgs / (self.absolute_bit - 1)
@@ -44,7 +46,7 @@ class ExposureEntropy(Exposure):
                 entropies[i] = shannon_entropy(threshold_current_frame)
             ind = np.argmax(entropies)
             opti_inds.append(ind)
-        opti_inds_adjusted_previous_n_frames = self.adjusted_opti_inds_v2_by_average_of_previous_n_frames(opti_inds)
+        opti_inds_adjusted_previous_n_frames = self.adjusted_opti_inds_v3_by_average_of_n_frames(opti_inds, self.smoothness_number)
         flatten_ims = np.reshape(self.raw_imgs, (self.num_frame, self.num_ims_per_frame, self.h * self.w))
         hists, _ = get_hists(flatten_ims)
         weighted_means = np.mean(flatten_ims,axis=2)

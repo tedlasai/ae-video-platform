@@ -19,6 +19,7 @@ class Browser:
     def __init__(self, root):
         super().__init__()
         self.target_intensity = None
+        self.smoothness_number = None
         self.high_threshold = None
         self.start_index = None
         self.low_threshold = None
@@ -77,7 +78,7 @@ class Browser:
         self.photo = ImageTk.PhotoImage(Image.fromarray(self.img).resize((self.imgSize[1], self.imgSize[0])))
         self.canvas = tk.Canvas(root, cursor="cross", width=self.photo.width(), height=self.photo.height(),
                                 borderwidth=0, highlightthickness=0)
-        self.canvas.grid(row=1, column=1, columnspan=3, rowspan=27, padx=0, pady=0, sticky=tk.NW)
+        self.canvas.grid(row=1, column=1, columnspan=4, rowspan=27, padx=0, pady=0, sticky=tk.NW)
         self.canvas_img = self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
         self.current_rects = []  # the rectangles drawn in canvas
         self.rectangles = []  # the coordinates of the rectangles
@@ -121,7 +122,7 @@ class Browser:
                                   label='Frame Number', font=(self.widgetFont, self.widgetFontSize),
                                   orient=tk.HORIZONTAL,
                                   length=self.widthToScale, command=command_function)
-        self.horSlider.grid(row=27, column=1, columnspan=3, sticky=tk.SW)
+        self.horSlider.grid(row=27, column=1, columnspan=4, sticky=tk.SW)
 
     def vertical_slider(self, command_function):
         # Vertical Slider
@@ -142,10 +143,10 @@ class Browser:
         self.defScene = tk.StringVar(self.root)
         self.defScene.set(self.scene[self.scene_index])  # default value
         self.selSceneLabel = tk.Label(self.root, text='Select Scene:', font=(self.widgetFont, self.widgetFontSize))
-        self.selSceneLabel.grid(row=0, column=4, sticky=tk.W)
+        self.selSceneLabel.grid(row=0, column=5, sticky=tk.W)
         self.sceneList = tk.OptionMenu(self.root, self.defScene, *self.scene, command=self.setValues)
         self.sceneList.config(font=(self.widgetFont, self.widgetFontSize - 2), width=15, anchor=tk.W)
-        self.sceneList.grid(row=1, column=4, sticky=tk.NE)
+        self.sceneList.grid(row=1, column=5, sticky=tk.NE)
 
     def auto_exposure_select(self):
         # Select Scene List
@@ -153,11 +154,11 @@ class Browser:
         self.defAutoExposure.set(self.auto_exposures[0])  # default value
         self.selAutoExposureLabel = tk.Label(self.root, text='Select AutoExposure:',
                                              font=(self.widgetFont, self.widgetFontSize))
-        self.selAutoExposureLabel.grid(row=0, column=5, sticky=tk.W)
+        self.selAutoExposureLabel.grid(row=0, column=6, sticky=tk.W)
         self.AutoExposureList = tk.OptionMenu(self.root, self.defAutoExposure, *self.auto_exposures,
                                               command=self.setAutoExposure)
         self.AutoExposureList.config(font=(self.widgetFont, self.widgetFontSize - 2), width=15, anchor=tk.W)
-        self.AutoExposureList.grid(row=1, column=5, sticky=tk.NE)
+        self.AutoExposureList.grid(row=1, column=6, sticky=tk.NE)
 
     def buttons_builder(self, text, command_function, row, column, para=0):
         self.b = tk.Button(self.root,
@@ -181,7 +182,8 @@ class Browser:
             'low_threshold': self.low_threshold.get(),
             'start_index': float(self.start_index.get()),
             'high_threshold': self.high_threshold.get(),
-            "target_intensity": self.target_intensity.get()
+            'target_intensity': self.target_intensity.get(),
+            'smoothness_number': self.smoothness_number.get(),
         }
         print(self.current_auto_exposure)
         if self.current_auto_exposure == "Global":
@@ -191,6 +193,7 @@ class Browser:
                                                        low_threshold=self.exposureParams['low_threshold'],
                                                        start_index=self.exposureParams['start_index'],
                                                        high_threshold=self.exposureParams['high_threshold'],
+                                                       smoothness_number=self.exposureParams['smoothness_number'],
                                                        )
             self.eV, self.eV_original, self.weighted_means, self.hists = exposures.pipeline()
 
@@ -204,6 +207,7 @@ class Browser:
                                                            low_threshold=self.exposureParams['low_threshold'],
                                                            start_index=self.exposureParams['start_index'],
                                                            high_threshold=self.exposureParams['high_threshold'],
+                                                           smoothness_number=self.exposureParams['smoothness_number'],
                                                            )
             self.eV, self.eV_original, self.weighted_means, self.hists = exposures.pipeline()
 
@@ -213,6 +217,7 @@ class Browser:
             exposures = exposure_entropy.ExposureEntropy(input_ims,
                                                          srgb_ims,
                                                          start_index=self.exposureParams['start_index'],
+                                                         smoothness_number=self.exposureParams['smoothness_number'],
                                                          )
             self.eV, self.eV_original, self.weighted_means, self.hists = exposures.pipeline()
 
@@ -224,6 +229,7 @@ class Browser:
                                                            low_threshold=self.exposureParams['low_threshold'],
                                                            start_index=self.exposureParams['start_index'],
                                                            high_threshold=self.exposureParams['high_threshold'],
+                                                           smoothness_number=self.exposureParams['smoothness_number'],
                                                            )
             self.eV, self.eV_original, self.weighted_means, self.hists = exposures.pipeline()
 

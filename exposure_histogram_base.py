@@ -9,10 +9,12 @@ class HistogramBase(Exposure):
                  target_intensity=0.13,
                  high_threshold=1,
                  low_threshold=0,
-                 start_index=20, ):
+                 start_index=20,
+                 smoothness_number=3):
         super().__init__(
             raw_images,
             start_index=start_index,
+            smoothness_number=smoothness_number,
         )
         self.low_threshold = low_threshold
         self.high_threshold = high_threshold

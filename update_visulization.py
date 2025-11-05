@@ -1,10 +1,11 @@
 from copy import deepcopy
 from PIL import Image, ImageTk
-
+import matplotlib
 import matplotlib.pyplot as plt
 import tkinter as tk
 import numpy as np
 import button_functions
+matplotlib.use("TkAgg")
 
 import constants
 

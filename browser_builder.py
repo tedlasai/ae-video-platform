@@ -163,7 +163,7 @@ class Browser:
     def buttons_builder(self, text, command_function, row, column, para=0):
         self.b = tk.Button(self.root,
                            text=text,
-                           fg='#ffffff',
+                           fg='#000000',
                            bg='#999999',
                            activebackground='#454545',
                            relief=tk.RAISED,
